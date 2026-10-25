@@ -19,7 +19,13 @@ Turns go Draw → Main 1 → Battle → Main 2 → End. The first player does no
 
 ## Decks
 
-Start Duel opens a picker: **Yugi**, **Kaiba**, **Joey**, or **Custom Deck** (coming soon). Each duelist deck is 40 cards from the Duelist Kingdom era (LOB, MRD, SRL, and similar). The opponent is a random one of the other two, and their name is shown on the life-point bar. A short VS screen shows both aces before the duel.
+Start Duel opens a picker: **Yugi**, **Kaiba**, **Joey**, or **Custom Deck**. Each duelist deck is 40 cards from the Duelist Kingdom era (LOB, MRD, SRL, and similar). The opponent is a random one of the other two, and their name is shown on the life-point bar. A short VS screen shows both aces before the duel.
+
+**Custom Deck** opens a builder for the classic card pool (Legend of Blue Eyes White Dragon, Metal Raiders, Magic Ruler, Spell Ruler, Pharaoh's Servant, and Labyrinth of Nightmare, plus the few starter-deck cards used by Yugi, Kaiba, and Joey). Search by name and filter by Monster/Spell/Trap, Attribute, Type, and Level. Tap a card to view it and add or remove copies.
+
+A legal deck has a 40–60 card Main Deck, at most 3 copies of any card, and an Extra Deck of Fusion Monsters (max 15). The counter turns red when a deck is short, over, or over a copy limit, and Duel stays disabled until it is legal. Up to 3 named decks are saved in `localStorage`. You can edit, copy, or delete them, or start from a copy of Yugi, Kaiba, or Joey. The opponent for a custom deck is Yugi, Kaiba, or Joey at random.
+
+The **Forbidden/Limited** switch is off by default. Turn it on to enforce the official TCG list (Forbidden 0, Limited 1, Semi-Limited 2). Cards on that list stay marked either way. The page refreshes the list from YGOPRODeck when it can; `classic-pool.js` holds a snapshot so the builder still works offline.
 
 Fusion monsters live in the Extra Deck (tap Extra during the duel):
 

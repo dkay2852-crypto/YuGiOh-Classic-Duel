@@ -115,6 +115,7 @@
       border-color: #f0c040; color: #1a1200;
     }
     .menu-btn:active { transform: scale(0.98); }
+    .menu-btn:disabled, .mini-btn:disabled { opacity: 0.4; }
     .rules-row { display: flex; gap: 8px; width: min(300px, 88vw); }
     .rules-row button {
       flex: 1; min-height: 44px; padding: 8px;
@@ -164,8 +165,163 @@
     .deck-opt.yugi { border-color: #a56bff; background: linear-gradient(180deg, #2a1844, #140e22); }
     .deck-opt.kaiba { border-color: #3d92f5; background: linear-gradient(180deg, #102844, #0c1828); }
     .deck-opt.joey { border-color: #e07030; background: linear-gradient(180deg, #3a2012, #1a100c); }
-    .deck-opt.soon { opacity: 0.72; border-style: dashed; }
+    .deck-opt.custom { border-color: var(--gold); background: linear-gradient(180deg, #3a3014, #1a160c); }
+    .deck-opt.custom img { height: 42%; max-height: 128px; width: auto; aspect-ratio: 59 / 86; object-fit: cover; border-radius: 4px; border: 1px solid var(--gold-dim); background: #111; }
     .deck-opt:active { transform: scale(0.98); }
+
+    /* —— Custom decks —— */
+    #customs { padding: 8px 10px 8px; gap: 6px; }
+    .fl-row {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      border: 1px solid var(--zone-line); border-radius: 6px; padding: 6px 8px;
+    }
+    .fl-copy { flex: 1; min-width: 0; }
+    .fl-copy strong { display: block; color: var(--cream); font-size: 0.82rem; font-weight: 700; }
+    .fl-copy span { display: block; color: var(--muted); font-size: 0.66rem; line-height: 1.25; }
+    .fl-switch {
+      flex: 0 0 auto; min-width: 58px; min-height: 36px; padding: 4px 8px;
+      border-radius: 4px; border: 1px solid var(--zone-line);
+      background: transparent; color: var(--muted); font: inherit; font-size: 0.85rem; cursor: pointer;
+    }
+    .fl-switch.on { background: rgba(212,160,23,0.18); color: var(--gold); border-color: var(--gold); }
+    #customList {
+      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .empty-note { margin: auto 0; color: var(--muted); text-align: center; font-size: 0.85rem; line-height: 1.4; padding: 8px; }
+    .saved-deck {
+      flex-shrink: 0; border: 1px solid var(--gold-dim); border-radius: 8px; padding: 8px;
+      background: linear-gradient(180deg, #1a2f4d, #101e33);
+    }
+    .saved-top { display: flex; gap: 8px; align-items: center; min-width: 0; }
+    .saved-top img {
+      width: 44px; height: 64px; object-fit: cover; border-radius: 3px;
+      border: 1px solid var(--gold-dim); background: #111; flex-shrink: 0;
+    }
+    .saved-copy { min-width: 0; flex: 1; }
+    .saved-name {
+      color: var(--gold); font-size: 1rem; font-weight: 700; line-height: 1.15;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .saved-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .saved-status { font-size: 0.7rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .saved-status.ok { color: #b7e1c0; }
+    .saved-status.bad { color: #ff8a80; }
+    .saved-actions { display: flex; gap: 4px; margin-top: 6px; }
+    .saved-actions button {
+      flex: 1; min-height: 40px; padding: 6px 2px; font: inherit; font-size: 0.78rem;
+      border-radius: 4px; border: 1px solid var(--gold-dim);
+      background: #1a2c48; color: var(--cream); cursor: pointer;
+    }
+    .saved-actions button.primary {
+      background: linear-gradient(180deg, #b88912, #7a5608);
+      color: #1a1200; font-weight: 700; border-color: #f0c040;
+    }
+    .saved-actions button:disabled { opacity: 0.4; }
+    .footer-row { flex-shrink: 0; display: flex; gap: 8px; }
+    .footer-row .menu-btn { width: auto; flex: 1; }
+
+    /* —— Deck builder (one screen; only the card grid scrolls) —— */
+    #builder { padding: 6px 8px 6px; gap: 4px; }
+    .build-top { flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+    .build-top h2 {
+      flex: 1; margin: 0; text-align: center; color: var(--gold);
+      font-size: 1.02rem; white-space: nowrap;
+    }
+    .mini-btn {
+      flex: 0 0 auto; min-height: 36px; min-width: 64px; padding: 6px 8px;
+      border-radius: 4px; border: 1px solid var(--gold-dim);
+      background: #1a2c48; color: var(--cream); font: inherit; font-size: 0.85rem; cursor: pointer;
+    }
+    .mini-btn.primary {
+      background: linear-gradient(180deg, #b88912, #7a5608);
+      color: #1a1200; font-weight: 700; border-color: #f0c040;
+    }
+    #buildName, #buildSearch, .filter-row select {
+      width: 100%; font: inherit; color: var(--cream);
+      background: #0c1626; border: 1px solid var(--zone-line); border-radius: 4px;
+    }
+    #buildName, #buildSearch {
+      flex-shrink: 0; min-height: 34px; font-size: 16px; padding: 4px 8px;
+    }
+    .build-counts {
+      flex-shrink: 0; display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 0;
+    }
+    .build-counts .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .build-counts .num { color: var(--gold); font-weight: 700; }
+    .build-counts .num.bad { color: #ff8a80; }
+    .build-status {
+      flex-shrink: 0; margin: 0; min-height: 0;
+      font-size: 0.68rem; color: #ff8a80; line-height: 1.2;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .build-status[hidden] { display: none !important; }
+    .seg { flex-shrink: 0; display: flex; gap: 4px; }
+    .seg button {
+      flex: 1; min-height: 32px; padding: 4px 2px; font: inherit; font-size: 0.72rem;
+      border-radius: 4px; border: 1px solid var(--zone-line);
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .seg button.on { background: rgba(212,160,23,0.18); color: var(--gold); border-color: var(--gold); }
+    .filter-row { flex-shrink: 0; display: flex; gap: 4px; }
+    .filter-row select {
+      flex: 1; min-width: 0; min-height: 32px; font-size: 13px; padding: 2px 2px;
+    }
+    #buildGrid {
+      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+      align-content: start; padding-bottom: 2px;
+    }
+    .pool-card {
+      position: relative; aspect-ratio: 59 / 86; padding: 0; border-radius: 4px; overflow: hidden;
+      border: 1px solid rgba(212,160,23,0.35); background: #111; cursor: pointer; color: var(--cream);
+    }
+    .pool-card img, .pool-card .ph {
+      width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;
+    }
+    .pool-card .ph {
+      display: flex; align-items: flex-end; justify-content: center;
+      background: repeating-linear-gradient(45deg, #1a2a4a 0 6px, #243860 6px 12px);
+      font-size: 0.62rem; padding: 4px; text-align: center;
+    }
+    .pool-card .cname {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      font-size: 0.56rem; line-height: 1.15; text-align: left;
+      background: rgba(0,0,0,0.75); color: var(--cream);
+      padding: 2px 3px 3px; max-height: 2.5em; overflow: hidden; pointer-events: none;
+    }
+    .pool-card .qty, .pool-card .mark {
+      position: absolute; top: 2px; z-index: 1; pointer-events: none;
+      font-size: 0.55rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
+      background: rgba(0,0,0,0.82);
+    }
+    .pool-card .qty { left: 2px; color: var(--gold); font-weight: 700; display: none; }
+    .pool-card .qty.on { display: block; }
+    .pool-card .mark { right: 2px; }
+    .pool-card .mark.f { color: #ff8a80; }
+    .pool-card .mark.l { color: #ffb74d; }
+    .pool-card .mark.s { color: #ffe082; }
+    .pool-card .mark.x { color: #d7c4ff; }
+    .pool-card.in { border-color: var(--gold); }
+    .pool-card.over { border-color: #ff5252; box-shadow: inset 0 0 0 1px #ff5252; }
+    .pool-empty { grid-column: 1 / -1; color: var(--muted); text-align: center; padding: 16px 8px; font-size: 0.85rem; }
+    input, select { user-select: text; -webkit-user-select: text; }
+    .build-sheet { align-items: stretch; }
+    .build-sheet .big-wrap { display: flex; justify-content: center; }
+    .build-sheet .big {
+      width: 132px; height: 192px; object-fit: cover; border-radius: 6px;
+      border: 1px solid var(--gold-dim); background: #111;
+    }
+    .build-sheet h3 { margin: 0; color: var(--gold); font-size: 1rem; text-align: center; line-height: 1.2; }
+    .build-sheet .stats, .build-sheet .count-line { font-size: 0.75rem; color: var(--cream); text-align: center; }
+    .build-sheet .ban-note { font-size: 0.72rem; text-align: center; color: #ffb74d; min-height: 0; }
+    .build-sheet .ban-note:empty { display: none; }
+    .build-sheet .desc {
+      font-size: 0.7rem; color: var(--muted); line-height: 1.35; text-align: left;
+      max-height: 4.2em; overflow: auto; white-space: pre-wrap;
+    }
     #btnDeckBack { flex-shrink: 0; align-self: center; }
 
     /* —— VS —— */
@@ -420,10 +576,11 @@
           <span class="who">Joey</span>
           <span class="ace">Red-Eyes Black Dragon</span>
         </button>
-        <button type="button" class="deck-opt soon" data-deck="custom">
-          <div class="ace-ph">?</div>
+        <button type="button" class="deck-opt custom" data-deck="custom">
+          <img id="customAceImg" alt="" hidden />
+          <div class="ace-ph" id="customAcePh">+</div>
           <span class="who">Custom Deck</span>
-          <span class="ace">Coming soon</span>
+          <span class="ace" id="customAceText">Build a deck</span>
         </button>
       </div>
       <button type="button" class="menu-btn" id="btnDeckBack">Back</button>
@@ -449,7 +606,8 @@
     <section id="howto" class="screen" hidden>
       <h2>How to Play</h2>
       <div class="scroll">
-        <p><strong>Start:</strong> Pick Classic or Duelist Kingdom, then Start Duel, then Yugi, Kaiba, or Joey. The opponent plays one of the other two decks.</p>
+        <p><strong>Start:</strong> Pick Classic or Duelist Kingdom, then Start Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
+        <p><strong>Custom decks:</strong> Search the classic card pool (LOB through Labyrinth of Nightmare). A main deck is 40–60 cards, at most 3 of any card. Fusion Monsters go in the Extra Deck (max 15). Save up to 3 decks on this device. The Forbidden/Limited switch is off unless you turn it on.</p>
         <p><strong>Goal:</strong> Drop their Life Points to 0, or deck them out.</p>
         <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Next Phase advances. You do not draw on your first turn.</p>
         <p><strong>Classic:</strong> 8000 LP. Level 5–6 needs 1 tribute; 7+ needs 2. Polymerization can use monsters from your hand or field.</p>
@@ -497,6 +655,57 @@
       </div>
     </section>
 
+    <section id="customs" class="screen" hidden>
+      <div class="deck-head">
+        <h2>Custom Decks</h2>
+        <p>Pick a saved deck. The opponent is Yugi, Kaiba, or Joey.</p>
+      </div>
+      <div class="fl-row">
+        <div class="fl-copy">
+          <strong>Forbidden/Limited</strong>
+          <span id="flHint">Off — up to 3 of any card. Turn on to use the official list.</span>
+        </div>
+        <button type="button" class="fl-switch" id="flToggle" aria-pressed="false">Off</button>
+      </div>
+      <div id="customList"></div>
+      <div class="footer-row">
+        <button type="button" class="menu-btn" id="btnCustomBack">Back</button>
+        <button type="button" class="menu-btn primary" id="btnNewDeck">New Deck</button>
+      </div>
+    </section>
+
+    <section id="builder" class="screen" hidden>
+      <div class="build-top">
+        <button type="button" class="mini-btn" id="btnBuildBack">Back</button>
+        <h2>Deck Builder</h2>
+        <button type="button" class="mini-btn primary" id="btnBuildSave">Save</button>
+      </div>
+      <input id="buildName" type="text" maxlength="24" autocomplete="off" autocapitalize="words" aria-label="Deck name" />
+      <div class="build-counts">
+        <div class="grow">Main <span class="num" id="buildMain">0</span>/40–60 · Extra <span class="num" id="buildExtra">0</span>/15</div>
+        <button type="button" class="fl-switch" id="flToggleBuild" aria-pressed="false">F/L Off</button>
+      </div>
+      <p class="build-status" id="buildStatus" hidden></p>
+      <input id="buildSearch" type="search" placeholder="Search name" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search cards" />
+      <div class="seg" id="buildKind">
+        <button type="button" data-kind="all" class="on">All</button>
+        <button type="button" data-kind="monster">Monster</button>
+        <button type="button" data-kind="spell">Spell</button>
+        <button type="button" data-kind="trap">Trap</button>
+      </div>
+      <div class="filter-row">
+        <select id="buildAttr" aria-label="Attribute"><option value="">Attribute</option></select>
+        <select id="buildType" aria-label="Type"><option value="">Type</option></select>
+        <select id="buildLevel" aria-label="Level"><option value="">Level</option></select>
+      </div>
+      <div class="seg" id="buildView">
+        <button type="button" data-view="pool" class="on">Pool</button>
+        <button type="button" data-view="main">Main</button>
+        <button type="button" data-view="extra">Extra</button>
+      </div>
+      <div id="buildGrid"></div>
+    </section>
+
     <section id="end" class="screen" hidden>
       <h2 id="endTitle">Victory</h2>
       <p id="endMsg"></p>
@@ -530,6 +739,22 @@
     </div>
   </div>
 
+  <div class="overlay" id="buildOverlay">
+    <div class="sheet build-sheet">
+      <div class="big-wrap"><img class="big" id="buildArt" alt="" /></div>
+      <h3 id="buildCardName"></h3>
+      <div class="stats" id="buildStats"></div>
+      <div class="ban-note" id="buildBan"></div>
+      <div class="desc" id="buildDesc"></div>
+      <div class="count-line" id="buildCount"></div>
+      <div class="actions">
+        <button type="button" id="buildAdd">Add</button>
+        <button type="button" id="buildRemove">Remove</button>
+        <button type="button" class="ghost" id="buildClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="choiceOverlay">
     <div class="sheet">
       <h3 id="choiceTitle"></h3>
@@ -537,12 +762,14 @@
     </div>
   </div>
 
+  <script src="classic-pool.js"></script>
   <script>
 (function () {
   "use strict";
 
   const API = "https://db.ygoprodeck.com/api/v7/cardinfo.php";
   const CACHE_KEY = "classicDuel_cardCache_v2";
+  const STORE_KEY = "classicDuel_customDecks_v1";
   const ZONES = 5;
   const PHASES = ["draw", "main1", "battle", "main2", "end"];
   const PHASE_LABEL = { draw: "Draw", main1: "Main 1", battle: "Battle", main2: "Main 2", end: "End" };
@@ -665,6 +892,12 @@
   let uidN = 1;
   let choiceResolve = null;
   let vsTimer = 0;
+  let flEnforce = false;
+  let savedDecks = [];
+  let draft = null;
+  let buildFilter = { q: "", kind: "all", attr: "", type: "", level: "", view: "pool" };
+  let buildTimer = 0;
+  let sheetName = "";
 
   const $ = (id) => document.getElementById(id);
   const el = {
@@ -687,34 +920,75 @@
     choiceOverlay: $("choiceOverlay"), choiceTitle: $("choiceTitle"), choiceBtns: $("choiceBtns"),
     toast: $("toast"), coin: $("coin"),
     endTitle: $("endTitle"), endMsg: $("endMsg"), btnAgain: $("btnAgain"), btnEndMenu: $("btnEndMenu"),
+    customAceImg: $("customAceImg"), customAcePh: $("customAcePh"), customAceText: $("customAceText"),
+    flToggle: $("flToggle"), flToggleBuild: $("flToggleBuild"), flHint: $("flHint"),
+    customList: $("customList"), btnCustomBack: $("btnCustomBack"), btnNewDeck: $("btnNewDeck"),
+    btnBuildBack: $("btnBuildBack"), btnBuildSave: $("btnBuildSave"),
+    buildName: $("buildName"), buildMain: $("buildMain"), buildExtra: $("buildExtra"),
+    buildStatus: $("buildStatus"), buildSearch: $("buildSearch"), buildGrid: $("buildGrid"),
+    buildAttr: $("buildAttr"), buildType: $("buildType"), buildLevel: $("buildLevel"),
+    buildOverlay: $("buildOverlay"), buildArt: $("buildArt"), buildCardName: $("buildCardName"),
+    buildStats: $("buildStats"), buildBan: $("buildBan"), buildDesc: $("buildDesc"),
+    buildCount: $("buildCount"), buildAdd: $("buildAdd"), buildRemove: $("buildRemove"), buildClose: $("buildClose"),
   };
 
   function artSmall(id) { return "https://images.ygoprodeck.com/images/cards_small/" + id + ".jpg"; }
   function artFull(id) { return "https://images.ygoprodeck.com/images/cards/" + id + ".jpg"; }
 
+  function makeCard(name, id, type, race, attribute, level, atk, def, desc, limit) {
+    const kind = type || "";
+    return {
+      id: id, name: name, type: kind,
+      race: race || "", attribute: attribute || "",
+      level: level || 0,
+      atk: atk == null ? null : atk,
+      def: def == null ? null : def,
+      desc: desc || "",
+      limit: limit == null ? 3 : limit,
+      image: artSmall(id), imageFull: artFull(id),
+      isMonster: /Monster/i.test(kind),
+      isSpell: /Spell/i.test(kind),
+      isTrap: /Trap/i.test(kind),
+      isFusion: /Fusion/i.test(kind),
+    };
+  }
+
   function hydrateAll() {
     cardDB = {};
     Object.keys(RAW).forEach((name) => {
       const raw = RAW[name];
-      const type = raw.type || "";
-      cardDB[name] = {
-        id: raw.id, name: name, type: type,
-        race: raw.race || "", attribute: raw.attribute || "",
-        level: raw.level || 0,
-        atk: raw.atk == null ? null : raw.atk,
-        def: raw.def == null ? null : raw.def,
-        desc: raw.desc || "",
-        image: artSmall(raw.id), imageFull: artFull(raw.id),
-        isMonster: /Monster/i.test(type),
-        isSpell: /Spell/i.test(type),
-        isTrap: /Trap/i.test(type),
-        isFusion: /Fusion/i.test(type),
-      };
+      cardDB[name] = makeCard(name, raw.id, raw.type, raw.race, raw.attribute, raw.level, raw.atk, raw.def, raw.desc, 3);
+    });
+    (window.CLASSIC_POOL || []).forEach((row) => {
+      const name = row[0];
+      const prev = cardDB[name];
+      const imgId = prev ? prev.id : row[1];
+      cardDB[name] = makeCard(name, imgId, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]);
+    });
+    learnFusions();
+  }
+
+  function learnFusions() {
+    const known = {};
+    FUSIONS.forEach((f) => { known[f.result] = true; });
+    Object.keys(cardDB).forEach((name) => {
+      const c = cardDB[name];
+      if (!c.isFusion || known[name]) return;
+      const line = String(c.desc || "").split("\n")[0];
+      if (line.indexOf("+") < 0) return;
+      const mats = [];
+      const re = /"([^"]+)"/g;
+      let m;
+      while ((m = re.exec(line))) mats.push(m[1]);
+      if (mats.length >= 2) {
+        FUSIONS.push({ result: name, materials: mats });
+        known[name] = true;
+      }
     });
   }
 
   function showScreen(name) {
-    ["menu", "decks", "vs", "howto", "duel", "end"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "end"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -2174,12 +2448,14 @@
   }
 
   function showVS() {
-    const p = DECKS[state.playerId];
-    const o = DECKS[state.aiId];
+    const p = state.playerDeck;
+    const o = state.aiDeck;
+    const pCard = cardDB[p.ace];
+    const oCard = cardDB[o.ace];
     el.vsMatch.textContent = state.playerName + " vs " + state.aiName;
     el.vsRules.textContent = state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom";
-    el.vsPArt.src = cardDB[p.ace].imageFull;
-    el.vsOArt.src = cardDB[o.ace].imageFull;
+    el.vsPArt.src = pCard ? pCard.imageFull : "";
+    el.vsOArt.src = oCard ? oCard.imageFull : "";
     el.vsPArt.alt = p.ace;
     el.vsOArt.alt = o.ace;
     el.vsPCap.textContent = p.ace;
@@ -2199,27 +2475,40 @@
     beginTurn("player");
   }
 
-  function beginMatch(pid, oid) {
+  function beginMatch(playerDeck, aiId) {
+    const aiSrc = DECKS[aiId];
+    if (!playerDeck || !aiSrc) return;
+    const aiDeck = { id: aiSrc.id, name: aiSrc.name, ace: aiSrc.ace, main: aiSrc.main.slice(), extra: aiSrc.extra.slice() };
+    const deck = {
+      id: playerDeck.id,
+      name: playerDeck.name,
+      ace: playerDeck.ace || pickAce(playerDeck.main, playerDeck.extra),
+      main: playerDeck.main.slice(),
+      extra: playerDeck.extra.slice(),
+    };
     matchGen++;
     clearTimeout(vsTimer);
     cancelChoice();
     closeSheet();
     closeExtra();
+    closeBuildSheet();
     const gen = matchGen;
     state = {
       gen: gen,
       rules: rulesMode,
       field: rulesMode === "dk" ? pickField() : null,
-      playerName: DECKS[pid].name,
-      aiName: DECKS[oid].name,
-      playerId: pid,
-      aiId: oid,
+      playerName: deck.name,
+      aiName: aiDeck.name,
+      playerId: deck.id,
+      aiId: aiId,
+      playerDeck: deck,
+      aiDeck: aiDeck,
       turn: "player",
       phase: "draw",
       turnCount: 1,
       firstTurn: true,
-      player: makePlayer(DECKS[pid]),
-      ai: makePlayer(DECKS[oid]),
+      player: makePlayer(deck),
+      ai: makePlayer(aiDeck),
       log: [],
       winner: null,
       pending: null,
@@ -2232,19 +2521,30 @@
   }
 
   function chooseDeck(id) {
-    if (id === "custom") { toast("Custom Deck is coming soon."); return; }
+    if (id === "custom") { openCustoms(); return; }
     if (!DECKS[id]) return;
-    beginMatch(id, pickOpponent(id));
+    const d = DECKS[id];
+    beginMatch({
+      id: d.id, name: d.name, ace: d.ace,
+      main: d.main.slice(), extra: d.extra.slice(),
+    }, pickOpponent(id));
   }
 
   async function refreshCards() {
-    const ids = Object.keys(cardDB).map((n) => cardDB[n].id).join(",");
+    const ids = [];
+    const byId = {};
+    Object.keys(DECKS).forEach((id) => {
+      DECKS[id].main.concat(DECKS[id].extra).forEach((n) => {
+        const c = cardDB[n];
+        if (!c || byId[c.id]) return;
+        byId[c.id] = n;
+        ids.push(c.id);
+      });
+    });
     try {
-      const res = await fetch(API + "?id=" + ids);
+      const res = await fetch(API + "?id=" + ids.join(","));
       if (!res.ok) return;
       const json = await res.json();
-      const byId = {};
-      Object.keys(cardDB).forEach((n) => { byId[cardDB[n].id] = n; });
       (json.data || []).forEach((raw) => {
         const name = byId[raw.id];
         if (!name || !cardDB[name]) return;
@@ -2254,6 +2554,597 @@
         if (img.image_url) cardDB[name].imageFull = img.image_url;
       });
     } catch (e) { /* embedded cards still work */ }
+  }
+
+  async function refreshBanlist() {
+    try {
+      const res = await fetch(API + "?banlist=tcg");
+      if (!res.ok) return;
+      const json = await res.json();
+      const lim = {};
+      (json.data || []).forEach((raw) => {
+        const st = raw.banlist_info && raw.banlist_info.ban_tcg;
+        if (st === "Forbidden") lim[raw.name] = 0;
+        else if (st === "Limited") lim[raw.name] = 1;
+        else if (st === "Semi-Limited") lim[raw.name] = 2;
+      });
+      if (!Object.keys(lim).length) return;
+      Object.keys(cardDB).forEach((name) => {
+        cardDB[name].limit = Object.prototype.hasOwnProperty.call(lim, name) ? lim[name] : 3;
+      });
+      if ($("customs").classList.contains("active")) renderCustoms();
+      if ($("builder").classList.contains("active")) { paintDraft(); renderBuilderGrid(); if (sheetName) openBuildSheet(sheetName); }
+    } catch (e) { /* snapshot in the card pool still applies */ }
+  }
+
+  function newId() {
+    return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  }
+
+  function loadStore() {
+    flEnforce = false;
+    savedDecks = [];
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (!raw || typeof raw !== "object") return;
+      flEnforce = !!raw.fl;
+      if (!Array.isArray(raw.decks)) return;
+      raw.decks.slice(0, 3).forEach((d) => {
+        const deck = normalizeDeck(d);
+        if (deck) savedDecks.push(deck);
+      });
+    } catch (e) {
+      flEnforce = false;
+      savedDecks = [];
+    }
+  }
+
+  function normalizeDeck(d) {
+    if (!d || typeof d !== "object") return null;
+    if (typeof d.name !== "string" || !Array.isArray(d.main) || !Array.isArray(d.extra)) return null;
+    const main = [];
+    const extra = [];
+    (d.main || []).forEach((x) => { if (typeof x === "string") main.push(x); });
+    (d.extra || []).forEach((x) => { if (typeof x === "string") extra.push(x); });
+    const fixedMain = [];
+    const fixedExtra = [];
+    main.forEach((n) => {
+      const c = cardDB[n];
+      if (c && c.isFusion) fixedExtra.push(n);
+      else fixedMain.push(n);
+    });
+    extra.forEach((n) => {
+      const c = cardDB[n];
+      if (c && !c.isFusion) fixedMain.push(n);
+      else fixedExtra.push(n);
+    });
+    return {
+      id: typeof d.id === "string" && d.id ? d.id : newId(),
+      name: d.name.trim().slice(0, 24) || "Custom Deck",
+      main: fixedMain.slice(0, 60),
+      extra: fixedExtra.slice(0, 15),
+    };
+  }
+
+  function saveStore() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ fl: flEnforce, decks: savedDecks }));
+    } catch (e) { toast("Couldn't save on this device."); }
+  }
+
+  function copyLimit(name) {
+    const c = cardDB[name];
+    if (!c || !flEnforce) return 3;
+    return c.limit == null ? 3 : c.limit;
+  }
+
+  function countNames(list) {
+    const counts = {};
+    (list || []).forEach((n) => { counts[n] = (counts[n] || 0) + 1; });
+    return counts;
+  }
+
+  function issuesFor(main, extra) {
+    const issues = [];
+    main = main || [];
+    extra = extra || [];
+    if (main.length < 40) issues.push("Main deck needs at least 40 cards (" + main.length + ").");
+    else if (main.length > 60) issues.push("Main deck allows at most 60 cards (" + main.length + ").");
+    if (extra.length > 15) issues.push("Extra Deck allows at most 15 cards (" + extra.length + ").");
+    const counts = countNames(main.concat(extra));
+    Object.keys(counts).sort().forEach((n) => {
+      const c = cardDB[n];
+      if (!c) { issues.push("Unknown card: " + n + "."); return; }
+      if (main.indexOf(n) >= 0 && c.isFusion) issues.push(n + " belongs in the Extra Deck.");
+      if (extra.indexOf(n) >= 0 && !c.isFusion) issues.push(n + " belongs in the Main Deck.");
+      const lim = copyLimit(n);
+      if (counts[n] > lim) {
+        if (flEnforce && c.limit === 0) issues.push(n + " is Forbidden.");
+        else if (flEnforce && c.limit === 1) issues.push(n + " is Limited to 1.");
+        else if (flEnforce && c.limit === 2) issues.push(n + " is Semi-Limited to 2.");
+        else issues.push(n + " has " + counts[n] + " copies (max " + lim + ").");
+      }
+    });
+    return issues;
+  }
+
+  function banMark(c) {
+    if (!c) return null;
+    if (c.limit === 0) return { cls: "f", text: "FORB" };
+    if (c.limit === 1) return { cls: "l", text: "LIM" };
+    if (c.limit === 2) return { cls: "s", text: "SEMI" };
+    return null;
+  }
+
+  function banSentence(c) {
+    if (!c || c.limit == null || c.limit >= 3) return "";
+    if (c.limit === 0) return "Official list: Forbidden";
+    if (c.limit === 1) return "Official list: Limited";
+    return "Official list: Semi-Limited";
+  }
+
+  function pickAce(main, extra) {
+    let best = null;
+    let bestAtk = -1;
+    (main || []).forEach((n) => {
+      const c = cardDB[n];
+      if (!c || !c.isMonster || c.isFusion) return;
+      const atk = c.atk || 0;
+      if (atk > bestAtk) { bestAtk = atk; best = n; }
+    });
+    if (best) return best;
+    (extra || []).forEach((n) => {
+      const c = cardDB[n];
+      if (!c) return;
+      const atk = c.atk || 0;
+      if (atk > bestAtk) { bestAtk = atk; best = n; }
+    });
+    return best || (main && main[0]) || "Dark Magician";
+  }
+
+  function syncFL() {
+    const on = flEnforce;
+    [el.flToggle, el.flToggleBuild].forEach((b) => {
+      if (!b) return;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    el.flToggle.textContent = on ? "On" : "Off";
+    el.flToggleBuild.textContent = on ? "F/L On" : "F/L Off";
+    el.flHint.textContent = on
+      ? "On — Forbidden 0, Limited 1, Semi-Limited 2. Official TCG list."
+      : "Off — up to 3 of any card. Turn on to use the official list.";
+  }
+
+  function toggleFL() {
+    flEnforce = !flEnforce;
+    saveStore();
+    syncFL();
+    if ($("customs").classList.contains("active")) renderCustoms();
+    if ($("builder").classList.contains("active")) {
+      paintDraft();
+      renderBuilderGrid();
+      if (sheetName) openBuildSheet(sheetName);
+    }
+  }
+
+  function paintCustomPicker() {
+    const n = savedDecks.length;
+    el.customAceText.textContent = n ? (n + " saved") : "Build a deck";
+    const deck = savedDecks[0];
+    const ace = deck ? cardDB[pickAce(deck.main, deck.extra)] : null;
+    if (ace && ace.image) {
+      el.customAceImg.src = ace.image;
+      el.customAceImg.alt = ace.name;
+      el.customAceImg.hidden = false;
+      el.customAcePh.hidden = true;
+    } else {
+      el.customAceImg.removeAttribute("src");
+      el.customAceImg.hidden = true;
+      el.customAcePh.hidden = false;
+    }
+  }
+
+  function openCustoms() {
+    closeBuildSheet();
+    draft = null;
+    showScreen("customs");
+    renderCustoms();
+  }
+
+  function renderCustoms() {
+    syncFL();
+    paintCustomPicker();
+    el.btnNewDeck.disabled = savedDecks.length >= 3;
+    el.customList.innerHTML = "";
+    if (!savedDecks.length) {
+      const note = document.createElement("p");
+      note.className = "empty-note";
+      note.textContent = "No saved decks yet. New Deck can start empty, or as a copy of Yugi, Kaiba, or Joey.";
+      el.customList.appendChild(note);
+      return;
+    }
+    savedDecks.forEach((deck) => {
+      const issues = issuesFor(deck.main, deck.extra);
+      const card = document.createElement("article");
+      card.className = "saved-deck";
+      const top = document.createElement("div");
+      top.className = "saved-top";
+      const img = document.createElement("img");
+      const ace = cardDB[pickAce(deck.main, deck.extra)];
+      if (ace) { img.src = ace.image; img.alt = ace.name; }
+      const copy = document.createElement("div");
+      copy.className = "saved-copy";
+      const nm = document.createElement("div");
+      nm.className = "saved-name";
+      nm.textContent = deck.name;
+      const meta = document.createElement("div");
+      meta.className = "saved-meta";
+      meta.textContent = "Main " + deck.main.length + " · Extra " + deck.extra.length;
+      const status = document.createElement("div");
+      status.className = "saved-status " + (issues.length ? "bad" : "ok");
+      status.textContent = issues.length ? issues[0] : "Ready to duel";
+      copy.appendChild(nm);
+      copy.appendChild(meta);
+      copy.appendChild(status);
+      top.appendChild(img);
+      top.appendChild(copy);
+      const actions = document.createElement("div");
+      actions.className = "saved-actions";
+      const duel = document.createElement("button");
+      duel.type = "button";
+      duel.className = "primary";
+      duel.textContent = "Duel";
+      duel.disabled = issues.length > 0;
+      duel.addEventListener("click", () => startCustom(deck));
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.textContent = "Edit";
+      edit.addEventListener("click", () => openBuilder(deck));
+      const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.textContent = "Copy";
+      copyBtn.disabled = savedDecks.length >= 3;
+      copyBtn.addEventListener("click", () => copySaved(deck));
+      const del = document.createElement("button");
+      del.type = "button";
+      del.textContent = "Delete";
+      del.addEventListener("click", () => deleteSaved(deck));
+      actions.appendChild(duel);
+      actions.appendChild(edit);
+      actions.appendChild(copyBtn);
+      actions.appendChild(del);
+      card.appendChild(top);
+      card.appendChild(actions);
+      el.customList.appendChild(card);
+    });
+  }
+
+  function startCustom(deck) {
+    const issues = issuesFor(deck.main, deck.extra);
+    if (issues.length) { toast(issues[0]); return; }
+    beginMatch({
+      id: "custom:" + deck.id,
+      name: deck.name,
+      ace: pickAce(deck.main, deck.extra),
+      main: deck.main.slice(),
+      extra: deck.extra.slice(),
+    }, pickOpponent("custom"));
+  }
+
+  function copySaved(deck) {
+    if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+    let name = deck.name + " copy";
+    if (name.length > 24) name = deck.name.slice(0, 19).trim() + " copy";
+    savedDecks.push({ id: newId(), name: name, main: deck.main.slice(), extra: deck.extra.slice() });
+    saveStore();
+    renderCustoms();
+    toast("Copied " + deck.name + ".");
+  }
+
+  function deleteSaved(deck) {
+    if (!confirm("Delete " + deck.name + "?")) return;
+    savedDecks = savedDecks.filter((d) => d.id !== deck.id);
+    saveStore();
+    renderCustoms();
+  }
+
+  async function promptNewDeck() {
+    if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+    const pick = await choose("Start a new deck", ["Empty deck", "Copy Yugi", "Copy Kaiba", "Copy Joey", "Cancel"]);
+    if (pick < 0 || pick === 4) return;
+    if (pick === 0) openBuilder({ id: null, name: "My Deck", main: [], extra: [] });
+    else {
+      const src = DECKS[["yugi", "kaiba", "joey"][pick - 1]];
+      openBuilder({ id: null, name: src.name, main: src.main.slice(), extra: src.extra.slice() });
+    }
+  }
+
+  function draftSnapshot() {
+    return JSON.stringify({
+      name: (draft.name || "").trim(),
+      main: draft.main,
+      extra: draft.extra,
+    });
+  }
+
+  function openBuilder(deck) {
+    clearTimeout(buildTimer);
+    closeBuildSheet();
+    draft = {
+      id: deck.id || null,
+      name: deck.name || "My Deck",
+      main: deck.main.slice(),
+      extra: deck.extra.slice(),
+    };
+    draft.savedJSON = draftSnapshot();
+    buildFilter = { q: "", kind: "all", attr: "", type: "", level: "", view: "pool" };
+    el.buildSearch.value = "";
+    el.buildName.value = draft.name;
+    el.buildAttr.value = "";
+    el.buildType.value = "";
+    el.buildLevel.value = "";
+    document.querySelectorAll("#buildKind button").forEach((b) => b.classList.toggle("on", b.dataset.kind === "all"));
+    document.querySelectorAll("#buildView button").forEach((b) => b.classList.toggle("on", b.dataset.view === "pool"));
+    showScreen("builder");
+    syncFL();
+    paintDraft();
+    renderBuilderGrid();
+  }
+
+  function paintDraft() {
+    if (!draft) return;
+    const mainN = draft.main.length;
+    const extraN = draft.extra.length;
+    const issues = issuesFor(draft.main, draft.extra);
+    el.buildMain.textContent = String(mainN);
+    el.buildMain.classList.toggle("bad", mainN < 40 || mainN > 60);
+    el.buildExtra.textContent = String(extraN);
+    el.buildExtra.classList.toggle("bad", extraN > 15);
+    el.buildStatus.hidden = issues.length === 0;
+    el.buildStatus.textContent = issues.length > 1 ? issues[0].replace(/\.$/, "") + " +" + (issues.length - 1) + " more" : (issues[0] || "");
+    const mainBtn = document.querySelector('#buildView button[data-view="main"]');
+    const extraBtn = document.querySelector('#buildView button[data-view="extra"]');
+    if (mainBtn) mainBtn.textContent = "Main " + mainN;
+    if (extraBtn) extraBtn.textContent = "Extra " + extraN;
+  }
+
+  function deckCards() {
+    const list = [];
+    Object.keys(cardDB).forEach((name) => {
+      const c = cardDB[name];
+      if (!c || /Token|Skill/i.test(c.type)) return;
+      if (c.isMonster || c.isSpell || c.isTrap) list.push(c);
+    });
+    list.sort((a, b) => a.name.localeCompare(b.name));
+    return list;
+  }
+
+  function passesFilter(c) {
+    if (buildFilter.kind === "monster" && !c.isMonster) return false;
+    if (buildFilter.kind === "spell" && !c.isSpell) return false;
+    if (buildFilter.kind === "trap" && !c.isTrap) return false;
+    if (buildFilter.attr && c.attribute !== buildFilter.attr) return false;
+    if (buildFilter.type && c.race !== buildFilter.type) return false;
+    if (buildFilter.level && String(c.level || 0) !== buildFilter.level) return false;
+    if (buildFilter.q && c.name.toLowerCase().indexOf(buildFilter.q) < 0) return false;
+    return true;
+  }
+
+  function renderBuilderGrid() {
+    if (!draft) return;
+    const counts = countNames(draft.main.concat(draft.extra));
+    let cards = deckCards().filter(passesFilter);
+    if (buildFilter.view === "main") {
+      const have = countNames(draft.main);
+      cards = cards.filter((c) => have[c.name] && !c.isFusion);
+    } else if (buildFilter.view === "extra") {
+      const have = countNames(draft.extra);
+      cards = cards.filter((c) => have[c.name] && c.isFusion);
+    }
+    const grid = el.buildGrid;
+    const scroll = grid.scrollTop;
+    grid.innerHTML = "";
+    if (!cards.length) {
+      const empty = document.createElement("div");
+      empty.className = "pool-empty";
+      empty.textContent = buildFilter.view === "pool" ? "No cards match." : "Nothing in this deck matches.";
+      grid.appendChild(empty);
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    cards.forEach((c) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      const qty = counts[c.name] || 0;
+      const lim = copyLimit(c.name);
+      b.className = "pool-card" + (qty ? " in" : "") + (qty > lim ? " over" : "");
+      b.dataset.name = c.name;
+      const img = document.createElement("img");
+      img.alt = "";
+      img.src = c.image;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.addEventListener("error", () => {
+        img.remove();
+        const ph = document.createElement("div");
+        ph.className = "ph";
+        ph.textContent = c.name;
+        b.insertBefore(ph, b.firstChild);
+      });
+      const name = document.createElement("span");
+      name.className = "cname";
+      name.textContent = c.name;
+      const q = document.createElement("span");
+      q.className = "qty" + (qty ? " on" : "");
+      q.textContent = qty ? "×" + qty : "";
+      b.appendChild(img);
+      b.appendChild(name);
+      b.appendChild(q);
+      const mark = banMark(c);
+      if (mark) {
+        const m = document.createElement("span");
+        m.className = "mark " + mark.cls;
+        m.textContent = mark.text;
+        b.appendChild(m);
+      } else if (c.isFusion) {
+        const m = document.createElement("span");
+        m.className = "mark x";
+        m.textContent = "EX";
+        b.appendChild(m);
+      }
+      b.addEventListener("click", () => openBuildSheet(c.name));
+      frag.appendChild(b);
+    });
+    grid.appendChild(frag);
+    grid.scrollTop = scroll;
+  }
+
+  function closeBuildSheet() {
+    sheetName = "";
+    el.buildOverlay.classList.remove("open");
+  }
+
+  function openBuildSheet(name) {
+    const c = cardDB[name];
+    if (!c || !draft) return;
+    sheetName = name;
+    el.buildArt.src = c.imageFull || c.image;
+    el.buildArt.alt = c.name;
+    el.buildCardName.textContent = c.name;
+    if (c.isMonster) {
+      el.buildStats.textContent =
+        [c.attribute, c.race, "Lv" + c.level, "ATK " + (c.atk == null ? "?" : c.atk), "DEF " + (c.def == null ? "?" : c.def), c.isFusion ? "Extra Deck" : "Main Deck"]
+          .filter(Boolean).join(" · ");
+    } else {
+      el.buildStats.textContent = [c.type, c.race, "Main Deck"].filter(Boolean).join(" · ");
+    }
+    el.buildBan.textContent = banSentence(c);
+    el.buildDesc.textContent = c.desc || "";
+    const have = (countNames(draft.main.concat(draft.extra)))[name] || 0;
+    const lim = copyLimit(name);
+    const full = c.isFusion ? draft.extra.length >= 15 : draft.main.length >= 60;
+    el.buildCount.textContent = lim === 0
+      ? "Forbidden — 0 allowed while the list is on"
+      : "In deck: " + have + " / " + lim + (c.isFusion ? " · Extra" : " · Main");
+    el.buildAdd.disabled = have >= lim || full;
+    el.buildAdd.textContent = c.isFusion ? "Add to Extra" : "Add to Main";
+    el.buildRemove.disabled = have <= 0;
+    el.buildOverlay.classList.add("open");
+  }
+
+  function addDraftCard(name) {
+    const c = cardDB[name];
+    if (!c || !draft) return;
+    const have = (countNames(draft.main.concat(draft.extra)))[name] || 0;
+    const lim = copyLimit(name);
+    if (lim === 0) { toast(name + " is Forbidden."); return; }
+    if (have >= lim) { toast("Max " + lim + (lim === 1 ? " copy." : " copies.")); return; }
+    if (c.isFusion) {
+      if (draft.extra.length >= 15) { toast("Extra Deck is full (15)."); return; }
+      draft.extra.push(name);
+    } else {
+      if (draft.main.length >= 60) { toast("Main Deck is full (60)."); return; }
+      draft.main.push(name);
+    }
+    afterDraftChange(name);
+  }
+
+  function removeDraftCard(name) {
+    if (!draft) return;
+    const c = cardDB[name];
+    const list = c && c.isFusion ? draft.extra : draft.main;
+    const i = list.lastIndexOf(name);
+    if (i < 0) return;
+    list.splice(i, 1);
+    afterDraftChange(name);
+  }
+
+  function afterDraftChange(name) {
+    draft.name = el.buildName.value;
+    paintDraft();
+    let node = null;
+    el.buildGrid.querySelectorAll(".pool-card").forEach((n) => { if (n.dataset.name === name) node = n; });
+    if (buildFilter.view === "pool" && node) {
+      const qty = (countNames(draft.main.concat(draft.extra)))[name] || 0;
+      const lim = copyLimit(name);
+      node.classList.toggle("in", qty > 0);
+      node.classList.toggle("over", qty > lim);
+      const q = node.querySelector(".qty");
+      if (q) {
+        q.textContent = qty ? "×" + qty : "";
+        q.classList.toggle("on", qty > 0);
+      }
+    } else renderBuilderGrid();
+    if (sheetName) openBuildSheet(sheetName);
+  }
+
+  function saveDraft() {
+    if (!draft) return;
+    draft.name = el.buildName.value.trim().slice(0, 24) || "Custom Deck";
+    const record = { id: draft.id || newId(), name: draft.name, main: draft.main.slice(), extra: draft.extra.slice() };
+    if (draft.id) {
+      const i = savedDecks.findIndex((d) => d.id === draft.id);
+      if (i < 0) { toast("That deck was deleted."); return; }
+      savedDecks[i] = record;
+    } else {
+      if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+      draft.id = record.id;
+      savedDecks.push(record);
+    }
+    draft.savedJSON = draftSnapshot();
+    saveStore();
+    const issues = issuesFor(record.main, record.extra);
+    toast(issues.length ? "Saved. Not duel-ready — " + issues[0] : "Saved " + record.name + ".");
+    openCustoms();
+  }
+
+  function leaveBuilder() {
+    if (!draft) { openCustoms(); return; }
+    draft.name = el.buildName.value;
+    if (draftSnapshot() !== draft.savedJSON && !confirm("Leave without saving changes?")) return;
+    openCustoms();
+  }
+
+  function fillBuilderSelects() {
+    const attrs = {};
+    const monsterRaces = {};
+    const cardRaces = {};
+    Object.keys(cardDB).forEach((n) => {
+      const c = cardDB[n];
+      if (c.attribute) attrs[c.attribute] = true;
+      if (!c.race) return;
+      if (c.isMonster) monsterRaces[c.race] = true;
+      else cardRaces[c.race] = true;
+    });
+    const addOpt = (sel, value, label) => {
+      const o = document.createElement("option");
+      o.value = value;
+      o.textContent = label;
+      sel.appendChild(o);
+    };
+    ["DARK", "LIGHT", "EARTH", "WATER", "FIRE", "WIND"].forEach((a) => { if (attrs[a]) addOpt(el.buildAttr, a, a); });
+    const mGroup = document.createElement("optgroup");
+    mGroup.label = "Monster";
+    Object.keys(monsterRaces).sort().forEach((r) => {
+      const o = document.createElement("option");
+      o.value = r;
+      o.textContent = r;
+      mGroup.appendChild(o);
+    });
+    const sGroup = document.createElement("optgroup");
+    sGroup.label = "Spell / Trap";
+    Object.keys(cardRaces).sort().forEach((r) => {
+      const o = document.createElement("option");
+      o.value = r;
+      o.textContent = r;
+      sGroup.appendChild(o);
+    });
+    el.buildType.appendChild(mGroup);
+    el.buildType.appendChild(sGroup);
+    for (let lv = 1; lv <= 12; lv++) addOpt(el.buildLevel, String(lv), "Lv " + lv);
+    el.buildSearch.placeholder = "Search " + deckCards().length + " cards";
   }
 
   function setRules(mode) {
@@ -2272,8 +3163,46 @@
   el.btnHowtoBack.addEventListener("click", () => showScreen("menu"));
   el.btnStart.addEventListener("click", () => {
     el.deckRules.textContent = rulesMode === "classic" ? "Classic rules" : "Duelist Kingdom rules";
+    paintCustomPicker();
     showScreen("decks");
   });
+  el.btnCustomBack.addEventListener("click", () => showScreen("decks"));
+  el.btnNewDeck.addEventListener("click", () => { promptNewDeck(); });
+  el.flToggle.addEventListener("click", toggleFL);
+  el.flToggleBuild.addEventListener("click", toggleFL);
+  el.btnBuildBack.addEventListener("click", leaveBuilder);
+  el.btnBuildSave.addEventListener("click", saveDraft);
+  el.buildName.addEventListener("input", () => { if (draft) draft.name = el.buildName.value; });
+  el.buildSearch.addEventListener("input", () => {
+    clearTimeout(buildTimer);
+    buildTimer = setTimeout(() => {
+      if (!draft || !$("builder").classList.contains("active")) return;
+      buildFilter.q = el.buildSearch.value.trim().toLowerCase();
+      renderBuilderGrid();
+    }, 60);
+  });
+  $("buildKind").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || !b.dataset.kind) return;
+    buildFilter.kind = b.dataset.kind;
+    $("buildKind").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+    renderBuilderGrid();
+  });
+  $("buildView").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || !b.dataset.view) return;
+    buildFilter.view = b.dataset.view;
+    $("buildView").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
+    el.buildGrid.scrollTop = 0;
+    renderBuilderGrid();
+  });
+  el.buildAttr.addEventListener("change", () => { buildFilter.attr = el.buildAttr.value; renderBuilderGrid(); });
+  el.buildType.addEventListener("change", () => { buildFilter.type = el.buildType.value; renderBuilderGrid(); });
+  el.buildLevel.addEventListener("change", () => { buildFilter.level = el.buildLevel.value; renderBuilderGrid(); });
+  el.buildAdd.addEventListener("click", () => { if (sheetName) addDraftCard(sheetName); });
+  el.buildRemove.addEventListener("click", () => { if (sheetName) removeDraftCard(sheetName); });
+  el.buildClose.addEventListener("click", closeBuildSheet);
+  el.buildOverlay.addEventListener("click", (e) => { if (e.target === el.buildOverlay) closeBuildSheet(); });
   el.btnDeckBack.addEventListener("click", () => showScreen("menu"));
   document.querySelectorAll(".deck-opt").forEach((btn) => {
     btn.addEventListener("click", () => chooseDeck(btn.dataset.deck));
@@ -2292,8 +3221,8 @@
     }
   });
   el.btnAgain.addEventListener("click", () => {
-    if (!state) { showScreen("menu"); return; }
-    beginMatch(state.playerId, state.aiId);
+    if (!state || !state.playerDeck) { showScreen("menu"); return; }
+    beginMatch(state.playerDeck, state.aiId);
   });
   el.btnEndMenu.addEventListener("click", () => { abandon(); showScreen("menu"); });
   el.plExtraBtn.addEventListener("click", () => openExtra("player"));
@@ -2304,6 +3233,9 @@
   window.addEventListener("resize", () => { if (state && $("duel").classList.contains("active")) render(); });
 
   hydrateAll();
+  loadStore();
+  fillBuilderSelects();
+  syncFL();
   Object.keys(DECKS).forEach((id) => {
     const d = DECKS[id];
     if (d.main.length !== 40) console.error("Deck is not 40 cards:", id, d.main.length);
@@ -2311,6 +3243,7 @@
   });
   showScreen("menu");
   refreshCards();
+  refreshBanlist();
 
   window.ClassicDuel = {
     getState: () => state,
@@ -2324,6 +3257,10 @@
     battle: battle,
     render: render,
     rules: () => rulesMode,
+    issuesFor: issuesFor,
+    saved: () => savedDecks,
+    fl: () => flEnforce,
+    poolSize: () => Object.keys(cardDB).length,
   };
 })();
   </script>
