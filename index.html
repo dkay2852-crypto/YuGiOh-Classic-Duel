@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#0a1628" />
+  <title>Classic Duel</title>
+  <style>
+    :root {
+      --bg0: #07111f;
+      --bg1: #0d1f38;
+      --felt: #0e3d2c;
+      --felt-edge: #0a2a1e;
+      --gold: #d4a017;
+      --gold-dim: #8a6810;
+      --cream: #f0e6c8;
+      --red: #c0392b;
+      --blue: #2a6fdb;
+      --ink: #f5f0e6;
+      --muted: #9aa8bc;
+      --zone: rgba(255,255,255,0.08);
+      --zone-line: rgba(212,160,23,0.35);
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
+      --safe-l: env(safe-area-inset-left, 0px);
+      --safe-r: env(safe-area-inset-right, 0px);
+      --card-w: clamp(36px, 11vw, 52px);
+      --card-h: calc(var(--card-w) * 1.45);
+      --hand-h: calc(var(--card-h) + 10px);
+      font-family: "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      margin: 0; padding: 0; height: 100%;
+      background: var(--bg0); color: var(--ink);
+      overflow: hidden; touch-action: manipulation;
+      user-select: none; -webkit-user-select: none;
+    }
+
+    #app {
+      height: 100dvh;
+      height: 100vh;
+      padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);
+      display: flex; flex-direction: column;
+      background:
+        radial-gradient(ellipse at 50% 0%, #143056 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 100%, #1a1a0a 0%, transparent 40%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+    }
+
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
+    .screen.active { display: flex; }
+
+    /* —— Menu —— */
+    #menu {
+      align-items: center; justify-content: center;
+      padding: 16px; gap: 14px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #menu::before {
+      content: ""; position: absolute; inset: 0;
+      background:
+        linear-gradient(135deg, transparent 40%, rgba(212,160,23,0.07) 50%, transparent 60%),
+        repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(255,255,255,0.02) 28px, rgba(255,255,255,0.02) 29px);
+      pointer-events: none;
+    }
+    .brand {
+      font-size: clamp(2.4rem, 11vw, 3.4rem);
+      letter-spacing: 0.04em;
+      color: var(--gold);
+      text-shadow: 0 2px 0 #3a2a00, 0 0 28px rgba(212,160,23,0.35);
+      margin: 0; line-height: 1; position: relative;
+      animation: brandIn 0.7s ease-out;
+    }
+    .tagline {
+      margin: 0 0 8px; color: var(--muted); font-size: 0.95rem;
+      letter-spacing: 0.12em; text-transform: uppercase; position: relative;
+    }
+    .menu-btn {
+      position: relative;
+      width: min(280px, 86vw); padding: 14px 18px;
+      border: 1px solid var(--gold-dim); border-radius: 4px;
+      background: linear-gradient(180deg, #1a2f4d, #101e33);
+      color: var(--cream); font: inherit; font-size: 1.05rem;
+      letter-spacing: 0.06em; cursor: pointer;
+      transition: transform 0.12s, border-color 0.12s, background 0.12s;
+    }
+    .menu-btn:active { transform: scale(0.97); }
+    .menu-btn.primary {
+      background: linear-gradient(180deg, #b88912, #7a5608);
+      border-color: #f0c040; color: #1a1200; font-weight: 700;
+    }
+    .rules-row {
+      position: relative; display: flex; gap: 8px; width: min(280px, 86vw);
+    }
+    .rules-row button {
+      flex: 1; padding: 10px 8px; font: inherit; font-size: 0.85rem;
+      border: 1px solid var(--zone-line); border-radius: 4px;
+      background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .rules-row button.on {
+      background: rgba(212,160,23,0.18); color: var(--gold);
+      border-color: var(--gold);
+    }
+    .rules-hint {
+      position: relative; max-width: 280px; font-size: 0.78rem;
+      color: var(--muted); line-height: 1.35; margin: 0;
+    }
+
+    /* —— How to play —— */
+    #howto {
+      padding: 12px 18px; gap: 10px; overflow: hidden;
+    }
+    #howto h2 { margin: 0; color: var(--gold); font-size: 1.4rem; }
+    #howto .scroll {
+      flex: 1; overflow: auto; -webkit-overflow-scrolling: touch;
+      font-size: 0.9rem; line-height: 1.45; color: var(--cream);
+    }
+    #howto .scroll p { margin: 0 0 10px; }
+    #howto .back { align-self: stretch; }
+
+    /* —— Duel board —— */
+    #duel {
+      padding: 4px 6px 2px; gap: 2px;
+    }
+    .bar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 6px; flex-shrink: 0; min-height: 28px; font-size: 0.72rem;
+    }
+    .lp {
+      display: flex; align-items: baseline; gap: 4px;
+      padding: 3px 8px; border-radius: 3px;
+      background: rgba(0,0,0,0.35); border: 1px solid var(--zone-line);
+      font-variant-numeric: tabular-nums;
+    }
+    .lp .who { color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .lp .val { color: var(--gold); font-size: 1.05rem; font-weight: 700; }
+    .lp.enemy .val { color: #ff8a80; }
+    .phase-pill {
+      flex: 1; text-align: center; color: var(--cream);
+      font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .field-tag {
+      text-align: center; font-size: 0.65rem; color: var(--gold);
+      letter-spacing: 0.1em; text-transform: uppercase; min-height: 14px;
+      flex-shrink: 0;
+    }
+
+    .field {
+      flex: 1; min-height: 0;
+      display: grid; grid-template-rows: 1fr auto 1fr;
+      gap: 3px; border-radius: 8px; padding: 4px;
+      background:
+        radial-gradient(ellipse at 50% 50%, #145c42 0%, var(--felt) 55%, var(--felt-edge) 100%);
+      border: 1px solid rgba(212,160,23,0.25);
+      box-shadow: inset 0 0 40px rgba(0,0,0,0.35);
+    }
+    .side {
+      display: flex; flex-direction: column; gap: 3px; min-height: 0; justify-content: center;
+    }
+    .side.opp { justify-content: flex-start; }
+    .side.me { justify-content: flex-end; }
+    .zones {
+      display: flex; justify-content: center; gap: 3px; min-height: 0;
+    }
+    .zone {
+      width: var(--card-w); height: var(--card-h);
+      border: 1px dashed var(--zone-line); border-radius: 3px;
+      background: var(--zone); position: relative;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .zone.st { border-color: rgba(80,140,255,0.35); }
+    .zone.m { border-color: rgba(212,160,23,0.4); }
+
+    .mid-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 4px; gap: 6px; flex-shrink: 0;
+    }
+    .pile {
+      width: calc(var(--card-w) * 0.85); height: calc(var(--card-h) * 0.85);
+      border-radius: 3px; border: 1px solid rgba(255,255,255,0.2);
+      background: linear-gradient(145deg, #1a2740, #0c1424);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 0.58rem; color: var(--muted); gap: 1px;
+    }
+    .pile .n { color: var(--cream); font-size: 0.85rem; font-weight: 700; }
+    .pile.gy { background: linear-gradient(145deg, #2a1a1a, #140c0c); }
+
+    .card {
+      width: 100%; height: 100%; border-radius: 2px; object-fit: cover;
+      border: 1px solid rgba(0,0,0,0.5); display: block;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.45);
+      animation: cardPlace 0.25s ease-out;
+    }
+    .card.facedown {
+      background:
+        repeating-linear-gradient(45deg, #1a2a4a 0 4px, #243860 4px 8px);
+      border: 1px solid var(--gold-dim);
+    }
+    .card.def { transform: rotate(90deg) scale(0.72); }
+    .card.atk-glow { box-shadow: 0 0 0 2px #ff5252; }
+    .card.sel { box-shadow: 0 0 0 2px var(--gold); }
+
+    .hand-wrap {
+      flex-shrink: 0; height: var(--hand-h);
+      display: flex; align-items: flex-end; justify-content: center;
+      padding: 0 4px 2px; perspective: 400px;
+    }
+    .hand {
+      display: flex; align-items: flex-end; justify-content: center;
+      height: 100%; width: 100%;
+    }
+    .hand .hc {
+      width: var(--card-w); height: var(--card-h);
+      margin-left: calc(var(--card-w) * -0.42);
+      transition: transform 0.15s, margin 0.15s;
+      border-radius: 3px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: #111;
+      animation: fanIn 0.35s ease-out both;
+    }
+    .hand .hc:first-child { margin-left: 0; }
+    .hand .hc:active, .hand .hc.sel { transform: translateY(-10px); z-index: 5; }
+    .hand .hc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .controls {
+      flex-shrink: 0; display: flex; gap: 6px; padding: 4px 2px 2px;
+      align-items: center;
+    }
+    .ctrl-btn {
+      flex: 1; padding: 10px 8px; border-radius: 4px; border: 1px solid var(--gold-dim);
+      background: linear-gradient(180deg, #1c3050, #101c30);
+      color: var(--cream); font: inherit; font-size: 0.85rem;
+      letter-spacing: 0.05em; cursor: pointer;
+    }
+    .ctrl-btn.primary {
+      background: linear-gradient(180deg, #b88912, #7a5608);
+      color: #1a1200; font-weight: 700; border-color: #f0c040;
+      flex: 1.4;
+    }
+    .ctrl-btn:disabled { opacity: 0.4; pointer-events: none; }
+    .log-line {
+      flex: 1.2; font-size: 0.62rem; color: var(--muted);
+      line-height: 1.2; max-height: 32px; overflow: hidden;
+      text-align: center;
+    }
+
+    /* —— Overlay / modal —— */
+    .overlay {
+      position: fixed; inset: 0; z-index: 40;
+      background: rgba(4,8,16,0.72);
+      display: none; align-items: flex-end; justify-content: center;
+      padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);
+      backdrop-filter: blur(3px);
+    }
+    .overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    .sheet {
+      width: min(420px, 100%); max-height: 88dvh;
+      background: linear-gradient(180deg, #15283f, #0c1626);
+      border: 1px solid var(--zone-line); border-radius: 12px 12px 0 0;
+      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+      animation: sheetUp 0.25s ease-out;
+    }
+    .sheet-top { display: flex; gap: 12px; align-items: flex-start; }
+    .sheet-art {
+      width: 110px; height: 160px; border-radius: 4px; object-fit: cover;
+      border: 1px solid var(--gold-dim); flex-shrink: 0; background: #111;
+    }
+    .sheet-meta { flex: 1; min-width: 0; }
+    .sheet-meta h3 { margin: 0 0 4px; color: var(--gold); font-size: 1.05rem; line-height: 1.2; }
+    .sheet-meta .stats { font-size: 0.8rem; color: var(--cream); margin-bottom: 4px; }
+    .sheet-meta .desc {
+      font-size: 0.72rem; color: var(--muted); line-height: 1.35;
+      max-height: 7.5em; overflow: auto;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .actions button {
+      flex: 1 1 40%; padding: 11px 8px; font: inherit; font-size: 0.88rem;
+      border-radius: 4px; border: 1px solid var(--gold-dim);
+      background: #1a2c48; color: var(--cream); cursor: pointer;
+    }
+    .actions button.danger { border-color: #a33; background: #3a1515; }
+    .actions button.ghost { background: transparent; color: var(--muted); }
+
+    .toast {
+      position: fixed; left: 50%; top: calc(var(--safe-t) + 12px);
+      transform: translateX(-50%) translateY(-120%);
+      background: rgba(10,20,36,0.95); border: 1px solid var(--gold);
+      color: var(--cream); padding: 8px 14px; border-radius: 6px;
+      font-size: 0.8rem; z-index: 60; transition: transform 0.25s;
+      max-width: 90vw; text-align: center; pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    #loading {
+      position: fixed; inset: 0; z-index: 80;
+      background: var(--bg0); display: none;
+      flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+    }
+    #loading.show { display: flex; }
+    .spinner {
+      width: 36px; height: 36px; border: 3px solid var(--zone-line);
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    #end {
+      align-items: center; justify-content: center; gap: 12px; text-align: center;
+    }
+    #end h2 { margin: 0; font-size: 2rem; color: var(--gold); }
+    #end p { margin: 0; color: var(--muted); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes sheetUp { from { transform: translateY(40%); } to { transform: translateY(0); } }
+    @keyframes brandIn { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+    @keyframes cardPlace { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+    @keyframes fanIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+    @media (max-height: 700px) {
+      :root { --card-w: clamp(32px, 10vw, 44px); }
+      .brand { font-size: 2.2rem; }
+      .menu-btn { padding: 11px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <section id="menu" class="screen active">
+      <h1 class="brand">Classic Duel</h1>
+      <p class="tagline">Yu-Gi-Oh! · Phase 1</p>
+      <div class="rules-row">
+        <button type="button" id="ruleClassic" class="on">Classic</button>
+        <button type="button" id="ruleDK">Duelist Kingdom</button>
+      </div>
+      <p class="rules-hint" id="rulesHint">8000 LP · tributes · 5/5 zones · no draw on turn 1</p>
+      <button type="button" class="menu-btn primary" id="btnStart">Start Duel</button>
+      <button type="button" class="menu-btn" id="btnHowto">How to Play</button>
+    </section>
+
+    <section id="howto" class="screen">
+      <h2>How to Play</h2>
+      <div class="scroll">
+        <p><strong>Goal:</strong> Reduce the opponent’s Life Points to 0, or deck them out.</p>
+        <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Use <em>Next Phase</em> to advance.</p>
+        <p><strong>Classic:</strong> One Normal Summon/Set per turn. Level 5–6 needs 1 tribute; 7+ needs 2. Change position once per turn (not the turn summoned).</p>
+        <p><strong>Duelist Kingdom:</strong> 2000 LP, no tributes, and a random field boosts matching Types by +30% ATK/DEF.</p>
+        <p><strong>Spells/Traps:</strong> Dark Hole, Raigeki, Monster Reborn, Pot of Greed, Trap Hole, Mirror Force, Fissure, Change of Heart.</p>
+        <p>Tap a card for a close-up and actions. Tap a monster in Battle phase to declare an attack.</p>
+      </div>
+      <button type="button" class="menu-btn back" id="btnHowtoBack">Back</button>
+    </section>
+
+    <section id="duel" class="screen">
+      <div class="bar">
+        <div class="lp enemy"><span class="who">CPU</span><span class="val" id="aiLP">8000</span></div>
+        <div class="phase-pill" id="phaseLabel">YOUR TURN · DRAW</div>
+        <div class="lp"><span class="who">You</span><span class="val" id="plLP">8000</span></div>
+      </div>
+      <div class="field-tag" id="fieldTag"></div>
+      <div class="field">
+        <div class="side opp">
+          <div class="zones" id="aiST"></div>
+          <div class="zones" id="aiMon"></div>
+        </div>
+        <div class="mid-row">
+          <div class="pile gy"><span>GY</span><span class="n" id="aiGY">0</span></div>
+          <div class="pile"><span>DECK</span><span class="n" id="aiDeck">0</span></div>
+          <div class="pile"><span>DECK</span><span class="n" id="plDeck">0</span></div>
+          <div class="pile gy"><span>GY</span><span class="n" id="plGY">0</span></div>
+        </div>
+        <div class="side me">
+          <div class="zones" id="plMon"></div>
+          <div class="zones" id="plST"></div>
+        </div>
+      </div>
+      <div class="hand-wrap"><div class="hand" id="hand"></div></div>
+      <div class="controls">
+        <button type="button" class="ctrl-btn" id="btnMenu">Menu</button>
+        <div class="log-line" id="logLine">Duel start</div>
+        <button type="button" class="ctrl-btn primary" id="btnNext">Next Phase</button>
+      </div>
+    </section>
+
+    <section id="end" class="screen">
+      <h2 id="endTitle">Victory</h2>
+      <p id="endMsg">You win!</p>
+      <button type="button" class="menu-btn primary" id="btnAgain">Duel Again</button>
+      <button type="button" class="menu-btn" id="btnEndMenu">Main Menu</button>
+    </section>
+  </div>
+
+  <div id="loading"><div class="spinner"></div><div id="loadMsg">Loading cards…</div></div>
+  <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay">
+    <div class="sheet">
+      <div class="sheet-top">
+        <img class="sheet-art" id="sheetArt" alt="" />
+        <div class="sheet-meta">
+          <h3 id="sheetName"></h3>
+          <div class="stats" id="sheetStats"></div>
+          <div class="desc" id="sheetDesc"></div>
+        </div>
+      </div>
+      <div class="actions" id="sheetActions"></div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  "use strict";
+
+  const API = "https://db.ygoprodeck.com/api/v7/cardinfo.php";
+  const CACHE_KEY = "classicDuel_cardCache_v1";
+  const ZONES = 5;
+
+  const FIELD_TYPES = {
+    Meadow: ["Beast", "Warrior", "Beast-Warrior"],
+    Forest: ["Insect", "Beast", "Plant", "Beast-Warrior"],
+    Mountain: ["Dragon", "Winged Beast", "Thunder"],
+    Sea: ["Fish", "Sea Serpent", "Thunder", "Aqua"],
+    Wasteland: ["Zombie", "Rock", "Dinosaur"],
+    Yami: ["Spellcaster", "Fiend"],
+  };
+
+  /* Classic LOB / Metal Raiders-era names (test deck pool) */
+  const DECK_LIST = [
+    "Blue-Eyes White Dragon", "Blue-Eyes White Dragon", "Dark Magician",
+    "Summoned Skull", "Gaia The Fierce Knight", "Curse of Dragon",
+    "Celtic Guardian", "Beaver Warrior", "Mystical Elf", "Feral Imp",
+    "Winged Dragon, Guardian of the Fortress #1", "Hitotsu-Me Giant",
+    "Battle Ox", "Koumori Dragon", "Two-Headed King Rex", "Uraby",
+    "Ryu-Kishin", "The Stern Mystic",     "Silver Fang", "Ansatsu",
+    "La Jinn the Mystical Genie of the Lamp", "Axe Raider",
+    "Man-Eater Bug", "Hane-Hane", "Penguin Soldier",
+    "Dark Hole", "Raigeki", "Monster Reborn", "Pot of Greed", "Pot of Greed",
+    "Fissure", "Change of Heart", "Trap Hole", "Trap Hole",
+    "Mirror Force", "Swords of Revealing Light", "Remove Trap",
+    "Judge Man", "Giant Soldier of Stone", "Mammoth Graveyard",
+  ];
+
+  const SPELL_FX = new Set([
+    "Dark Hole", "Raigeki", "Monster Reborn", "Pot of Greed",
+    "Trap Hole", "Mirror Force", "Fissure", "Change of Heart",
+  ]);
+
+  const PHASES = ["draw", "main1", "battle", "main2", "end"];
+  const PHASE_LABEL = {
+    draw: "Draw", main1: "Main 1", battle: "Battle", main2: "Main 2", end: "End",
+  };
+
+  let rulesMode = "classic";
+  let cardDB = {}; // name -> card
+  let state = null;
+  let sheetCtx = null; // { owner, where, index, card, faceup }
+
+  const $ = (id) => document.getElementById(id);
+  const el = {
+    menu: $("menu"), howto: $("howto"), duel: $("duel"), end: $("end"),
+    ruleClassic: $("ruleClassic"), ruleDK: $("ruleDK"), rulesHint: $("rulesHint"),
+    btnStart: $("btnStart"), btnHowto: $("btnHowto"), btnHowtoBack: $("btnHowtoBack"),
+    aiLP: $("aiLP"), plLP: $("plLP"), phaseLabel: $("phaseLabel"), fieldTag: $("fieldTag"),
+    aiST: $("aiST"), aiMon: $("aiMon"), plMon: $("plMon"), plST: $("plST"),
+    aiGY: $("aiGY"), aiDeck: $("aiDeck"), plDeck: $("plDeck"), plGY: $("plGY"),
+    hand: $("hand"), btnNext: $("btnNext"), btnMenu: $("btnMenu"), logLine: $("logLine"),
+    overlay: $("overlay"), sheetArt: $("sheetArt"), sheetName: $("sheetName"),
+    sheetStats: $("sheetStats"), sheetDesc: $("sheetDesc"), sheetActions: $("sheetActions"),
+    loading: $("loading"), loadMsg: $("loadMsg"), toast: $("toast"),
+    endTitle: $("endTitle"), endMsg: $("endMsg"), btnAgain: $("btnAgain"), btnEndMenu: $("btnEndMenu"),
+  };
+
+  function showScreen(name) {
+    ["menu", "howto", "duel", "end"].forEach((s) => {
+      $(s).classList.toggle("active", s === name);
+    });
+  }
+
+  function toast(msg) {
+    el.toast.textContent = msg;
+    el.toast.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.toast.classList.remove("show"), 2200);
+  }
+
+  function log(msg) {
+    if (!state) return;
+    state.log.unshift(msg);
+    if (state.log.length > 40) state.log.pop();
+    el.logLine.textContent = msg;
+  }
+
+  /* —— Card loading / cache —— */
+  function loadCache() {
+    try {
+      return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  }
+  function saveCache(db) {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(db));
+    } catch (_) { /* quota */ }
+  }
+
+  function normalizeCard(raw) {
+    const img = (raw.card_images && raw.card_images[0]) || {};
+    return {
+      id: raw.id,
+      name: raw.name,
+      type: raw.type || "",
+      race: raw.race || "",
+      attribute: raw.attribute || "",
+      level: raw.level || 0,
+      atk: raw.atk == null ? null : raw.atk,
+      def: raw.def == null ? null : raw.def,
+      desc: raw.desc || "",
+      image: img.image_url_small || img.image_url || "",
+      imageFull: img.image_url || img.image_url_small || "",
+      isMonster: /Monster/i.test(raw.type || ""),
+      isSpell: /Spell/i.test(raw.type || ""),
+      isTrap: /Trap/i.test(raw.type || ""),
+    };
+  }
+
+  async function fetchCard(name) {
+    const url = API + "?name=" + encodeURIComponent(name);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status + " for " + name);
+    const json = await res.json();
+    if (!json.data || !json.data[0]) throw new Error("Missing: " + name);
+    return normalizeCard(json.data[0]);
+  }
+
+  async function ensureCards(names) {
+    const cache = loadCache();
+    const need = [...new Set(names)].filter((n) => !cache[n]);
+    el.loading.classList.add("show");
+    let i = 0;
+    for (const name of need) {
+      el.loadMsg.textContent = `Loading cards… ${++i}/${need.length || 1}`;
+      try {
+        cache[name] = await fetchCard(name);
+        saveCache(cache);
+      } catch (err) {
+        console.warn(err);
+        // Minimal stub so duel can still start if a rare name fails
+        cache[name] = {
+          id: name.length, name, type: "Normal Monster", race: "Warrior",
+          attribute: "EARTH", level: 4, atk: 1200, def: 1000, desc: "(offline stub)",
+          image: "", imageFull: "", isMonster: true, isSpell: false, isTrap: false,
+        };
+      }
+      await new Promise((r) => setTimeout(r, 80));
+    }
+    // Also ensure already-cached names are present
+    for (const n of new Set(names)) {
+      if (!cache[n]) continue;
+    }
+    el.loading.classList.remove("show");
+    return cache;
+  }
+
+  /* —— Deck helpers —— */
+  function makeDeckInstance(db) {
+    const deck = DECK_LIST.map((name, idx) => {
+      const base = db[name];
+      if (!base) throw new Error("Card not loaded: " + name);
+      return {
+        uid: name.replace(/\W/g, "") + "_" + idx + "_" + Math.random().toString(36).slice(2, 7),
+        name: base.name,
+        ref: base,
+      };
+    });
+    shuffle(deck);
+    return deck;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function emptyZones() {
+    return Array.from({ length: ZONES }, () => null);
+  }
+
+  function makePlayer(db) {
+    return {
+      lp: rulesMode === "classic" ? 8000 : 2000,
+      deck: makeDeckInstance(db),
+      hand: [],
+      gy: [],
+      monsters: emptyZones(),
+      spells: emptyZones(),
+      normalSummoned: false,
+      positionChanged: new Set(), // uids changed this turn
+      summonedThisTurn: new Set(),
+      attackedThisTurn: new Set(),
+      controlledUntilEnd: [], // { zone, originalOwner }
+    };
+  }
+
+  function pickField() {
+    const keys = Object.keys(FIELD_TYPES);
+    return keys[Math.floor(Math.random() * keys.length)];
+  }
+
+  function startDuel() {
+    state = {
+      rules: rulesMode,
+      field: rulesMode === "dk" ? pickField() : null,
+      turn: "player",
+      phase: "draw",
+      turnCount: 1,
+      firstTurn: true,
+      player: makePlayer(cardDB),
+      ai: makePlayer(cardDB),
+      log: [],
+      winner: null,
+      pendingAttack: null, // { from, to }
+      trapPrompt: null,
+      busy: false,
+    };
+    drawCards(state.player, 5);
+    drawCards(state.ai, 5);
+    log("Duel start — " + (rulesMode === "classic" ? "Classic" : "Duelist Kingdom") + " rules");
+    if (state.field) log("Field: " + state.field + " (+30% matching Types)");
+    showScreen("duel");
+    beginTurn("player");
+    render();
+  }
+
+  function drawCards(p, n) {
+    for (let i = 0; i < n; i++) {
+      if (!p.deck.length) {
+        const loser = p === state.player ? "player" : "ai";
+        endGame(loser === "player" ? "ai" : "player", "Deck out!");
+        return false;
+      }
+      p.hand.push(p.deck.pop());
+    }
+    return true;
+  }
+
+  function beginTurn(who) {
+    state.turn = who;
+    state.phase = "draw";
+    const p = who === "player" ? state.player : state.ai;
+    p.normalSummoned = false;
+    p.positionChanged = new Set();
+    p.summonedThisTurn = new Set();
+    p.attackedThisTurn = new Set();
+    // Return Change of Heart monsters
+    revertControl(p);
+    if (who === "player") {
+      if (!(state.firstTurn && state.turnCount === 1)) {
+        if (!drawCards(p, 1)) return;
+        log("You draw a card.");
+      } else {
+        log("First turn — no draw.");
+      }
+      state.phase = "main1";
+      render();
+    } else {
+      runAITurn();
+    }
+  }
+
+  function revertControl(endingPlayer) {
+    // Cards taken via Change of Heart return at end of the controller's turn
+    const controller = endingPlayer;
+    const zones = controller.monsters;
+    for (let i = 0; i < ZONES; i++) {
+      const m = zones[i];
+      if (m && m.tempControl) {
+        const original = m.tempControl === "player" ? state.player : state.ai;
+        zones[i] = null;
+        m.tempControl = null;
+        const slot = firstEmpty(original.monsters);
+        if (slot >= 0) original.monsters[slot] = m;
+        else original.gy.push(m);
+        log(m.name + " returns to its owner.");
+      }
+    }
+  }
+
+  function nextPhase() {
+    if (!state || state.busy || state.winner) return;
+    if (state.turn !== "player") return;
+    const idx = PHASES.indexOf(state.phase);
+    if (state.phase === "end" || idx === PHASES.length - 1) {
+      endTurn();
+      return;
+    }
+    // skip draw (already done)
+    let next = PHASES[idx + 1];
+    if (state.phase === "draw") next = "main1";
+    state.phase = next;
+    if (state.phase === "end") {
+      log("End Phase.");
+      endTurn();
+      return;
+    }
+    log("Phase: " + PHASE_LABEL[state.phase]);
+    render();
+  }
+
+  function endTurn() {
+    if (state.winner) return;
+    // End of turn cleanup for current player already handled in beginTurn for next
+    if (state.turn === "player") {
+      revertControl(state.player);
+      state.firstTurn = false;
+      state.turnCount++;
+      log("Opponent's turn…");
+      render();
+      setTimeout(() => beginTurn("ai"), 450);
+    } else {
+      revertControl(state.ai);
+      state.turnCount++;
+      log("Your turn.");
+      beginTurn("player");
+    }
+  }
+
+  function endGame(winner, reason) {
+    state.winner = winner;
+    showScreen("end");
+    el.endTitle.textContent = winner === "player" ? "Victory!" : "Defeat";
+    el.endMsg.textContent = reason || (winner === "player" ? "You win the duel." : "You lose the duel.");
+  }
+
+  /* —— Stats with field bonus —— */
+  function getStats(cardInst, faceup) {
+    const ref = cardInst.ref;
+    let atk = ref.atk || 0;
+    let def = ref.def || 0;
+    if (state.field && faceup !== false) {
+      const types = FIELD_TYPES[state.field] || [];
+      if (types.includes(ref.race)) {
+        atk = Math.floor(atk * 1.3);
+        def = Math.floor(def * 1.3);
+      }
+    }
+    return { atk, def };
+  }
+
+  function firstEmpty(zones) {
+    return zones.findIndex((z) => !z);
+  }
+
+  function occupied(zones) {
+    return zones.filter(Boolean);
+  }
+
+  function tributesNeeded(level) {
+    if (state.rules === "dk") return 0;
+    if (level >= 7) return 2;
+    if (level >= 5) return 1;
+    return 0;
+  }
+
+  /* —— Actions —— */
+  function canNormalSummon(p) {
+    return !p.normalSummoned;
+  }
+
+  function placeMonster(p, handIdx, pos, faceup, tributeIdxs) {
+    const card = p.hand[handIdx];
+    if (!card || !card.ref.isMonster) return false;
+    const need = tributesNeeded(card.ref.level);
+    if (need > 0) {
+      if (!tributeIdxs || tributeIdxs.length !== need) return false;
+      tributeIdxs.sort((a, b) => b - a);
+      for (const zi of tributeIdxs) {
+        if (!p.monsters[zi]) return false;
+        p.gy.push(p.monsters[zi]);
+        p.monsters[zi] = null;
+      }
+    }
+    const slot = firstEmpty(p.monsters);
+    if (slot < 0) return false;
+    p.hand.splice(handIdx, 1);
+    p.monsters[slot] = {
+      ...card,
+      position: pos, // 'atk' | 'def'
+      faceup: !!faceup,
+      tempControl: null,
+    };
+    p.normalSummoned = true;
+    p.summonedThisTurn.add(p.monsters[slot].uid);
+    return { slot, monster: p.monsters[slot] };
+  }
+
+  function setSpellTrap(p, handIdx) {
+    const card = p.hand[handIdx];
+    if (!card || (!card.ref.isSpell && !card.ref.isTrap)) return false;
+    const slot = firstEmpty(p.spells);
+    if (slot < 0) return false;
+    p.hand.splice(handIdx, 1);
+    p.spells[slot] = { ...card, faceup: false, setTurn: state.turnCount };
+    return slot;
+  }
+
+  function activateFromHand(p, handIdx, isAI) {
+    const card = p.hand[handIdx];
+    if (!card || !card.ref.isSpell) return false;
+    if (!SPELL_FX.has(card.name)) {
+      toast("This spell isn't implemented yet.");
+      return false;
+    }
+    p.hand.splice(handIdx, 1);
+    return resolveSpell(p, card, isAI);
+  }
+
+  function activateSetST(p, zoneIdx, isAI) {
+    const card = p.spells[zoneIdx];
+    if (!card) return false;
+    if (card.ref.isTrap && !SPELL_FX.has(card.name)) {
+      toast("This trap isn't implemented yet.");
+      return false;
+    }
+    if (card.ref.isSpell && !SPELL_FX.has(card.name)) {
+      toast("This spell isn't implemented yet.");
+      return false;
+    }
+    // Traps generally need timing; Mirror Force / Trap Hole handled separately
+    if (card.ref.isTrap && card.name !== "Trap Hole" && card.name !== "Mirror Force") {
+      return false;
+    }
+    if (card.ref.isSpell || (card.ref.isTrap && !isAI && confirmActivate(card))) {
+      p.spells[zoneIdx] = null;
+      return resolveSpell(p, card, isAI);
+    }
+    return false;
+  }
+
+  function confirmActivate() { return true; }
+
+  function resolveSpell(owner, card, isAI) {
+    const opp = owner === state.player ? state.ai : state.player;
+    const name = card.name;
+    log((isAI ? "CPU" : "You") + " activate " + name + "!");
+
+    if (name === "Dark Hole") {
+      destroyAllMonsters(state.player);
+      destroyAllMonsters(state.ai);
+    } else if (name === "Raigeki") {
+      destroyAllMonsters(opp);
+    } else if (name === "Pot of Greed") {
+      drawCards(owner, 2);
+    } else if (name === "Fissure") {
+      const targets = occupied(opp.monsters).filter((m) => m.faceup || true);
+      if (!targets.length) {
+        log("Fissure resolves with no target.");
+      } else {
+        let best = null, bestAtk = Infinity, bestIdx = -1;
+        opp.monsters.forEach((m, i) => {
+          if (!m) return;
+          const a = getStats(m, m.faceup).atk;
+          // Face-down: use printed ATK for Fissure simplicity (classic often reveals)
+          const val = m.faceup ? a : (m.ref.atk || 0);
+          if (val < bestAtk) { bestAtk = val; best = m; bestIdx = i; }
+        });
+        if (bestIdx >= 0) destroyMonster(opp, bestIdx);
+      }
+    } else if (name === "Change of Heart") {
+      const idxs = opp.monsters.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
+      if (!idxs.length) {
+        log("No monster to take.");
+      } else {
+        let idx;
+        if (isAI) {
+          idx = idxs.reduce((best, i) => {
+            const a = getStats(opp.monsters[i], true).atk;
+            const b = getStats(opp.monsters[best], true).atk;
+            return a > b ? i : best;
+          }, idxs[0]);
+        } else {
+          idx = idxs[0];
+          // Prefer highest ATK face-up
+          idxs.forEach((i) => {
+            if (getStats(opp.monsters[i], true).atk > getStats(opp.monsters[idx], true).atk)
+              idx = i;
+          });
+        }
+        const slot = firstEmpty(owner.monsters);
+        if (slot < 0) {
+          log("No zone to take control.");
+        } else {
+          const m = opp.monsters[idx];
+          opp.monsters[idx] = null;
+          m.tempControl = owner === state.player ? "ai" : "player"; // original owner
+          m.faceup = true;
+          m.position = "atk";
+          owner.monsters[slot] = m;
+          log("Took control of " + m.name + ".");
+        }
+      }
+    } else if (name === "Monster Reborn") {
+      const pool = [...owner.gy, ...opp.gy].filter((c) => c.ref.isMonster);
+      if (!pool.length) {
+        log("No monster in either GY.");
+      } else {
+        pool.sort((a, b) => (b.ref.atk || 0) - (a.ref.atk || 0));
+        const pick = pool[0];
+        // remove from correct GY
+        let gi = owner.gy.findIndex((c) => c.uid === pick.uid);
+        if (gi >= 0) owner.gy.splice(gi, 1);
+        else {
+          gi = opp.gy.findIndex((c) => c.uid === pick.uid);
+          if (gi >= 0) opp.gy.splice(gi, 1);
+        }
+        const slot = firstEmpty(owner.monsters);
+        if (slot < 0) {
+          owner.gy.push(pick);
+          log("No monster zone.");
+        } else {
+          owner.monsters[slot] = {
+            ...pick,
+            position: "atk",
+            faceup: true,
+            tempControl: null,
+          };
+          log("Special Summoned " + pick.name + ".");
+        }
+      }
+    } else if (name === "Trap Hole" || name === "Mirror Force") {
+      // Should be activated on timing; if forced from sheet, just send to GY
+      log(name + " is sent to the GY (no valid timing).");
+    }
+
+    owner.gy.push(card);
+    checkLP();
+    render();
+    return true;
+  }
+
+  function destroyAllMonsters(p) {
+    for (let i = 0; i < ZONES; i++) {
+      if (p.monsters[i]) destroyMonster(p, i);
+    }
+  }
+
+  function destroyMonster(p, idx) {
+    const m = p.monsters[idx];
+    if (!m) return;
+    p.monsters[idx] = null;
+    p.gy.push(m);
+    log(m.name + " destroyed.");
+  }
+
+  function tryTrapHole(summoner, slot) {
+    const victim = summoner === state.player ? state.ai : state.player;
+    // victim is the one who may have Trap Hole set
+    for (let i = 0; i < ZONES; i++) {
+      const st = victim.spells[i];
+      if (st && st.name === "Trap Hole" && !st.faceup) {
+        const m = summoner.monsters[slot];
+        if (!m) return;
+        const atk = m.ref.atk || 0;
+        if (atk >= 1000 && m.position === "atk" && m.faceup) {
+          // Auto-activate for AI; for player, auto for simplicity in phase 1
+          victim.spells[i] = null;
+          victim.gy.push(st);
+          log((victim === state.player ? "You" : "CPU") + " activate Trap Hole!");
+          destroyMonster(summoner, slot);
+          render();
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function tryMirrorForce(attacker, atkZone) {
+    const defender = attacker === state.player ? state.ai : state.player;
+    for (let i = 0; i < ZONES; i++) {
+      const st = defender.spells[i];
+      if (st && st.name === "Mirror Force" && !st.faceup) {
+        defender.spells[i] = null;
+        defender.gy.push(st);
+        log((defender === state.player ? "You" : "CPU") + " activate Mirror Force!");
+        for (let z = 0; z < ZONES; z++) {
+          const m = attacker.monsters[z];
+          if (m && m.position === "atk" && m.faceup) destroyMonster(attacker, z);
+        }
+        render();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function changePosition(p, zoneIdx) {
+    const m = p.monsters[zoneIdx];
+    if (!m) return false;
+    if (p.summonedThisTurn.has(m.uid)) {
+      toast("Can't change position the turn it's summoned.");
+      return false;
+    }
+    if (p.positionChanged.has(m.uid)) {
+      toast("Already changed position this turn.");
+      return false;
+    }
+    if (!m.faceup && m.position === "def") {
+      // Flip summon / flip to face-up attack
+      m.faceup = true;
+      m.position = "atk";
+    } else if (m.position === "atk") {
+      m.position = "def";
+    } else {
+      m.position = "atk";
+    }
+    p.positionChanged.add(m.uid);
+    log(m.name + " → " + (m.position === "atk" ? "Attack" : "Defense") + " Position.");
+    render();
+    return true;
+  }
+
+  function battle(atkOwner, atkIdx, defOwner, defIdx) {
+    const atkM = atkOwner.monsters[atkIdx];
+    if (!atkM || atkM.position !== "atk" || !atkM.faceup) return;
+    if (atkOwner.attackedThisTurn.has(atkM.uid)) {
+      toast("Already attacked.");
+      return;
+    }
+    if (tryMirrorForce(atkOwner, atkIdx)) {
+      atkOwner.attackedThisTurn.add(atkM.uid);
+      checkLP();
+      return;
+    }
+
+    // Direct attack
+    if (defIdx == null || defIdx < 0) {
+      if (occupied(defOwner.monsters).length) {
+        toast("Choose a target monster.");
+        return;
+      }
+      const dmg = getStats(atkM, true).atk;
+      defOwner.lp = Math.max(0, defOwner.lp - dmg);
+      log(atkM.name + " direct attack! " + dmg + " damage.");
+      atkOwner.attackedThisTurn.add(atkM.uid);
+      checkLP();
+      render();
+      return;
+    }
+
+    const defM = defOwner.monsters[defIdx];
+    if (!defM) return;
+
+    const wasHidden = !defM.faceup;
+    defM.faceup = true;
+    const a = getStats(atkM, true).atk;
+    const dStats = getStats(defM, true);
+    const d = defM.position === "def" ? dStats.def : dStats.atk;
+
+    log(atkM.name + " (" + a + ") vs " + defM.name + " (" + d + ")" + (wasHidden ? " [flipped]" : ""));
+
+    if (defM.position === "def") {
+      if (a > d) {
+        destroyMonster(defOwner, defIdx);
+      } else if (a < d) {
+        const dmg = d - a;
+        atkOwner.lp = Math.max(0, atkOwner.lp - dmg);
+        log(dmg + " battle damage to attacker.");
+      } else {
+        log("No destruction (tied DEF).");
+      }
+    } else {
+      if (a > d) {
+        destroyMonster(defOwner, defIdx);
+        const dmg = a - d;
+        defOwner.lp = Math.max(0, defOwner.lp - dmg);
+        log(dmg + " damage.");
+      } else if (a < d) {
+        destroyMonster(atkOwner, atkIdx);
+        const dmg = d - a;
+        atkOwner.lp = Math.max(0, atkOwner.lp - dmg);
+        log(dmg + " damage.");
+      } else {
+        destroyMonster(atkOwner, atkIdx);
+        destroyMonster(defOwner, defIdx);
+        log("Both destroyed.");
+      }
+    }
+    if (atkOwner.monsters[atkIdx]) atkOwner.attackedThisTurn.add(atkM.uid);
+    checkLP();
+    render();
+  }
+
+  function checkLP() {
+    if (!state || state.winner) return;
+    if (state.player.lp <= 0) endGame("ai", "Your LP hit 0.");
+    else if (state.ai.lp <= 0) endGame("player", "Opponent's LP hit 0.");
+  }
+
+  /* —— AI —— */
+  async function runAITurn() {
+    state.busy = true;
+    el.btnNext.disabled = true;
+    const ai = state.ai;
+    const pl = state.player;
+
+    // Draw
+    if (!(state.firstTurn && state.turn === "ai" && state.turnCount === 1)) {
+      if (!drawCards(ai, 1)) { state.busy = false; return; }
+      log("CPU draws.");
+    }
+    await wait(400);
+    state.phase = "main1";
+    render();
+
+    // Activate helpful spells from hand
+    await aiUseSpells();
+    await wait(350);
+
+    // Summon strongest legal
+    await aiSummon();
+    await wait(350);
+
+    // Set a trap if available
+    await aiSetTrap();
+    await wait(300);
+
+    state.phase = "battle";
+    log("CPU Battle Phase.");
+    render();
+    await wait(400);
+    await aiAttack();
+
+    state.phase = "main2";
+    render();
+    await wait(250);
+
+    state.phase = "end";
+    state.busy = false;
+    el.btnNext.disabled = false;
+    state.firstTurn = false;
+    endTurn();
+  }
+
+  function wait(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+
+  async function aiUseSpells() {
+    const ai = state.ai;
+    const pl = state.player;
+    // Raigeki if player has 2+ monsters
+    let idx = ai.hand.findIndex((c) => c.name === "Raigeki");
+    if (idx >= 0 && occupied(pl.monsters).length >= 2) {
+      activateFromHand(ai, idx, true);
+      await wait(400);
+    }
+    idx = ai.hand.findIndex((c) => c.name === "Dark Hole");
+    if (idx >= 0 && occupied(pl.monsters).length >= 2 && occupied(ai.monsters).length <= 1) {
+      activateFromHand(ai, idx, true);
+      await wait(400);
+    }
+    idx = ai.hand.findIndex((c) => c.name === "Fissure");
+    if (idx >= 0 && occupied(pl.monsters).length >= 1) {
+      activateFromHand(ai, idx, true);
+      await wait(400);
+    }
+    idx = ai.hand.findIndex((c) => c.name === "Pot of Greed");
+    if (idx >= 0) {
+      activateFromHand(ai, idx, true);
+      await wait(400);
+    }
+    idx = ai.hand.findIndex((c) => c.name === "Monster Reborn");
+    if (idx >= 0 && (ai.gy.some((c) => c.ref.isMonster) || pl.gy.some((c) => c.ref.isMonster))) {
+      if (firstEmpty(ai.monsters) >= 0) {
+        activateFromHand(ai, idx, true);
+        await wait(400);
+      }
+    }
+    idx = ai.hand.findIndex((c) => c.name === "Change of Heart");
+    if (idx >= 0 && occupied(pl.monsters).length && firstEmpty(ai.monsters) >= 0) {
+      activateFromHand(ai, idx, true);
+      await wait(400);
+    }
+  }
+
+  async function aiSummon() {
+    const ai = state.ai;
+    if (!canNormalSummon(ai)) return;
+    if (firstEmpty(ai.monsters) < 0 && tributesNeeded(12) === 0) return;
+
+    const monsters = ai.hand
+      .map((c, i) => ({ c, i }))
+      .filter(({ c }) => c.ref.isMonster);
+
+    // Sort by ATK descending
+    monsters.sort((a, b) => (b.c.ref.atk || 0) - (a.c.ref.atk || 0));
+
+    for (const { c, i } of monsters) {
+      const need = tributesNeeded(c.ref.level);
+      const fieldMons = ai.monsters.map((m, zi) => (m ? zi : -1)).filter((z) => z >= 0);
+      if (need > fieldMons.length) continue;
+      if (need === 0 && firstEmpty(ai.monsters) < 0) continue;
+
+      let tributes = [];
+      if (need > 0) {
+        // Tribute weakest
+        tributes = fieldMons
+          .slice()
+          .sort((a, b) => (ai.monsters[a].ref.atk || 0) - (ai.monsters[b].ref.atk || 0))
+          .slice(0, need);
+        // After tributes need a free zone — tributes free zones
+      }
+      // Recalculate hand index (may have shifted if spells used — re-find)
+      const hi = ai.hand.findIndex((x) => x.uid === c.uid);
+      if (hi < 0) continue;
+      const res = placeMonster(ai, hi, "atk", true, tributes);
+      if (res) {
+        log("CPU summons " + c.name + ".");
+        tryTrapHole(ai, res.slot);
+        render();
+        return;
+      }
+    }
+
+    // Set a weaker monster face-down if can't summon strong
+    const weak = monsters.filter(({ c }) => tributesNeeded(c.ref.level) === 0);
+    if (weak.length && firstEmpty(ai.monsters) >= 0) {
+      weak.sort((a, b) => (a.c.ref.atk || 0) - (b.c.ref.atk || 0));
+      const pick = weak[0];
+      const hi = ai.hand.findIndex((x) => x.uid === pick.c.uid);
+      if (hi >= 0) {
+        placeMonster(ai, hi, "def", false, []);
+        log("CPU Sets a monster.");
+        render();
+      }
+    }
+  }
+
+  async function aiSetTrap() {
+    const ai = state.ai;
+    if (firstEmpty(ai.spells) < 0) return;
+    const traps = ["Trap Hole", "Mirror Force"];
+    for (const name of traps) {
+      const hi = ai.hand.findIndex((c) => c.name === name);
+      if (hi >= 0) {
+        setSpellTrap(ai, hi);
+        log("CPU Sets a card.");
+        render();
+        return;
+      }
+    }
+    // Set a spell face-down sometimes
+    const hi = ai.hand.findIndex((c) => c.ref.isSpell && SPELL_FX.has(c.name));
+    if (hi >= 0 && Math.random() < 0.35) {
+      setSpellTrap(ai, hi);
+      log("CPU Sets a card.");
+      render();
+    }
+  }
+
+  async function aiAttack() {
+    const ai = state.ai;
+    const pl = state.player;
+    for (let i = 0; i < ZONES; i++) {
+      const m = ai.monsters[i];
+      if (!m || m.position !== "atk" || !m.faceup) continue;
+      if (ai.attackedThisTurn.has(m.uid)) continue;
+      const a = getStats(m, true).atk;
+
+      const targets = pl.monsters
+        .map((tm, zi) => (tm ? { tm, zi } : null))
+        .filter(Boolean);
+
+      if (!targets.length) {
+        battle(ai, i, pl, -1);
+        await wait(500);
+        if (state.winner) return;
+        continue;
+      }
+
+      // Attack if we win or pierce favorably
+      let best = null;
+      for (const { tm, zi } of targets) {
+        const ds = getStats(tm, tm.faceup);
+        const d = !tm.faceup ? 0 : (tm.position === "def" ? ds.def : ds.atk);
+        // Face-down: AI may risk attack if ATK is high
+        if (!tm.faceup) {
+          if (a >= 1500) { best = zi; break; }
+          continue;
+        }
+        if (tm.position === "def") {
+          if (a > d) { best = zi; break; }
+        } else {
+          if (a > d) { best = zi; break; }
+          // Don't attack into stronger
+        }
+      }
+      if (best != null) {
+        battle(ai, i, pl, best);
+        await wait(500);
+        if (state.winner) return;
+      }
+    }
+  }
+
+  /* —— UI render —— */
+  function renderZones(container, zones, owner, kind) {
+    container.innerHTML = "";
+    for (let i = 0; i < ZONES; i++) {
+      const z = document.createElement("div");
+      z.className = "zone " + (kind === "m" ? "m" : "st");
+      const card = zones[i];
+      if (card) {
+        const img = document.createElement(card.faceup && card.ref.image ? "img" : "div");
+        if (card.faceup && card.ref.image) {
+          img.className = "card" + (card.position === "def" ? " def" : "");
+          img.src = card.ref.image;
+          img.alt = card.name;
+          img.draggable = false;
+        } else {
+          img.className = "card facedown" + (card.position === "def" ? " def" : "");
+        }
+        if (state.pendingAttack && state.pendingAttack.from === i && owner === "player" && kind === "m") {
+          img.classList.add("atk-glow");
+        }
+        z.appendChild(img);
+        z.addEventListener("click", (e) => {
+          e.stopPropagation();
+          onZoneTap(owner, kind, i);
+        });
+      } else if (state.pendingAttack && owner === "ai" && kind === "m") {
+        // allow clicking empty? no — direct handled separately
+      }
+      container.appendChild(z);
+    }
+  }
+
+  function render() {
+    if (!state) return;
+    const pl = state.player;
+    const ai = state.ai;
+    el.plLP.textContent = pl.lp;
+    el.aiLP.textContent = ai.lp;
+    el.plDeck.textContent = pl.deck.length;
+    el.aiDeck.textContent = ai.deck.length;
+    el.plGY.textContent = pl.gy.length;
+    el.aiGY.textContent = ai.gy.length;
+    el.fieldTag.textContent = state.field
+      ? "Field: " + state.field + " · +30% " + (FIELD_TYPES[state.field] || []).join(", ")
+      : (state.rules === "classic" ? "Classic Rules" : "");
+
+    const turnLabel = state.turn === "player" ? "YOUR TURN" : "CPU TURN";
+    el.phaseLabel.textContent = turnLabel + " · " + (PHASE_LABEL[state.phase] || "").toUpperCase();
+
+    renderZones(el.aiST, ai.spells, "ai", "st");
+    renderZones(el.aiMon, ai.monsters, "ai", "m");
+    renderZones(el.plMon, pl.monsters, "player", "m");
+    renderZones(el.plST, pl.spells, "player", "st");
+
+    // Hand
+    el.hand.innerHTML = "";
+    pl.hand.forEach((c, i) => {
+      const d = document.createElement("div");
+      d.className = "hc";
+      d.style.animationDelay = (i * 0.03) + "s";
+      if (c.ref.image) {
+        const img = document.createElement("img");
+        img.src = c.ref.image;
+        img.alt = c.name;
+        img.draggable = false;
+        d.appendChild(img);
+      } else {
+        d.textContent = c.name.slice(0, 3);
+        d.style.fontSize = "0.55rem";
+        d.style.display = "flex";
+        d.style.alignItems = "center";
+        d.style.justifyContent = "center";
+        d.style.padding = "2px";
+        d.style.color = "var(--cream)";
+      }
+      d.addEventListener("click", () => openSheet({
+        owner: "player", where: "hand", index: i, card: c, faceup: true,
+      }));
+      el.hand.appendChild(d);
+    });
+
+    el.btnNext.disabled = state.turn !== "player" || state.busy || !!state.winner;
+  }
+
+  function onZoneTap(owner, kind, index) {
+    if (!state || state.winner) return;
+    const p = owner === "player" ? state.player : state.ai;
+    const zones = kind === "m" ? p.monsters : p.spells;
+    const card = zones[index];
+
+    // Attack targeting
+    if (state.pendingAttack && state.turn === "player" && state.phase === "battle") {
+      if (owner === "ai" && kind === "m" && card) {
+        const from = state.pendingAttack.from;
+        state.pendingAttack = null;
+        battle(state.player, from, state.ai, index);
+        return;
+      }
+    }
+
+    if (!card) {
+      if (state.pendingAttack && owner === "ai" && kind === "m" && !occupied(state.ai.monsters).length) {
+        const from = state.pendingAttack.from;
+        state.pendingAttack = null;
+        battle(state.player, from, state.ai, -1);
+      }
+      return;
+    }
+
+    const faceup = owner === "player" ? true : !!card.faceup;
+    // Opponent face-down: still show back unless we allow peek — show limited sheet
+    openSheet({
+      owner, where: kind === "m" ? "monster" : "st", index, card,
+      faceup: owner === "player" || card.faceup,
+    });
+  }
+
+  function openSheet(ctx) {
+    sheetCtx = ctx;
+    const c = ctx.card;
+    const known = ctx.faceup;
+    el.sheetName.textContent = known ? c.name : "Set Card";
+    el.sheetArt.src = known && c.ref.imageFull ? c.ref.imageFull : (known && c.ref.image ? c.ref.image : "");
+    el.sheetArt.style.background = known ? "#111" : "repeating-linear-gradient(45deg,#1a2a4a 0 6px,#243860 6px 12px)";
+    if (!known) el.sheetArt.removeAttribute("src");
+
+    if (known && c.ref.isMonster) {
+      const s = getStats(c, true);
+      el.sheetStats.textContent =
+        (c.ref.attribute || "") + " · " + (c.ref.race || "") +
+        " · Lv" + c.ref.level + " · ATK " + s.atk + " / DEF " + s.def +
+        (c.position ? " · " + (c.faceup ? "" : "FD ") + c.position.toUpperCase() : "");
+    } else if (known) {
+      el.sheetStats.textContent = c.ref.type || (c.ref.isSpell ? "Spell" : "Trap");
+    } else {
+      el.sheetStats.textContent = "Face-down";
+    }
+    el.sheetDesc.textContent = known ? (c.ref.desc || "") : "";
+
+    const actions = el.sheetActions;
+    actions.innerHTML = "";
+
+    const add = (label, fn, cls) => {
+      const b = document.createElement("button");
+      b.textContent = label;
+      if (cls) b.className = cls;
+      b.addEventListener("click", () => { closeSheet(); fn(); });
+      actions.appendChild(b);
+    };
+
+    const myTurn = state.turn === "player" && !state.busy;
+    const main = state.phase === "main1" || state.phase === "main2";
+
+    if (ctx.owner === "player" && ctx.where === "hand" && myTurn && main) {
+      if (c.ref.isMonster) {
+        add("Summon ATK", () => doSummon(ctx.index, "atk", true));
+        add("Set DEF", () => doSummon(ctx.index, "def", false));
+      }
+      if (c.ref.isSpell && SPELL_FX.has(c.name)) {
+        add("Activate", () => {
+          activateFromHand(state.player, ctx.index, false);
+        });
+      }
+      if ((c.ref.isSpell || c.ref.isTrap) && firstEmpty(state.player.spells) >= 0) {
+        add("Set", () => {
+          if (setSpellTrap(state.player, ctx.index) !== false) {
+            log("You Set a card.");
+            render();
+          }
+        });
+      }
+    }
+
+    if (ctx.owner === "player" && ctx.where === "monster" && myTurn) {
+      if (main) {
+        add("Change Position", () => changePosition(state.player, ctx.index));
+      }
+      if (state.phase === "battle" && c.position === "atk" && c.faceup) {
+        add("Attack", () => {
+          if (state.player.attackedThisTurn.has(c.uid)) {
+            toast("Already attacked.");
+            return;
+          }
+          if (!occupied(state.ai.monsters).length) {
+            battle(state.player, ctx.index, state.ai, -1);
+          } else {
+            state.pendingAttack = { from: ctx.index };
+            toast("Tap an opponent monster to attack.");
+            render();
+          }
+        });
+      }
+    }
+
+    if (ctx.owner === "player" && ctx.where === "st" && myTurn && main) {
+      if (c.ref.isSpell && SPELL_FX.has(c.name)) {
+        add("Activate", () => {
+          state.player.spells[ctx.index] = null;
+          resolveSpell(state.player, c, false);
+        });
+      }
+    }
+
+    add("Close", () => {}, "ghost");
+    el.overlay.classList.add("open");
+  }
+
+  function closeSheet() {
+    el.overlay.classList.remove("open");
+    sheetCtx = null;
+  }
+
+  function doSummon(handIdx, pos, faceup) {
+    const p = state.player;
+    const card = p.hand[handIdx];
+    if (!card) return;
+    if (!canNormalSummon(p)) {
+      toast("Already Normal Summoned/Set this turn.");
+      return;
+    }
+    const need = tributesNeeded(card.ref.level);
+    let tributes = [];
+    if (need > 0) {
+      const idxs = p.monsters.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
+      if (idxs.length < need) {
+        toast("Need " + need + " tribute(s).");
+        return;
+      }
+      // Auto-tribute weakest
+      tributes = idxs
+        .slice()
+        .sort((a, b) => (p.monsters[a].ref.atk || 0) - (p.monsters[b].ref.atk || 0))
+        .slice(0, need);
+      log("Tributed " + tributes.map((i) => p.monsters[i].name).join(", "));
+    } else if (firstEmpty(p.monsters) < 0) {
+      toast("Monster zones full.");
+      return;
+    }
+    const res = placeMonster(p, handIdx, pos, faceup, tributes);
+    if (res) {
+      log((faceup ? "Summoned " : "Set ") + card.name + ".");
+      if (faceup && pos === "atk") tryTrapHole(p, res.slot);
+      render();
+    }
+  }
+
+  /* —— Events —— */
+  el.ruleClassic.addEventListener("click", () => {
+    rulesMode = "classic";
+    el.ruleClassic.classList.add("on");
+    el.ruleDK.classList.remove("on");
+    el.rulesHint.textContent = "8000 LP · tributes · 5/5 zones · no draw on turn 1";
+  });
+  el.ruleDK.addEventListener("click", () => {
+    rulesMode = "dk";
+    el.ruleDK.classList.add("on");
+    el.ruleClassic.classList.remove("on");
+    el.rulesHint.textContent = "2000 LP · no tributes · random field +30% Type boost";
+  });
+  el.btnHowto.addEventListener("click", () => showScreen("howto"));
+  el.btnHowtoBack.addEventListener("click", () => showScreen("menu"));
+  el.btnStart.addEventListener("click", async () => {
+    try {
+      cardDB = await ensureCards(DECK_LIST);
+      startDuel();
+    } catch (e) {
+      el.loading.classList.remove("show");
+      toast("Failed to load cards. Check network.");
+      console.error(e);
+    }
+  });
+  el.btnNext.addEventListener("click", nextPhase);
+  el.btnMenu.addEventListener("click", () => {
+    if (confirm("Return to main menu? Duel will be lost.")) {
+      state = null;
+      showScreen("menu");
+    }
+  });
+  el.btnAgain.addEventListener("click", async () => {
+    cardDB = await ensureCards(DECK_LIST);
+    startDuel();
+  });
+  el.btnEndMenu.addEventListener("click", () => showScreen("menu"));
+  el.overlay.addEventListener("click", (e) => {
+    if (e.target === el.overlay) closeSheet();
+  });
+
+  // Preload cache silently if present
+  cardDB = loadCache();
+})();
+  </script>
+</body>
+</html>
