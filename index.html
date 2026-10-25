@@ -519,6 +519,16 @@
     }
     .card.def { transform: rotate(90deg) scale(0.68); }
     .card.atk-glow { box-shadow: 0 0 0 2px #ff5252; }
+    .zone.ai-act {
+      border-style: solid;
+      border-color: #ffe08a;
+      box-shadow: 0 0 0 2px #f0c040, 0 0 12px rgba(240, 192, 64, 0.9);
+      z-index: 3;
+      animation: aiPulse 0.8s ease-in-out infinite;
+    }
+    @keyframes aiPulse {
+      50% { box-shadow: 0 0 0 2px #fff6d0, 0 0 16px rgba(255, 220, 120, 1); }
+    }
 
     .hand-wrap {
       flex: 0 0 auto; height: var(--hand-h);
@@ -717,7 +727,7 @@
       <h2>How to Play</h2>
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
-        <p><strong>Tournament:</strong> Duelist Kingdom rules on an island. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. A loss costs 1. At 0 the run is over. Progress is saved on this device — use Continue. Each arena has a field: Forest, Wasteland, Mountain, Fortress, Yami, and Yami again at the castle.</p>
+        <p><strong>Tournament:</strong> Duelist Kingdom rules on an island. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. A loss costs 1. At 0 the run is over. Progress is saved on this device — use Continue. Each arena has a field: Forest, Wasteland, Mountain, Fortress, Yami, and Yami again at the castle. Opponents get sharper along the path: Weevil leans on insects and traps, Rex on dinosaurs, Mai on Harpies and equips, Keith on machines, Panik on defense. Pegasus reads your hand with the Millennium Eye.</p>
         <p><strong>Custom decks:</strong> Search the classic card pool (LOB through Labyrinth of Nightmare). A main deck is 40–60 cards, at most 3 of any card. Fusion Monsters go in the Extra Deck (max 15). Save up to 3 decks on this device. The Forbidden/Limited switch is off unless you turn it on.</p>
         <p><strong>Goal:</strong> Drop their Life Points to 0, or deck them out.</p>
         <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Next Phase advances. You do not draw on your first turn.</p>
@@ -920,6 +930,20 @@
     { result: "Thousand Dragon", materials: ["Time Wizard", "Baby Dragon"] },
     { result: "Rabid Horseman", materials: ["Battle Ox", "Mystic Horseman"] },
   ];
+
+  /* Difficulty rises along the tournament path. Free-duel rivals use the same brain. */
+  const AI_STYLE = {
+    weevil:  { diff: 1, style: "trap",     bias: ["Insect"], bluff: 0.62, defend: 0.64, aggression: 0.28, trapLove: 0.95, equipLove: 0.85 },
+    rex:     { diff: 2, style: "aggro",    bias: ["Dinosaur", "Zombie"], bluff: 0.1, defend: 0.12, aggression: 0.96, trapLove: 0.32, equipLove: 0.6 },
+    mai:     { diff: 3, style: "equip",    bias: ["Winged Beast", "Dragon"], bluff: 0.22, defend: 0.32, aggression: 0.64, trapLove: 0.42, equipLove: 0.98 },
+    keith:   { diff: 4, style: "beatdown", bias: ["Machine"], bluff: 0.14, defend: 0.2, aggression: 0.9, trapLove: 0.42, equipLove: 0.92 },
+    panik:   { diff: 5, style: "wall",     bias: ["Fiend", "Spellcaster"], bluff: 0.5, defend: 0.92, aggression: 0.32, trapLove: 0.74, equipLove: 0.88 },
+    rival:   { diff: 6, style: "balanced", bias: [], bluff: 0.28, defend: 0.46, aggression: 0.72, trapLove: 0.64, equipLove: 0.82 },
+    pegasus: { diff: 7, style: "mind",     bias: ["Spellcaster", "Fiend", "Dragon"], bluff: 0.34, defend: 0.4, aggression: 0.76, trapLove: 0.68, equipLove: 0.74 },
+    yugi:    { diff: 5, style: "balanced", bias: ["Spellcaster", "Fiend"], bluff: 0.3, defend: 0.5, aggression: 0.64, trapLove: 0.72, equipLove: 0.78 },
+    kaiba:   { diff: 6, style: "beatdown", bias: ["Dragon"], bluff: 0.12, defend: 0.26, aggression: 0.88, trapLove: 0.5, equipLove: 0.84 },
+    joey:    { diff: 4, style: "aggro",    bias: ["Warrior", "Dragon", "Beast"], bluff: 0.18, defend: 0.3, aggression: 0.8, trapLove: 0.46, equipLove: 0.62 },
+  };
 
   const DECKS = {
     yugi: {
@@ -1561,6 +1585,7 @@
     const trapOwner = oppOf(summoner);
     const i = findSetTrap(trapOwner, "Trap Hole");
     if (i < 0) return false;
+    if (trapOwner === state.ai && !aiShouldTrapHole(m)) return false;
     const st = trapOwner.spells[i];
     trapOwner.spells[i] = null;
     trapOwner.gy.push(strip(st));
@@ -1569,10 +1594,11 @@
     return true;
   }
 
-  function tryMirrorForce(attacker) {
+  function tryMirrorForce(attacker, atkMonster) {
     const defender = oppOf(attacker);
     const i = findSetTrap(defender, "Mirror Force");
     if (i < 0) return false;
+    if (defender === state.ai && !aiShouldMirror(attacker, atkMonster)) return false;
     const st = defender.spells[i];
     defender.spells[i] = null;
     defender.gy.push(strip(st));
@@ -1817,13 +1843,23 @@
     const m = ai.monsters[zoneIdx];
     if (!m || !canEquip(name, m)) return false;
     const hi = ai.hand.findIndex((c) => c.uid === uid);
-    if (hi < 0) return false;
-    const slot = firstEmpty(ai.spells);
-    if (slot < 0) return false;
-    const card = ai.hand.splice(hi, 1)[0];
-    ai.spells[slot] = Object.assign(strip(card), {
-      faceup: true, equipTo: m.uid, equipAtk: spec.atk, equipDef: spec.def,
-    });
+    if (hi >= 0) {
+      const slot = firstEmpty(ai.spells);
+      if (slot < 0) return false;
+      const card = ai.hand.splice(hi, 1)[0];
+      ai.spells[slot] = Object.assign(strip(card), {
+        faceup: true, equipTo: m.uid, equipAtk: spec.atk, equipDef: spec.def,
+      });
+    } else {
+      const zi = ai.spells.findIndex((c) => c && c.uid === uid);
+      if (zi < 0) return false;
+      const st = ai.spells[zi];
+      if (!st.faceup && st.setTurn === state.turnCount) return false;
+      st.faceup = true;
+      st.equipTo = m.uid;
+      st.equipAtk = spec.atk;
+      st.equipDef = spec.def;
+    }
     log(whoName(ai) + " equips " + name + " to " + m.name + ".");
     return true;
   }
@@ -2064,7 +2100,8 @@
     if (lockUi) state.busy = true;
     try {
       if (defIdx != null && defIdx >= 0 && defOwner.monsters[defIdx]) {
-        if (findSetTrap(defOwner, "Magical Hats") >= 0) {
+        const hatsAtk = atkOwner.monsters.find((m) => m && m.uid === atkUid) || atkM;
+        if (findSetTrap(defOwner, "Magical Hats") >= 0 && shouldActivateHats(defOwner, hatsAtk, defIdx)) {
           const miss = await resolveHats(defOwner, atkOwner);
           if (!state || state.winner) return;
           atkOwner.attackedThisTurn.add(atkUid);
@@ -2077,7 +2114,7 @@
         }
       }
       if (!state || state.winner) return;
-      if (tryMirrorForce(atkOwner)) {
+      if (tryMirrorForce(atkOwner, atkOwner.monsters.find((m) => m && m.uid === atkUid) || atkM)) {
         atkOwner.attackedThisTurn.add(atkUid);
         checkLP();
         render();
@@ -2554,6 +2591,9 @@
           z.classList.add("targetable");
         }
       }
+      if (state.spot && state.spot.owner === owner && state.spot.kind === kind && state.spot.index === i) {
+        z.classList.add("ai-act");
+      }
       z.addEventListener("click", (e) => { e.stopPropagation(); onZoneTap(owner, kind, i); });
       container.appendChild(z);
     }
@@ -2629,98 +2669,478 @@
     }
   }
 
+  function aiProfile() {
+    if (!state) return AI_STYLE.yugi;
+    const key = (state.tourneyKey && AI_STYLE[state.tourneyKey]) ? state.tourneyKey : state.aiId;
+    const style = AI_STYLE[key] || AI_STYLE.yugi;
+    if (state.tourneyKey === "rival" && state.aiId && AI_STYLE[state.aiId]) {
+      const ace = AI_STYLE[state.aiId];
+      return {
+        diff: style.diff,
+        style: ace.style || style.style,
+        bias: ace.bias && ace.bias.length ? ace.bias : style.bias,
+        bluff: style.bluff,
+        defend: (style.defend + ace.defend) / 2,
+        aggression: Math.max(style.aggression, ace.aggression - 0.06),
+        trapLove: style.trapLove,
+        equipLove: Math.max(style.equipLove, ace.equipLove),
+      };
+    }
+    return style;
+  }
+
+  function pegasusEye() {
+    return !!(state && state.tourneyKey === "pegasus");
+  }
+
+  function eyeLine(text) {
+    if (!pegasusEye() || !state || state.winner || !text) return;
+    if (state.eyeTurn === state.turnCount) return;
+    state.eyeTurn = state.turnCount;
+    const line = "Pegasus: \"" + text + "\"";
+    log(line);
+    toast(line);
+  }
+
+  function raceMatchesField(race) {
+    if (!state || !state.field || !race) return false;
+    return (FIELD_TYPES[state.field] || []).indexOf(race) >= 0;
+  }
+
+  function projectedStats(card) {
+    const ref = card.ref || card;
+    let atk = ref.atk || 0;
+    let def = ref.def || 0;
+    if (raceMatchesField(ref.race)) {
+      atk = Math.floor(atk * 1.3);
+      def = Math.floor(def * 1.3);
+    }
+    const boost = castleBoost();
+    if (boost && ref.race === "Fiend") {
+      atk += boost;
+      def += boost;
+    }
+    return { atk: atk, def: def };
+  }
+
+  function isFlipCard(card) {
+    if (!card) return false;
+    const type = (card.ref && card.ref.type) || "";
+    return /Flip/i.test(type) || card.name === "Man-Eater Bug";
+  }
+
+  function aiSloppy() {
+    const diff = aiProfile().diff;
+    if (diff >= 7) return false;
+    return Math.random() < (7 - diff) * 0.035;
+  }
+
+  function knownThreat(owner) {
+    let atk = 0;
+    let def = 0;
+    owner.monsters.forEach((m) => {
+      if (!m || !m.faceup) return;
+      const s = getStats(m);
+      if (s.atk > atk) atk = s.atk;
+      if (s.def > def) def = s.def;
+    });
+    return { atk: atk, def: def };
+  }
+
+  function ourBestAtk(owner) {
+    let best = 0;
+    owner.monsters.forEach((m) => {
+      if (!m || !m.faceup) return;
+      const a = getStats(m).atk;
+      if (a > best) best = a;
+    });
+    return best;
+  }
+
+  function setBackrowCount(owner) {
+    let n = 0;
+    owner.spells.forEach((st) => { if (st && !st.faceup) n++; });
+    return n;
+  }
+
+  function sidePower(owner) {
+    let n = 0;
+    let power = 0;
+    let best = 0;
+    owner.monsters.forEach((m) => {
+      if (!m) return;
+      n++;
+      const v = m.faceup ? Math.max(getStats(m).atk, Math.floor(getStats(m).def * 0.45)) : (m.ref.atk || 900);
+      power += v;
+      if (v > best) best = v;
+    });
+    return { n: n, power: power, best: best };
+  }
+
+  function fissureIndex(foe) {
+    let best = -1;
+    let bestVal = Infinity;
+    foe.monsters.forEach((m, i) => {
+      if (!m) return;
+      const val = m.faceup ? getStats(m).atk : (m.ref.atk || 0);
+      if (val < bestVal) { bestVal = val; best = i; }
+    });
+    return best;
+  }
+
+  function suspectTrapHole() {
+    const sets = setBackrowCount(state.player);
+    if (!sets) return false;
+    if (pegasusEye()) return true;
+    const prof = aiProfile();
+    if (prof.aggression >= 0.9 && prof.diff <= 2) return false;
+    return prof.trapLove >= 0.6 || prof.diff >= 4;
+  }
+
+  function scareMirror() {
+    const sets = setBackrowCount(state.player);
+    if (!sets) return false;
+    if (pegasusEye()) return !state.player.hand.some((c) => c.name === "Mirror Force");
+    const prof = aiProfile();
+    if (prof.aggression >= 0.9 && prof.diff <= 2) return false;
+    return prof.diff >= 3 || prof.trapLove >= 0.7;
+  }
+
+  function aiShouldTrapHole(m) {
+    const prof = aiProfile();
+    const atk = getStats(m).atk;
+    const myBest = ourBestAtk(state.ai);
+    if (atk >= state.ai.lp) return true;
+    if (atk >= 2000) return true;
+    if (atk >= myBest && atk >= 1400) return true;
+    if (prof.trapLove >= 0.85 && atk >= 1200) return true;
+    if (prof.diff >= 5 && atk >= 1600) return true;
+    return atk >= 1700 && myBest < atk;
+  }
+
+  function aiShouldMirror(atkOwner, atkM) {
+    const prof = aiProfile();
+    if (!atkM) return prof.trapLove >= 0.5;
+    const a = getStats(atkM).atk;
+    const waiting = atkOwner.monsters.filter((m) => m && m.faceup && m.position === "atk" && !atkOwner.attackedThisTurn.has(m.uid)).length;
+    if (occupied(state.ai.monsters).length === 0 && a >= state.ai.lp) return true;
+    if (waiting >= 2 && a >= 1300) return true;
+    if (a >= 2300) return true;
+    const weAnswer = state.ai.monsters.some((mon) => {
+      if (!mon || !mon.faceup) return false;
+      const s = getStats(mon);
+      return mon.position === "def" ? s.def >= a : s.atk > a;
+    });
+    if (weAnswer && waiting <= 1 && prof.trapLove < 0.9) return false;
+    if (!weAnswer && a >= 1500) return true;
+    if (prof.trapLove >= 0.9 && a >= 1200) return true;
+    return a >= 1800;
+  }
+
+  function shouldActivateHats(defOwner, atkM, defIdx) {
+    if (!defOwner || defOwner !== state.ai) return true;
+    const target = defOwner.monsters[defIdx];
+    if (!target || !atkM) return true;
+    if (!target.faceup) {
+      if (target.name === "Man-Eater Bug" || target.name === "Castle of Dark Illusions") return false;
+      return getStats(atkM).atk >= 1600;
+    }
+    const a = getStats(atkM).atk;
+    const s = getStats(target);
+    if (target.position === "def") return a > s.def;
+    return a >= s.atk;
+  }
+
+  function tributeLocked(ai, m) {
+    if (!m) return true;
+    if (m.name === "Castle of Dark Illusions" || m.name === "Relinquished" || m.name === "Thousand-Eyes Restrict") return true;
+    if (m.name === "Petit Moth" && findCocoon(m)) return true;
+    const baby = ai.monsters.some((x) => x && x.name === "Baby Dragon") || ai.hand.some((c) => c.name === "Baby Dragon");
+    const wiz = ai.monsters.some((x) => x && x.name === "Time Wizard") || ai.hand.some((c) => c.name === "Time Wizard");
+    if (m.name === "Baby Dragon" && wiz) return true;
+    if (m.name === "Time Wizard" && (baby || ai.extra.some((c) => c.name === "Thousand Dragon"))) return true;
+    if (m.name === "Thousand-Eyes Idol" && ai.hand.some((c) => c.name === "Polymerization") &&
+        ai.monsters.some((x) => x && x.name === "Relinquished")) return true;
+    return false;
+  }
+
+  function tributeValue(m) {
+    if (!m) return 0;
+    const s = m.faceup === false ? projectedStats(m) : getStats(m);
+    return Math.max(s.atk, Math.floor(s.def * 0.75));
+  }
+
+  function planTribute(ai, card) {
+    const need = tributesNeeded(card.ref.level);
+    const idxs = [];
+    ai.monsters.forEach((m, i) => { if (m) idxs.push(i); });
+    if (need > idxs.length) return null;
+    if (need === 0) return firstEmpty(ai.monsters) >= 0 ? [] : null;
+    const ranked = idxs.filter((i) => !tributeLocked(ai, ai.monsters[i]))
+      .sort((a, b) => tributeValue(ai.monsters[a]) - tributeValue(ai.monsters[b]));
+    if (ranked.length < need) return null;
+    const tributes = ranked.slice(0, need);
+    let costliest = 0;
+    tributes.forEach((i) => { costliest = Math.max(costliest, tributeValue(ai.monsters[i])); });
+    const margin = need >= 2 ? 600 : 400;
+    if (projectedStats(card).atk < costliest + margin) return null;
+    return tributes;
+  }
+
+  function handMonsters(ai) {
+    const list = [];
+    ai.hand.forEach((c, i) => {
+      if (!c.ref.isMonster || c.ref.isFusion || !canNormalSummon(c)) return;
+      if (c.name === "Cocoon of Evolution") return;
+      list.push({ c: c, i: i });
+    });
+    return list;
+  }
+
+  function scoreCandidate(ai, card, tributes) {
+    const prof = aiProfile();
+    const pwr = projectedStats(card);
+    let score = pwr.atk + (prof.style === "wall" ? pwr.def * 0.45 : pwr.def * 0.05);
+    if (raceMatchesField(card.ref.race)) score += 120 + prof.diff * 10;
+    if (prof.bias.indexOf(card.ref.race) >= 0) score += 140;
+    if (prof.style === "aggro" || prof.style === "beatdown" || prof.style === "mind") score += pwr.atk * 0.04;
+    tributes.forEach((i) => { score -= tributeValue(ai.monsters[i]) * 0.22; });
+    if (card.name === "Thousand-Eyes Idol" &&
+        ai.hand.some((c) => c.name === "Polymerization") &&
+        ai.monsters.some((m) => m && m.name === "Relinquished") &&
+        ai.extra.some((c) => c.name === "Thousand-Eyes Restrict")) score += 8000;
+    if (card.name === "Man-Eater Bug") {
+      const threat = knownThreat(state.player).atk;
+      if (threat >= 1500) score += 1100 + threat * 0.1;
+      else score -= 400;
+    } else if (isFlipCard(card)) {
+      score += knownThreat(state.player).atk >= 1600 ? 420 : -180;
+    }
+    return score;
+  }
+
+  function chooseStance(ai, card) {
+    const prof = aiProfile();
+    const pwr = projectedStats(card);
+    const oppAtk = knownThreat(state.player).atk;
+    if (isFlipCard(card) && !aiSloppy()) return { pos: "def", faceup: false };
+    if (aiSloppy() && prof.diff <= 2) return { pos: "atk", faceup: true };
+    const atkBodies = ai.monsters.filter((m) => m && m.faceup && m.position === "atk").length;
+    if (scareMirror() && atkBodies >= 1 && (card.ref.atk || 0) >= 1000 && prof.aggression < 0.9) {
+      return { pos: "def", faceup: true };
+    }
+    if (occupied(ai.monsters).length >= 1 && pwr.atk < 900 && Math.random() < prof.bluff) {
+      return { pos: "def", faceup: false };
+    }
+    const loses = oppAtk > pwr.atk && oppAtk > 0;
+    const trapScare = suspectTrapHole() && (card.ref.atk || 0) >= 1000;
+    if (trapScare && (prof.diff >= 3 || prof.trapLove >= 0.7) && (pwr.def >= 1100 || prof.defend >= 0.5)) {
+      if (pegasusEye()) eyeLine("Trap Hole will not stop this summon.");
+      return { pos: "def", faceup: prof.style === "wall" ? false : pwr.def >= pwr.atk };
+    }
+    if ((prof.style === "aggro" || prof.style === "beatdown") && pwr.atk + 150 >= pwr.def && !loses) {
+      return { pos: "atk", faceup: true };
+    }
+    if (pwr.def >= pwr.atk + 250 && (loses || prof.style === "wall")) {
+      return { pos: "def", faceup: prof.style === "wall" ? false : true };
+    }
+    if (loses && pwr.def >= oppAtk && prof.defend >= 0.35) return { pos: "def", faceup: true };
+    if (loses && prof.defend >= 0.6) return { pos: "def", faceup: false };
+    return { pos: "atk", faceup: true };
+  }
+
+  function fusionWorth(ai, option) {
+    const name = option.fusion.result;
+    const result = cardDB[name];
+    if (!result || name === "Thousand Dragon") return false;
+    const resAtk = projectedStats({ ref: result, name: name }).atk;
+    if (name === "Thousand-Eyes Restrict") {
+      let opp = 0;
+      state.player.monsters.forEach((m) => {
+        if (m && m.faceup && (m.ref.atk || 0) > opp) opp = m.ref.atk || 0;
+      });
+      if (!occupied(state.player.monsters).length) return false;
+      return opp >= 1400 && opp + 300 >= ourBestAtk(ai);
+    }
+    let lostBest = 0;
+    option.picks.forEach((p) => {
+      const raw = p.card.faceup === false ? projectedStats(p.card).atk : (p.where === "field" ? getStats(p.card).atk : projectedStats(p.card).atk);
+      const v = p.where === "field" ? raw : raw * 0.55;
+      if (v > lostBest) lostBest = v;
+    });
+    if (name === "Blue-Eyes Ultimate Dragon") {
+      const opp = knownThreat(state.player).atk;
+      if (opp > lostBest && resAtk > opp) return true;
+      return firstEmpty(ai.monsters) < 0 && opp > 0 && resAtk > opp;
+    }
+    return resAtk >= lostBest + 250;
+  }
+
+  async function aiGlance(owner, kind, index) {
+    if (!state || state.winner) return;
+    state.spot = owner ? { owner: owner, kind: kind, index: index } : null;
+    render();
+    await wait(460);
+  }
+
+  function prepareIntel() {
+    state.intel = { wipe: "", big: 0, bigName: "" };
+    if (!pegasusEye()) return;
+    const hand = state.player.hand;
+    if (hand.some((c) => c.name === "Dark Hole")) state.intel.wipe = "Dark Hole";
+    else if (hand.some((c) => c.name === "Raigeki")) state.intel.wipe = "Raigeki";
+    let big = null;
+    hand.forEach((c) => {
+      if (!c.ref.isMonster || c.ref.isFusion || !canNormalSummon(c)) return;
+      const atk = projectedStats(c).atk;
+      if (!big || atk > big.atk) big = { name: c.name, atk: atk };
+    });
+    if (big && big.atk >= 1800) {
+      state.intel.big = big.atk;
+      state.intel.bigName = big.name;
+    }
+  }
+
+  function holdForWipe(ai) {
+    if (!state.intel || !state.intel.wipe) return false;
+    if (occupied(ai.monsters).length < 1) return false;
+    eyeLine("I see " + state.intel.wipe + " in your hand.");
+    return true;
+  }
+
   async function aiTrySimple(ai) {
     const pl = state.player;
-    const play = async (pred) => {
-      const idx = ai.hand.findIndex(pred);
+    const cast = async (name) => {
+      const idx = ai.hand.findIndex((c) => c.name === name);
       if (idx < 0) return false;
+      const before = ai.monsters.map((m) => (m ? m.uid : 0));
       activateSimple(ai, ai.hand[idx].uid);
-      render();
-      await wait(280);
+      if (!state || state.winner) return true;
+      const slot = ai.monsters.findIndex((m, i) => m && before[i] !== m.uid);
+      if (slot >= 0) await aiGlance("ai", "m", slot);
+      else await aiGlance();
       return true;
     };
-    await play((c) => c.name === "Pot of Greed");
-    if (!state || state.winner) return;
-    if (occupied(pl.spells).length) await play((c) => c.name === "Harpie's Feather Duster");
-    if (!state || state.winner) return;
-    if (occupied(pl.monsters).length >= 1) await play((c) => c.name === "Raigeki");
-    if (!state || state.winner) return;
-    if (occupied(pl.monsters).length >= 2 && occupied(ai.monsters).length <= 1) await play((c) => c.name === "Dark Hole");
-    if (!state || state.winner) return;
-    if (occupied(pl.monsters).length >= 1) await play((c) => c.name === "Fissure");
-    if (!state || state.winner) return;
-    if (firstEmpty(ai.monsters) >= 0 && (ai.gy.some((c) => c.ref.isMonster) || pl.gy.some((c) => c.ref.isMonster))) {
-      await play((c) => c.name === "Monster Reborn");
+    const pots = ai.hand.filter((c) => c.name === "Pot of Greed").length;
+    for (let i = 0; i < pots; i++) {
+      if (!state || state.winner) return;
+      await cast("Pot of Greed");
     }
     if (!state || state.winner) return;
-    if (occupied(pl.monsters).length && firstEmpty(ai.monsters) >= 0) await play((c) => c.name === "Change of Heart");
+    const back = occupied(pl.spells).length;
+    if (back >= 2 || (back >= 1 && (aiProfile().diff >= 3 || scareMirror()))) await cast("Harpie's Feather Duster");
+    if (!state || state.winner) return;
+    let them = sidePower(pl);
+    const handBestNow = handMonsters(ai).reduce((m, x) => Math.max(m, projectedStats(x.c).atk), 0);
+    const reach = Math.max(ourBestAtk(ai), handBestNow);
+    if (them.n >= 1 && (them.best > reach + 100 || (them.n >= 2 && them.power > reach + 300))) await cast("Raigeki");
+    if (!state || state.winner) return;
+    them = sidePower(pl);
+    const us = sidePower(ai);
+    if (them.n >= 1 && them.best > ourBestAtk(ai) && them.power > us.power + 700 && (us.n <= 1 || them.power > us.power * 1.35)) {
+      await cast("Dark Hole");
+    }
+    if (!state || state.winner) return;
+    const fi = fissureIndex(pl);
+    if (fi >= 0) {
+      const tm = pl.monsters[fi];
+      const wall = tm.faceup ? (tm.position === "def" ? getStats(tm).def : getStats(tm).atk) : 1600;
+      const clears = occupied(pl.monsters).length === 1 && ourBestAtk(ai) >= 1000;
+      if (wall > ourBestAtk(ai) || clears || (!tm.faceup && ourBestAtk(ai) < 1800)) await cast("Fissure");
+    }
+    if (!state || state.winner) return;
+    if (!(state.intel && state.intel.wipe && occupied(ai.monsters).length >= 1) && firstEmpty(ai.monsters) >= 0) {
+      const pool = ai.gy.concat(pl.gy).filter((c) => c.ref.isMonster);
+      if (pool.length) {
+        pool.sort((a, b) => projectedStats(b).atk - projectedStats(a).atk);
+        const best = projectedStats(pool[0]).atk;
+        const handBest = handMonsters(ai).reduce((m, x) => Math.max(m, projectedStats(x.c).atk), 0);
+        if ((best >= 1500 && best + 100 >= handBest) || (best >= 1000 && handBest < 1000)) {
+          await cast("Monster Reborn");
+        }
+      }
+    }
+    if (!state || state.winner) return;
+    if (occupied(pl.monsters).length && firstEmpty(ai.monsters) >= 0) {
+      let best = 0;
+      pl.monsters.forEach((m) => {
+        if (!m) return;
+        const a = m.faceup ? getStats(m).atk : (m.ref.atk || 0);
+        if (a > best) best = a;
+      });
+      const only = occupied(pl.monsters).length === 1;
+      if (best >= 1400 || (only && best >= 1000) || best > ourBestAtk(ai)) await cast("Change of Heart");
+    }
   }
 
   async function aiTryPoly(ai) {
+    let uid = null;
     const idx = ai.hand.findIndex((c) => c.name === "Polymerization");
-    if (idx < 0) return;
-    const options = possibleFusions(ai).filter((o) => o.fusion.result !== "Thousand Dragon");
+    if (idx >= 0) uid = ai.hand[idx].uid;
+    else {
+      const st = ai.spells.find((c) => c && c.name === "Polymerization" && !c.faceup && c.setTurn !== state.turnCount);
+      if (st) uid = st.uid;
+    }
+    if (!uid) return;
+    const options = possibleFusions(ai).filter((o) => fusionWorth(ai, o));
     if (!options.length) return;
-    options.sort((a, b) => (cardDB[b.fusion.result].atk || 0) - (cardDB[a.fusion.result].atk || 0));
-    performFusion(ai, ai.hand[idx].uid, options[0]);
-    render();
-    await wait(320);
+    options.sort((a, b) => {
+      const ar = projectedStats({ ref: cardDB[a.fusion.result], name: a.fusion.result }).atk;
+      const br = projectedStats({ ref: cardDB[b.fusion.result], name: b.fusion.result }).atk;
+      return br - ar;
+    });
+    if (!performFusion(ai, uid, options[0])) return;
+    const slot = ai.monsters.findIndex((m) => m && m.name === options[0].fusion.result);
+    if (slot >= 0) await aiGlance("ai", "m", slot);
+    else await aiGlance();
   }
 
   async function aiSummon(ai) {
-    if (ai.normalSummoned || !state || state.winner) return;
-    const protect = [];
-    const wizardish = ai.hand.some((c) => c.name === "Time Wizard") || ai.monsters.some((m) => m && m.name === "Time Wizard");
-    if (wizardish) protect.push("Baby Dragon", "Time Wizard");
-    if (!ai.normalSummoned && ai.hand.some((c) => c.name === "Polymerization") &&
-        ai.extra.some((c) => c.name === "Thousand-Eyes Restrict") &&
-        ai.monsters.some((m) => m && m.name === "Relinquished")) {
-      const idol = ai.hand.findIndex((c) => c.name === "Thousand-Eyes Idol");
-      if (idol >= 0 && firstEmpty(ai.monsters) >= 0) {
-        placeMonster(ai, idol, "atk", true, []);
-        log(whoName(ai) + " summons Thousand-Eyes Idol.");
-        render();
-        return;
-      }
+    if (!ai || ai.normalSummoned || !state || state.winner) return;
+    if (holdForWipe(ai)) return;
+    const options = [];
+    handMonsters(ai).forEach((x) => {
+      const tributes = planTribute(ai, x.c);
+      if (!tributes) return;
+      options.push({ c: x.c, tributes: tributes, score: scoreCandidate(ai, x.c, tributes) });
+    });
+    if (!options.length) return;
+    options.sort((a, b) => b.score - a.score);
+    const pick = options[0];
+    const stance = chooseStance(ai, pick.c);
+    if (pick.tributes.length) {
+      log(whoName(ai) + " tributes " + pick.tributes.map((i) => ai.monsters[i].name).join(" and ") + ".");
     }
-    const monsters = ai.hand.map((c, i) => ({ c: c, i: i })).filter((x) => x.c.ref.isMonster && !x.c.ref.isFusion && canNormalSummon(x.c));
-    monsters.sort((a, b) => (b.c.ref.atk || 0) - (a.c.ref.atk || 0));
-    for (let k = 0; k < monsters.length; k++) {
-      const c = monsters[k].c;
-      const need = tributesNeeded(c.ref.level);
-      const fieldIdx = ai.monsters.map((m, zi) => (m ? zi : -1)).filter((z) => z >= 0);
-      if (need > fieldIdx.length) continue;
-      if (need === 0 && firstEmpty(ai.monsters) < 0) continue;
-      let tributes = [];
-      if (need > 0) {
-        const ranked = fieldIdx.slice().sort((a, b) => {
-          const pa = protect.indexOf(ai.monsters[a].name) >= 0 ? 1 : 0;
-          const pb = protect.indexOf(ai.monsters[b].name) >= 0 ? 1 : 0;
-          if (pa !== pb) return pa - pb;
-          return (ai.monsters[a].ref.atk || 0) - (ai.monsters[b].ref.atk || 0);
-        });
-        tributes = ranked.slice(0, need);
-      }
-      const hi = ai.hand.findIndex((x) => x.uid === c.uid);
-      if (hi < 0) continue;
-      const res = placeMonster(ai, hi, "atk", true, tributes);
-      if (res) {
-        log(whoName(ai) + " summons " + c.name + ".");
-        tryTrapHole(ai, res.slot);
-        render();
-        return;
-      }
+    const hi = ai.hand.findIndex((c) => c.uid === pick.c.uid);
+    if (hi < 0) return;
+    const res = placeMonster(ai, hi, stance.pos, stance.faceup, pick.tributes);
+    if (!res) return;
+    if (state.intel && state.intel.bigName && state.intel.big > ourBestAtk(ai)) {
+      eyeLine("I see " + state.intel.bigName + " in your hand.");
     }
-    const weak = monsters.filter((x) => tributesNeeded(x.c.ref.level) === 0);
-    if (weak.length && firstEmpty(ai.monsters) >= 0) {
-      weak.sort((a, b) => (a.c.ref.atk || 0) - (b.c.ref.atk || 0));
-      const hi = ai.hand.findIndex((x) => x.uid === weak[0].c.uid);
-      if (hi >= 0) {
-        placeMonster(ai, hi, "def", false, []);
-        log(whoName(ai) + " Sets a monster.");
-        render();
-      }
+    log(whoName(ai) + (stance.faceup
+      ? " summons " + pick.c.name + " in " + (stance.pos === "atk" ? "Attack" : "Defense") + " Position."
+      : " Sets a monster."));
+    if (stance.faceup && stance.pos === "atk") tryTrapHole(ai, res.slot);
+    if (!state || state.winner) return;
+    if (ai.monsters[res.slot]) await aiGlance("ai", "m", res.slot);
+    else await aiGlance();
+  }
+
+  async function aiEgotist(ai) {
+    if (!controlsHarpie(ai) || !state || state.winner) return;
+    if (state.intel && state.intel.wipe && occupied(ai.monsters).length >= 2) {
+      eyeLine("I see " + state.intel.wipe + " in your hand.");
+      return;
     }
+    const eg = ai.hand.findIndex((c) => c.name === "Elegant Egotist");
+    if (eg < 0 || firstEmpty(ai.monsters) < 0) return;
+    if (!hasNamed(ai, "Harpie Lady Sisters") && !hasNamed(ai, "Harpie Lady")) return;
+    if (!activateEgotist(ai, ai.hand[eg].uid, null)) return;
+    let slot = ai.monsters.findIndex((m) => m && m.name === "Harpie Lady Sisters" && ai.summonedThisTurn.has(m.uid));
+    if (slot < 0) slot = ai.monsters.findIndex((m) => m && m.name === "Harpie Lady" && ai.summonedThisTurn.has(m.uid));
+    if (slot >= 0) await aiGlance("ai", "m", slot);
+    else await aiGlance();
   }
 
   async function aiTime(ai) {
@@ -2728,98 +3148,321 @@
     if (!tw || !state || state.winner) return;
     const baby = ai.monsters.some((m) => m && m.name === "Baby Dragon");
     const td = ai.extra.some((c) => c.name === "Thousand Dragon");
-    const oppBig = state.player.monsters.some((m) => m && m.faceup && getStats(m).atk >= 1800);
-    if ((baby && td) || oppBig) {
-      await activateTimeWizard(ai, tw.uid, "heads");
-      await wait(200);
-    }
+    let mine = 0;
+    let theirs = 0;
+    ai.monsters.forEach((m) => { if (m && m.faceup) mine += getStats(m).atk; });
+    state.player.monsters.forEach((m) => { if (m && m.faceup) theirs += getStats(m).atk; });
+    const behind = theirs >= 1800 && theirs > mine + 600;
+    if (!(behind || (baby && td && (theirs >= 1200 || mine < 2000)))) return;
+    const slot = ai.monsters.findIndex((m) => m && m.uid === tw.uid);
+    await aiGlance("ai", "m", slot);
+    await activateTimeWizard(ai, tw.uid, "heads");
   }
 
-  function aiShield(ai) {
+  async function aiShield(ai) {
+    let uid = null;
     const idx = ai.hand.findIndex((c) => c.name === "Shield & Sword");
-    if (idx < 0) return;
-    let score = 0;
+    if (idx >= 0) uid = ai.hand[idx].uid;
+    else {
+      const st = ai.spells.find((c) => c && c.name === "Shield & Sword" && !c.faceup && c.setTurn !== state.turnCount);
+      if (st) uid = st.uid;
+    }
+    if (!uid) return;
+    let swing = 0;
     let any = false;
-    ai.monsters.forEach((m) => { if (m && m.faceup) { any = true; score += (m.ref.def || 0) - (m.ref.atk || 0); } });
-    state.player.monsters.forEach((m) => { if (m && m.faceup) { any = true; score -= (m.ref.def || 0) - (m.ref.atk || 0); } });
-    if (any && score >= 400) { activateShield(ai, ai.hand[idx].uid); render(); }
-  }
-
-  function aiSwords(ai) {
-    const idx = ai.hand.findIndex((c) => c.name === "Swords of Revealing Light");
-    if (idx < 0 || firstEmpty(ai.spells) < 0) return;
-    const opp = occupied(state.player.monsters);
-    if (!opp.length) return;
-    const myBest = Math.max(0, ...ai.monsters.filter(Boolean).map((m) => m.faceup ? getStats(m).atk : 0));
-    const oppBest = Math.max(...opp.map((m) => m.faceup ? getStats(m).atk : (m.ref.atk || 0)));
-    if (opp.some((m) => !m.faceup) || oppBest > myBest + 300) {
-      activateSwords(ai, ai.hand[idx].uid);
-      render();
+    ai.monsters.forEach((m) => {
+      if (!m || !m.faceup) return;
+      any = true;
+      const s = getStats(m);
+      swing += s.def - s.atk;
+    });
+    state.player.monsters.forEach((m) => {
+      if (!m || !m.faceup) return;
+      any = true;
+      const s = getStats(m);
+      swing += s.atk - s.def;
+    });
+    if (any && swing >= 450) {
+      activateShield(ai, uid);
+      await aiGlance();
     }
   }
 
-  function aiEquips(ai) {
-    for (let n = 0; n < 2; n++) {
-      const idx = ai.hand.findIndex((c) => {
-        if (!EQUIP[c.name]) return false;
-        return ai.monsters.some((m) => canEquip(c.name, m));
+  async function aiSwords(ai) {
+    let uid = null;
+    const idx = ai.hand.findIndex((c) => c.name === "Swords of Revealing Light");
+    if (idx >= 0 && firstEmpty(ai.spells) >= 0) uid = ai.hand[idx].uid;
+    else {
+      const st = ai.spells.find((c) => c && c.name === "Swords of Revealing Light" && !c.faceup && c.setTurn !== state.turnCount);
+      if (st) uid = st.uid;
+    }
+    if (!uid) return;
+    const opp = occupied(state.player.monsters);
+    const incoming = state.intel && state.intel.big > ourBestAtk(ai) + 200;
+    if (!opp.length && !incoming) return;
+    const myBest = ourBestAtk(ai);
+    const oppBest = opp.length ? Math.max.apply(null, opp.map((m) => (m.faceup ? getStats(m).atk : (m.ref.atk || 1200)))) : 0;
+    if (!(incoming || opp.some((m) => !m.faceup) || oppBest > myBest + 200)) return;
+    if (incoming && state.intel.bigName) eyeLine("I see " + state.intel.bigName + " in your hand.");
+    if (!activateSwords(ai, uid)) return;
+    const slot = ai.spells.findIndex((st) => st && st.uid === uid);
+    await aiGlance("ai", "st", slot >= 0 ? slot : 0);
+  }
+
+  async function aiEquips(ai) {
+    const prof = aiProfile();
+    const cap = prof.equipLove >= 0.85 ? 3 : 2;
+    for (let n = 0; n < cap; n++) {
+      if (!state || state.winner || (firstEmpty(ai.spells) < 0 && !ai.spells.some((st) => st && !st.faceup && EQUIP[st.name]))) break;
+      let pick = null;
+      ai.hand.forEach((c) => {
+        if (!EQUIP[c.name] || !ai.monsters.some((m) => canEquip(c.name, m))) return;
+        if (!pick) pick = { uid: c.uid, name: c.name };
       });
-      if (idx < 0 || firstEmpty(ai.spells) < 0) return;
-      const name = ai.hand[idx].name;
-      let best = -1, bestAtk = -1;
+      if (!pick) {
+        ai.spells.forEach((st) => {
+          if (!st || st.faceup || st.setTurn === state.turnCount || !EQUIP[st.name]) return;
+          if (!ai.monsters.some((m) => canEquip(st.name, m))) return;
+          if (!pick) pick = { uid: st.uid, name: st.name };
+        });
+      }
+      if (!pick) break;
+      const spec = EQUIP[pick.name];
+      let best = -1;
+      let bestAtk = -1;
       ai.monsters.forEach((m, i) => {
-        if (!canEquip(name, m)) return;
-        const a = getStats(m).atk;
+        if (!canEquip(pick.name, m)) return;
+        let a = getStats(m).atk + (spec.atk || 0);
+        if (prof.bias.indexOf(m.ref.race) >= 0) a += 30;
         if (a > bestAtk) { bestAtk = a; best = i; }
       });
-      if (best < 0) return;
-      aiEquip(ai, ai.hand[idx].uid, name, best);
+      if (best < 0 || !aiEquip(ai, pick.uid, pick.name, best)) break;
+      const slot = ai.spells.findIndex((st) => st && st.equipTo === ai.monsters[best].uid && st.name === pick.name);
+      await aiGlance("ai", slot >= 0 ? "st" : "m", slot >= 0 ? slot : best);
     }
-    render();
   }
 
-  function aiSetTrap(ai) {
-    if (firstEmpty(ai.spells) < 0) return;
+  function bluffHandIndex(ai) {
+    return ai.hand.findIndex((c) => {
+      if (!c.ref.isSpell) return false;
+      if (SIMPLE_SPELLS.has(c.name)) return false;
+      if (c.name === "Swords of Revealing Light" || c.name === "Shield & Sword") return false;
+      if (c.name === "Toon World" || c.name === "Black Illusion Ritual" || c.name === "Elegant Egotist") return false;
+      if (c.name === "Insect Barrier" || c.name === "Harpie's Feather Duster") return false;
+      if (c.name === "Polymerization" && possibleFusions(ai).some((o) => fusionWorth(ai, o))) return false;
+      if (EQUIP[c.name] && ai.monsters.some((m) => canEquip(c.name, m))) return false;
+      return true;
+    });
+  }
+
+  async function aiSetBackrow(ai) {
+    const prof = aiProfile();
+    const maxSets = prof.trapLove >= 0.85 ? 2 : 1;
     const order = ["Mirror Force", "Magical Hats", "Trap Hole"];
-    for (let i = 0; i < order.length; i++) {
+    let sets = 0;
+    for (let i = 0; i < order.length && sets < maxSets; i++) {
+      if (firstEmpty(ai.spells) < 0) break;
+      if (ai.spells.some((st) => st && !st.faceup && st.name === order[i])) continue;
       const hi = ai.hand.findIndex((c) => c.name === order[i]);
-      if (hi >= 0) { setSpellTrap(ai, hi); log(whoName(ai) + " Sets a card."); render(); return; }
+      if (hi < 0) continue;
+      const slot = setSpellTrap(ai, hi);
+      if (slot === false || slot == null) continue;
+      log(whoName(ai) + " Sets a card.");
+      sets++;
+      await aiGlance("ai", "st", slot);
+      if (!state || state.winner) return;
+    }
+    if (Math.random() >= prof.bluff || firstEmpty(ai.spells) < 0) return;
+    const hi = bluffHandIndex(ai);
+    if (hi < 0) return;
+    const slot = setSpellTrap(ai, hi);
+    if (slot === false || slot == null) return;
+    log(whoName(ai) + " Sets a card.");
+    await aiGlance("ai", "st", slot);
+  }
+
+  function scoreAttack(ai, m, target) {
+    const prof = aiProfile();
+    const a = getStats(m).atk;
+    if (!target) {
+      if (isToon(m) && (ai.lp <= 500 || (a < 800 && ai.lp <= 1200))) return -1;
+      let score = a + 80;
+      if (isToon(m)) score -= 80;
+      if (pegasusEye() && state.player.hand.some((c) => c.name === "Kuriboh")) score = 80 + (3000 - a) / 80;
+      return score;
+    }
+    if (isToon(m) && !isToon(target)) return -1;
+    if (!target.faceup) {
+      if (a >= 2100) return 340;
+      if (a >= 1900 && prof.diff >= 4) return 210;
+      if (a >= 1600 && prof.aggression >= 0.9 && prof.diff <= 3) return 90;
+      if (aiSloppy() && a >= 1500 && prof.diff <= 2) return 45;
+      return -1;
+    }
+    const ds = getStats(target);
+    if (target.position === "def") {
+      if (a > ds.def) return 420 + ds.def * 0.35;
+      return -1;
+    }
+    if (a > ds.atk) return 1000 + ds.atk + (a - ds.atk) * 0.2;
+    if (a === ds.atk && ds.atk >= 1700 && prof.aggression >= 0.45) return 140;
+    return -1;
+  }
+
+  async function braceForMirror(ai) {
+    if (!scareMirror()) return;
+    const attackers = [];
+    ai.monsters.forEach((m, i) => {
+      if (!m || !m.faceup || m.position !== "atk") return;
+      if (ai.summonedThisTurn.has(m.uid) || ai.positionChanged.has(m.uid) || terLocks(m)) return;
+      attackers.push(i);
+    });
+    if (attackers.length < 2) return;
+    attackers.sort((a, b) => getStats(ai.monsters[b]).atk - getStats(ai.monsters[a]).atk);
+    let tucked = -1;
+    for (let n = 1; n < attackers.length; n++) {
+      const i = attackers[n];
+      const m = ai.monsters[i];
+      m.position = "def";
+      ai.positionChanged.add(m.uid);
+      log(m.name + " → Defense Position.");
+      tucked = i;
+    }
+    if (tucked >= 0) {
+      if (pegasusEye()) eyeLine("I will not walk into that set card.");
+      await aiGlance("ai", "m", tucked);
+    }
+  }
+
+  async function aiPositions(ai) {
+    await braceForMirror(ai);
+    if (!state || state.winner) return;
+    const prof = aiProfile();
+    const opp = knownThreat(state.player).atk;
+    for (let i = 0; i < ZONES; i++) {
+      const m = ai.monsters[i];
+      if (!m || ai.summonedThisTurn.has(m.uid) || ai.positionChanged.has(m.uid) || terLocks(m)) continue;
+      if (!m.faceup) {
+        if (isFlipCard(m) || m.name === "Castle of Dark Illusions") continue;
+        const pwr = projectedStats(m);
+        if (pwr.atk >= 1500 && (prof.aggression >= 0.55 || pwr.atk > opp) && !aiSloppy()) {
+          m.faceup = true;
+          m.position = "atk";
+          ai.positionChanged.add(m.uid);
+          onFlip(ai, i);
+          log(m.name + " → Attack Position.");
+          await aiGlance("ai", "m", i);
+        }
+        continue;
+      }
+      const s = getStats(m);
+      const canBeat = state.player.monsters.some((tm) => tm && scoreAttack(ai, m, tm) >= 40) ||
+        (canDirectAttack(m, state.player) && scoreAttack(ai, m, null) >= 40);
+      if (m.position === "atk" && opp > s.atk && s.def > s.atk && !canBeat && prof.defend >= 0.34) {
+        m.position = "def";
+        ai.positionChanged.add(m.uid);
+        log(m.name + " → Defense Position.");
+        await aiGlance("ai", "m", i);
+      } else if (m.position === "def" && canBeat && s.atk + 150 >= s.def && prof.aggression >= 0.4 && prof.style !== "wall") {
+        if (scareMirror() && ai.monsters.some((other, oi) => oi !== i && other && other.faceup && other.position === "atk")) continue;
+        m.position = "atk";
+        ai.positionChanged.add(m.uid);
+        log(m.name + " → Attack Position.");
+        await aiGlance("ai", "m", i);
+      } else if (m.position === "atk" && prof.style === "wall" && s.def >= s.atk + 200 && opp >= s.atk) {
+        m.position = "def";
+        ai.positionChanged.add(m.uid);
+        log(m.name + " → Defense Position.");
+        await aiGlance("ai", "m", i);
+      }
+      if (!state || state.winner) return;
     }
   }
 
   async function aiAttack(ai) {
     const pl = state.player;
-    if (swordsUp(pl)) { log("Swords of Revealing Light — " + state.aiName + " cannot attack."); return; }
-    for (let i = 0; i < ZONES; i++) {
-      if (!state || state.winner) return;
-      const m = ai.monsters[i];
-      if (!m || m.position !== "atk" || !m.faceup) continue;
-      if (ai.attackedThisTurn.has(m.uid)) continue;
-      if (m.name === "Panther Warrior" && occupied(ai.monsters).length < 2) continue;
-      if (terLocks(m) || insectBarrierBlocks(m, pl)) continue;
-      if (isToon(m) && (ai.summonedThisTurn.has(m.uid) || ai.lp < 500)) continue;
-      if (canDirectAttack(m, pl)) {
-        await battle(ai, i, pl, -1);
-        await wait(280);
-        continue;
-      }
-      const a = getStats(m).atk;
-      let targets = pl.monsters.map((tm, zi) => (tm ? { tm: tm, zi: zi } : null)).filter(Boolean);
-      if (isToon(m)) targets = targets.filter((t) => isToon(t.tm));
-      if (!targets.length) continue;
+    if (swordsUp(pl)) {
+      log("Swords of Revealing Light — " + state.aiName + " cannot attack.");
+      return;
+    }
+    const directReady = ai.monsters.some((m) => m && m.faceup && m.position === "atk" && canDirectAttack(m, pl));
+    if (pegasusEye() && directReady && pl.hand.some((c) => c.name === "Kuriboh")) eyeLine("I see Kuriboh in your hand.");
+    else if (pegasusEye() && pl.hand.some((c) => c.name === "Mirror Force") && setBackrowCount(pl) === 0) {
+      eyeLine("Your Mirror Force is still in your hand.");
+    }
+    let swings = 0;
+    const scared = scareMirror();
+    while (state && !state.winner) {
       let best = null;
-      for (let t = 0; t < targets.length; t++) {
-        const tm = targets[t].tm;
-        const zi = targets[t].zi;
-        if (!tm.faceup) { if (a >= 1500) { best = zi; break; } continue; }
-        const ds = getStats(tm);
-        const d = tm.position === "def" ? ds.def : ds.atk;
-        if (a > d) { best = zi; break; }
+      for (let i = 0; i < ZONES; i++) {
+        const m = ai.monsters[i];
+        if (!m || m.position !== "atk" || !m.faceup || ai.attackedThisTurn.has(m.uid)) continue;
+        if (terLocks(m) || insectBarrierBlocks(m, pl)) continue;
+        if (isToon(m) && (ai.summonedThisTurn.has(m.uid) || ai.lp <= 500)) continue;
+        if (m.name === "Panther Warrior") {
+          const ti = weakestIndex(ai, i, ["Baby Dragon", "Time Wizard", "Petit Moth"]);
+          if (ti < 0) continue;
+          const cost = ai.monsters[ti].faceup === false ? (ai.monsters[ti].ref.atk || 0) : getStats(ai.monsters[ti]).atk;
+          if (cost >= 1500 && aiProfile().diff >= 3) continue;
+        }
+        let choice = null;
+        const foeToon = pl.monsters.some((tm) => tm && isToon(tm));
+        if (canDirectAttack(m, pl) && !(isToon(m) && foeToon)) {
+          const s = scoreAttack(ai, m, null);
+          if (s >= 40) choice = { target: -1, score: s };
+        }
+        if (!canDirectAttack(m, pl) || (isToon(m) && foeToon)) {
+          pl.monsters.forEach((tm, zi) => {
+            if (!tm) return;
+            if (isToon(m) && !isToon(tm)) return;
+            const s = scoreAttack(ai, m, tm);
+            if (s >= 40 && (!choice || s > choice.score)) choice = { target: zi, score: s };
+          });
+        }
+        if (choice && (!best || choice.score > best.score)) best = { i: i, choice: choice };
       }
-      if (best != null) {
-        await battle(ai, i, pl, best);
-        await wait(280);
+      if (!best) break;
+      if (scared && swings >= 1) break;
+      const atkUid = ai.monsters[best.i].uid;
+      await aiGlance("ai", "m", best.i);
+      if (!state || state.winner) return;
+      await battle(ai, best.i, pl, best.choice.target);
+      const lived = ai.monsters.find((m) => m && m.uid === atkUid);
+      if (lived && !ai.attackedThisTurn.has(atkUid)) break;
+      swings++;
+      if (!state || state.winner) return;
+      await wait(120);
+    }
+  }
+
+  async function aiMain2(ai) {
+    const prof = aiProfile();
+    const opp = knownThreat(state.player).atk;
+    let announced = false;
+    const announce = () => {
+      if (announced) return;
+      announced = true;
+      state.phase = "main2";
+      log(state.aiName + " continues in Main Phase 2.");
+    };
+    for (let i = 0; i < ZONES; i++) {
+      const m = ai.monsters[i];
+      if (!m || !m.faceup || m.position !== "atk") continue;
+      if (ai.positionChanged.has(m.uid) || ai.summonedThisTurn.has(m.uid) || terLocks(m)) continue;
+      const s = getStats(m);
+      if (opp > s.atk && s.def > s.atk + 100 && prof.defend >= 0.3) {
+        announce();
+        m.position = "def";
+        ai.positionChanged.add(m.uid);
+        log(m.name + " → Defense Position.");
+        await aiGlance("ai", "m", i);
       }
+    }
+    const before = occupied(ai.spells).length;
+    if (before < ZONES && (ai.hand.some((c) => c.ref.isTrap) || bluffHandIndex(ai) >= 0)) announce();
+    await aiSetBackrow(ai);
+    if (occupied(ai.spells).length === before && announced && state && state.phase === "main2") {
+      /* A position change already explained the phase. */
     }
   }
 
@@ -2828,6 +3471,8 @@
     const gen = state.gen;
     const still = () => state && state.gen === gen && !state.winner;
     state.busy = true;
+    state.spot = null;
+    state.intel = null;
     render();
     try {
       const ai = state.ai;
@@ -2835,10 +3480,11 @@
         if (!drawCards(ai, 1)) return;
         log(state.aiName + " draws.");
       }
-      await wait(280);
+      await wait(320);
       if (!still()) return;
       state.phase = "main1";
       render();
+      prepareIntel();
       await aiOpening(ai);
       if (!still()) return;
       await aiTrySimple(ai);
@@ -2849,25 +3495,37 @@
       if (!still()) return;
       await aiTryPoly(ai);
       if (!still()) return;
+      await aiEgotist(ai);
+      if (!still()) return;
+      state.spot = null;
       aiAbsorb(ai);
+      if (state && state.spot) await aiGlance(state.spot.owner, state.spot.kind, state.spot.index);
       if (!still()) return;
       await aiBarrel(ai);
       if (!still()) return;
       await aiTime(ai);
       if (!still()) return;
-      aiShield(ai);
-      aiSwords(ai);
-      aiEquips(ai);
-      aiSetTrap(ai);
-      await wait(200);
+      await aiPositions(ai);
+      if (!still()) return;
+      await aiShield(ai);
+      if (!still()) return;
+      await aiSwords(ai);
+      if (!still()) return;
+      await aiEquips(ai);
+      if (!still()) return;
+      await aiSetBackrow(ai);
       if (!still()) return;
       state.phase = "battle";
+      state.spot = null;
       log(state.aiName + " enters the Battle Phase.");
       render();
-      await wait(220);
+      await wait(240);
       if (!still()) return;
       await aiAttack(ai);
       if (!still()) return;
+      await aiMain2(ai);
+      if (!still()) return;
+      state.spot = null;
       state.phase = "end";
       endTurn();
     } catch (err) {
@@ -2876,11 +3534,11 @@
     } finally {
       if (state && state.gen === gen) {
         state.busy = false;
+        state.spot = null;
         if (!state.winner && state.turn === "player") render();
       }
     }
   }
-
   function showVS() {
     const p = state.playerDeck;
     const o = state.aiDeck;
@@ -4151,8 +4809,9 @@
       const handFace = ai.hand.find((c) => c.name === "Illusionist Faceless Mage");
       if (handFace) tribute = handFace.uid;
       else {
-        const other = ai.hand.find((c) => c.ref.isMonster && !c.ref.isFusion && c.name !== "Relinquished" && c.name !== "Thousand-Eyes Idol" && !isToon(c) && (c.ref.level || 0) >= 1);
-        if (other) tribute = other.uid;
+        const others = ai.hand.filter((c) => c.ref.isMonster && !c.ref.isFusion && c.name !== "Relinquished" && c.name !== "Thousand-Eyes Idol" && !isToon(c) && (c.ref.level || 0) >= 1);
+        others.sort((a, b) => (a.ref.atk || 0) - (b.ref.atk || 0));
+        if (others.length) tribute = others[0].uid;
         else {
           const field = ai.monsters.find((m) => m && m.name !== "Thousand-Eyes Idol" && !isToon(m));
           if (field) tribute = field.uid;
@@ -4174,8 +4833,11 @@
       const c = findCocoon(m);
       if (c && (c.evoAge || 0) >= 2 && hasNamed(ai, "Great Moth")) {
         evolveMoth(ai, i, "Great Moth");
-        render();
-        await wait(280);
+        await aiGlance("ai", "m", i);
+        break;
+      } else if (c && (c.evoAge || 0) >= 1 && !hasNamed(ai, "Great Moth") && hasNamed(ai, "Larvae Moth")) {
+        evolveMoth(ai, i, "Larvae Moth");
+        await aiGlance("ai", "m", i);
         break;
       }
     }
@@ -4184,8 +4846,8 @@
     const cocoonI = ai.hand.findIndex((c) => c.name === "Cocoon of Evolution");
     if (petitI >= 0 && cocoonI >= 0) {
       equipCocoon(ai, ai.hand[cocoonI].uid, petitI);
-      render();
-      await wait(200);
+      const slot = ai.spells.findIndex((st) => st && st.cocoon);
+      await aiGlance("ai", slot >= 0 ? "st" : "m", slot >= 0 ? slot : petitI);
     }
     if (!state || state.winner) return;
     for (let i = 0; i < ZONES; i++) {
@@ -4195,8 +4857,7 @@
         m.position = "atk";
         onFlip(ai, i);
         log(whoName(ai) + " Flip Summons Castle of Dark Illusions.");
-        render();
-        await wait(200);
+        await aiGlance("ai", "m", i);
         break;
       }
     }
@@ -4204,41 +4865,43 @@
     const barrier = ai.hand.findIndex((c) => c.name === "Insect Barrier");
     if (barrier >= 0 && state.player.monsters.some((m) => m && m.ref.race === "Insect") &&
         !ai.spells.some((st) => st && st.faceup && st.name === "Insect Barrier")) {
-      activateBarrier(ai, ai.hand[barrier].uid);
-      render();
-      await wait(160);
+      const uid = ai.hand[barrier].uid;
+      activateBarrier(ai, uid);
+      const slot = ai.spells.findIndex((st) => st && st.uid === uid);
+      await aiGlance("ai", "st", slot >= 0 ? slot : 0);
     }
     if (!state || state.winner) return;
     const tw = ai.hand.findIndex((c) => c.name === "Toon World");
-    if (tw >= 0 && !hasToonWorld(ai) && ai.lp > 1000) {
-      activateToonWorld(ai, ai.hand[tw].uid);
-      render();
-      await wait(200);
+    if (tw >= 0 && !hasToonWorld(ai) && ai.lp > 1000 && !(state.intel && state.intel.wipe && ai.lp <= 1500)) {
+      const uid = ai.hand[tw].uid;
+      activateToonWorld(ai, uid);
+      const slot = ai.spells.findIndex((st) => st && st.uid === uid);
+      await aiGlance("ai", "st", slot >= 0 ? slot : 0);
     }
     if (!state || state.winner) return;
-    if (hasToonWorld(ai)) {
+    if (hasToonWorld(ai) && !(state.intel && state.intel.wipe)) {
       const toons = ai.hand.map((c, i) => ({ c: c, i: i })).filter((x) => isToon(x.c));
-      toons.sort((a, b) => (b.c.ref.atk || 0) - (a.c.ref.atk || 0));
+      toons.sort((a, b) => projectedStats(b.c).atk - projectedStats(a.c).atk);
       for (let t = 0; t < toons.length; t++) {
         const hi = ai.hand.findIndex((c) => c.uid === toons[t].c.uid);
         if (hi >= 0 && summonToon(ai, hi)) {
-          render();
-          await wait(180);
+          const slot = ai.monsters.findIndex((m) => m && m.uid === toons[t].c.uid);
+          if (slot >= 0) await aiGlance("ai", "m", slot);
         }
         if (!state || state.winner) return;
       }
+    } else if (hasToonWorld(ai) && state.intel && state.intel.wipe) {
+      eyeLine("I see " + state.intel.wipe + " in your hand.");
     }
     if (!state || state.winner) return;
-    if (controlsHarpie(ai)) {
-      const eg = ai.hand.findIndex((c) => c.name === "Elegant Egotist");
-      if (eg >= 0 && (hasNamed(ai, "Harpie Lady Sisters") || hasNamed(ai, "Harpie Lady")) && firstEmpty(ai.monsters) >= 0) {
-        activateEgotist(ai, ai.hand[eg].uid, null);
-        render();
-        await wait(200);
-      }
-    }
+    await aiEgotist(ai);
     if (!state || state.winner) return;
+    const hadRel = ai.monsters.some((m) => m && m.name === "Relinquished");
     aiTryRitual(ai);
+    if (!hadRel) {
+      const rel = ai.monsters.findIndex((m) => m && m.name === "Relinquished");
+      if (rel >= 0) await aiGlance("ai", "m", rel);
+    }
     if (!state || state.winner) return;
     if (!ai.normalSummoned && hasNamed(ai, "Great Moth") &&
         ai.hand.some((c) => c.name === "Cocoon of Evolution") &&
@@ -4251,17 +4914,16 @@
         const ci = ai.hand.findIndex((c) => c.name === "Cocoon of Evolution");
         const pi = ai.monsters.findIndex((m) => m && m.name === "Petit Moth");
         if (ci >= 0 && pi >= 0) equipCocoon(ai, ai.hand[ci].uid, pi);
-        render();
-        await wait(200);
+        await aiGlance("ai", "m", pi >= 0 ? pi : 0);
       }
     }
     if (!state || state.winner || ai.normalSummoned) return;
     if (!ai.monsters.some((m) => m && m.name === "Castle of Dark Illusions")) {
       const hi = ai.hand.findIndex((c) => c.name === "Castle of Dark Illusions");
       if (hi >= 0 && firstEmpty(ai.monsters) >= 0) {
-        placeMonster(ai, hi, "def", false, []);
+        const res = placeMonster(ai, hi, "def", false, []);
         log(whoName(ai) + " Sets Castle of Dark Illusions.");
-        render();
+        if (res) await aiGlance("ai", "m", res.slot);
       }
     }
   }
@@ -4272,13 +4934,18 @@
     if (hostIdx < 0) return;
     let best = -1;
     let bestAtk = -1;
+    let hidden = -1;
     state.player.monsters.forEach((m, i) => {
       if (!m) return;
-      const a = m.faceup ? getStats(m).atk : (m.ref.atk || 0);
+      if (!m.faceup) { if (hidden < 0) hidden = i; return; }
+      const a = m.ref.atk || 0;
       if (a > bestAtk) { bestAtk = a; best = i; }
     });
-    if (best >= 0) absorbMonster(ai, hostIdx, best);
-    render();
+    if (best < 0) best = hidden;
+    if (best >= 0 && absorbMonster(ai, hostIdx, best)) {
+      state.spot = { owner: "ai", kind: "m", index: hostIdx };
+      render();
+    }
   }
 
   async function aiBarrel(ai) {
@@ -4292,6 +4959,8 @@
       if (a > bestAtk) { bestAtk = a; best = i; }
     });
     if (best < 0) return;
+    state.spot = { owner: "ai", kind: "m", index: host };
+    render();
     await fireBarrel(ai, host, best);
   }
 
@@ -4652,6 +5321,9 @@
     activateTimeWizard: activateTimeWizard,
     battle: battle,
     render: render,
+    runAI: runAITurn,
+    aiProfile: () => aiProfile(),
+    pegasusEye: () => pegasusEye(),
     rules: () => rulesMode,
     issuesFor: issuesFor,
     saved: () => savedDecks,
