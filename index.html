@@ -577,6 +577,78 @@
     #endChips { margin: 0; color: var(--gold); font-size: 1.05rem; font-weight: 700; }
     #endChips[hidden] { display: none !important; }
 
+    #decks .rules-row, #decks .rules-hint { flex-shrink: 0; align-self: center; }
+    #tourneyRules[hidden], #tourneyRulesHint[hidden] { display: none !important; }
+
+    /* —— Pack opening and unlock celebration (one screen, no page scroll) —— */
+    #pack, #unlock {
+      align-items: center; justify-content: flex-start; text-align: center;
+      padding: 8px 12px 8px; gap: 6px;
+    }
+    #pack h2, #unlock h2 {
+      margin: 0; color: var(--gold); font-size: clamp(1.15rem, 5vw, 1.45rem);
+      line-height: 1.1; flex-shrink: 0;
+    }
+    #pack .vs-kicker, #unlock .vs-kicker { flex-shrink: 0; }
+    .pack-stage {
+      flex: 1; min-height: 0; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pack-card {
+      width: min(42vw, 168px); aspect-ratio: 59 / 86; max-height: 100%;
+      border: 1px solid var(--gold-dim); border-radius: 8px; padding: 0;
+      background: #111; position: relative; cursor: pointer; color: var(--gold);
+    }
+    .pack-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 7px; display: block; }
+    .pack-card .back {
+      position: absolute; inset: 0; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; letter-spacing: 0.12em;
+      background:
+        repeating-linear-gradient(45deg, #1a2a4a 0 8px, #243860 8px 16px);
+      border: 2px solid rgba(212,160,23,0.55);
+    }
+    .pack-card .back[hidden], .pack-card img[hidden] { display: none !important; }
+    .pack-card.reveal { animation: packIn 0.35s ease-out; }
+    #packName {
+      margin: 0; min-height: 1.25em; max-width: 92vw; flex-shrink: 0;
+      color: var(--gold); font-size: 0.95rem; line-height: 1.25;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    #packRarity { margin: 0; min-height: 1em; flex-shrink: 0; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    #packRarity.common { color: var(--muted); }
+    #packRarity.rare { color: #8ec8ff; }
+    #packRarity.super { color: #d7b4ff; }
+    #packRarity.ultra { color: #ffd56a; }
+    #packRarity.secret { color: #ff9ad5; }
+    #btnPackNext, #btnUnlockNext { flex-shrink: 0; }
+    .unlock-lead { margin: 0; max-width: 22rem; color: var(--cream); font-size: 0.78rem; line-height: 1.3; flex-shrink: 0; }
+    .unlock-grid {
+      flex: 1; min-height: 0; width: 100%;
+      display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr;
+      gap: 6px; align-items: stretch;
+    }
+    .unlock-card {
+      margin: 0; min-height: 0; min-width: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .unlock-card img {
+      width: auto; height: auto; max-width: 100%; max-height: calc(100% - 1.5em);
+      aspect-ratio: 59 / 86; object-fit: cover; border-radius: 4px;
+      border: 1px solid var(--gold-dim); background: #111;
+    }
+    .unlock-card figcaption {
+      flex-shrink: 0; max-width: 100%; font-size: 0.58rem; line-height: 1.15; color: var(--cream);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pool-card .own {
+      position: absolute; left: 2px; top: 2px; z-index: 1; pointer-events: none;
+      font-size: 0.52rem; line-height: 1.15; padding: 2px 3px; border-radius: 2px;
+      background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
+    }
+    .pool-card .own.none { color: #ff8a80; }
+    .pool-card.unowned { opacity: 0.48; }
+
     .overlay, #loading {
       position: fixed; left: 0; right: 0;
       top: var(--vv-off, 0px); height: var(--vv-h, 100dvh);
@@ -640,6 +712,7 @@
 
     @keyframes slideL { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
     @keyframes slideR { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
+    @keyframes packIn { from { opacity: 0; transform: rotateY(88deg) scale(0.9); } to { opacity: 1; transform: none; } }
   </style>
 </head>
 <body>
@@ -651,7 +724,7 @@
         <button type="button" id="ruleClassic" class="on">Classic</button>
         <button type="button" id="ruleDK">Duelist Kingdom</button>
       </div>
-      <p class="rules-hint" id="rulesHint">Free Duel: 8000 LP · tributes for Level 5+ · fuse from hand or field</p>
+      <p class="rules-hint" id="rulesHint">Free Duel: 8000 LP · tributes · no attack on the first turn</p>
       <button type="button" class="menu-btn primary" id="btnStart">Free Duel</button>
       <button type="button" class="menu-btn tourney" id="btnTourney">Tournament</button>
       <button type="button" class="menu-btn" id="btnContinue" hidden>Continue</button>
@@ -663,6 +736,11 @@
         <h2>Choose Your Deck</h2>
         <p id="deckRules">Classic rules</p>
       </div>
+      <div class="rules-row" id="tourneyRules" hidden>
+        <button type="button" id="tourneyClassic">Classic</button>
+        <button type="button" id="tourneyDK" class="on">Duelist Kingdom</button>
+      </div>
+      <p class="rules-hint" id="tourneyRulesHint" hidden>2000 LP · no tributes · arena field bonus</p>
       <div class="deck-grid">
         <button type="button" class="deck-opt yugi" data-deck="yugi">
           <img alt="" src="https://images.ygoprodeck.com/images/cards_small/46986414.jpg" />
@@ -692,7 +770,7 @@
     <section id="island" class="screen" hidden>
       <div class="island-top">
         <div style="min-width:0">
-          <h2>Duelist Kingdom</h2>
+          <h2 id="islandTitle">Duelist Kingdom</h2>
           <p id="islandDeck">Yugi</p>
         </div>
         <div class="chip-pill" id="islandChips">★ 2 / 10</div>
@@ -727,12 +805,13 @@
       <h2>How to Play</h2>
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
-        <p><strong>Tournament:</strong> Duelist Kingdom rules on an island. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. A loss costs 1. At 0 the run is over. Progress is saved on this device — use Continue. Each arena has a field: Forest, Wasteland, Mountain, Fortress, Yami, and Yami again at the castle. Opponents get sharper along the path: Weevil leans on insects and traps, Rex on dinosaurs, Mai on Harpies and equips, Keith on machines, Panik on defense. Pegasus reads your hand with the Millennium Eye.</p>
-        <p><strong>Custom decks:</strong> Search the classic card pool (LOB through Labyrinth of Nightmare). A main deck is 40–60 cards, at most 3 of any card. Fusion Monsters go in the Extra Deck (max 15). Save up to 3 decks on this device. The Forbidden/Limited switch is off unless you turn it on.</p>
+        <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. A loss costs 1. At 0 the run is over. Each win opens a booster from that duelist's set. Progress is saved on this device. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods.</p>
+        <p><strong>Custom decks:</strong> Build from cards you own. Owned counts show on each card. Preset Yugi, Kaiba, and Joey decks do not need the collection. A main deck is 40–60 cards, at most 3 of any card. Fusion Monsters go in the Extra Deck (max 15). Save up to 3 decks on this device. The Forbidden/Limited switch is off unless you turn it on.</p>
         <p><strong>Goal:</strong> Drop their Life Points to 0, or deck them out.</p>
         <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Next Phase advances. You do not draw on your first turn.</p>
-        <p><strong>Classic:</strong> 8000 LP. Level 5–6 needs 1 tribute; 7+ needs 2. Polymerization can use monsters from your hand or field.</p>
-        <p><strong>Duelist Kingdom:</strong> 2000 LP, no tributes. A random field gives matching Types +30% ATK and DEF. Polymerization uses monsters on the field only.</p>
+        <p><strong>Classic:</strong> 8000 LP. Level 5–6 needs 1 tribute; 7+ needs 2. Egyptian Gods need 3. No attacks on the very first turn. Polymerization can use monsters from your hand or field.</p>
+        <p><strong>Duelist Kingdom:</strong> 2000 LP, no tributes. The field gives matching Types +30% ATK and DEF. The first player may attack. Polymerization uses monsters on the field only.</p>
+        <p><strong>Exodia:</strong> After you beat Pegasus, the five pieces can go in a deck. Holding all five in your hand wins, in either rule set.</p>
         <p><strong>Fusion:</strong> Activate Polymerization to summon from your Extra Deck. Tap Extra to look at it. Yugi fuses Gaia the Dragon Champion, Kaiba fuses Blue-Eyes Ultimate Dragon (and Rabid Horseman), Joey fuses Flame Swordsman.</p>
         <p><strong>Time Wizard:</strong> Call Heads or Tails. Right: the opponent’s monsters are destroyed, and Baby Dragon becomes Thousand Dragon. Wrong: your monsters are destroyed and you take damage equal to half their ATK.</p>
         <p><strong>Equips:</strong> Legendary Sword (Warrior), Book of Secret Arts (Spellcaster), Dragon Treasure (Dragon), Black Pendant, Horn of the Unicorn. Tap Equip, then a face-up monster.</p>
@@ -820,7 +899,8 @@
         <select id="buildLevel" aria-label="Level"><option value="">Level</option></select>
       </div>
       <div class="seg" id="buildView">
-        <button type="button" data-view="pool" class="on">Pool</button>
+        <button type="button" data-view="pool" class="on">All</button>
+        <button type="button" data-view="owned">Owned</button>
         <button type="button" data-view="main">Main</button>
         <button type="button" data-view="extra">Extra</button>
       </div>
@@ -833,6 +913,29 @@
       <p id="endMsg"></p>
       <button type="button" class="menu-btn primary" id="btnAgain">Duel Again</button>
       <button type="button" class="menu-btn" id="btnEndMenu">Main Menu</button>
+    </section>
+
+    <section id="unlock" class="screen" hidden>
+      <p class="vs-kicker">Millennium Prize</p>
+      <h2>The seal breaks</h2>
+      <p class="unlock-lead" id="unlockLead">Exodia and the Egyptian Gods are in your collection.</p>
+      <div class="unlock-grid" id="unlockGrid"></div>
+      <button type="button" class="menu-btn primary" id="btnUnlockNext">Open Pack</button>
+    </section>
+
+    <section id="pack" class="screen" hidden>
+      <p class="vs-kicker" id="packKicker">Booster</p>
+      <h2 id="packTitle">Legend of Blue Eyes</h2>
+      <p class="rules-hint" id="packSub">Card 1 of 5</p>
+      <div class="pack-stage">
+        <button type="button" class="pack-card" id="packCard">
+          <img id="packArt" alt="" hidden />
+          <span class="back" id="packBack">★</span>
+        </button>
+      </div>
+      <p id="packName"></p>
+      <p id="packRarity"></p>
+      <button type="button" class="menu-btn primary" id="btnPackNext">Reveal</button>
     </section>
   </div>
 
@@ -885,6 +988,7 @@
   </div>
 
   <script src="classic-pool.js"></script>
+  <script src="pack-sets.js"></script>
   <script>
 (function () {
   "use strict";
@@ -1029,6 +1133,43 @@
   const STAR_CASTLE = 10;
   const STAR_LOSS = 1;
   const TOURNEY_KEY = "classicDuel_tournament_v1";
+  const COLLECTION_KEY = "classicDuel_collection_v1";
+  const EXODIA_NAMES = [
+    "Exodia the Forbidden One",
+    "Right Arm of the Forbidden One",
+    "Left Arm of the Forbidden One",
+    "Right Leg of the Forbidden One",
+    "Left Leg of the Forbidden One",
+  ];
+  const GOD_NAMES = ["Slifer the Sky Dragon", "Obelisk the Tormentor", "The Winged Dragon of Ra"];
+  const REWARD_NAMES = EXODIA_NAMES.concat(GOD_NAMES);
+  const REWARD_SHORT = {
+    "Exodia the Forbidden One": "Exodia",
+    "Right Arm of the Forbidden One": "Right Arm",
+    "Left Arm of the Forbidden One": "Left Arm",
+    "Right Leg of the Forbidden One": "Right Leg",
+    "Left Leg of the Forbidden One": "Left Leg",
+    "Slifer the Sky Dragon": "Slifer",
+    "Obelisk the Tormentor": "Obelisk",
+    "The Winged Dragon of Ra": "Ra",
+  };
+  const PACK_OF = {
+    weevil: "Legend of Blue Eyes White Dragon",
+    rex: "Metal Raiders",
+    mai: "Magic Ruler",
+    keith: "Pharaoh's Servant",
+    panik: "Labyrinth of Nightmare",
+    rival: "Legend of Blue Eyes White Dragon",
+    pegasus: "Spell Ruler",
+  };
+  const PACK_BONUS = {
+    weevil: ["Basic Insect", "Killer Needle", "Great Moth", "Petit Moth", "Cocoon of Evolution"],
+    rex: ["Two-Headed King Rex", "Megazowler", "Sword Arm of Dragon", "Uraby"],
+    mai: ["Harpie Lady", "Harpie Lady Sisters", "Cyber Harpie Lady", "Elegant Egotist", "Harpie's Feather Duster"],
+    keith: ["Barrel Dragon", "Slot Machine", "Launcher Spider", "Robotic Knight", "7 Completed"],
+    panik: ["Castle of Dark Illusions", "Summoned Skull", "Malevolent Nuzzler"],
+    pegasus: ["Toon World", "Relinquished", "Blue-Eyes Toon Dragon", "Thousand-Eyes Restrict", "Manga Ryu-Ran"],
+  };
   const PATH = ["weevil", "rex", "mai", "keith", "panik", "rival"];
   /* Stakes sum to 8, so 2 + one win each = 10 and the castle opens. */
   const STAKES = { weevil: 1, rex: 1, mai: 1, keith: 2, panik: 1, rival: 2 };
@@ -1198,6 +1339,9 @@
   let deckPickMode = "free";
   let endPrimary = "again";
   let tourney = null;
+  let tourneyRulesPick = "dk";
+  let collection = { counts: {}, unlocked: false };
+  let prize = null;
 
   const $ = (id) => document.getElementById(id);
   const el = {
@@ -1207,7 +1351,13 @@
     deckRules: $("deckRules"), btnDeckBack: $("btnDeckBack"),
     vsRules: $("vsRules"), vsMatch: $("vsMatch"), vsPArt: $("vsPArt"), vsOArt: $("vsOArt"),
     vsPCap: $("vsPCap"), vsOCap: $("vsOCap"), vsTaunt: $("vsTaunt"), btnVsGo: $("btnVsGo"),
-    islandDeck: $("islandDeck"), islandChips: $("islandChips"), islandNote: $("islandNote"),
+    islandTitle: $("islandTitle"), islandDeck: $("islandDeck"), islandChips: $("islandChips"), islandNote: $("islandNote"),
+    tourneyRules: $("tourneyRules"), tourneyRulesHint: $("tourneyRulesHint"),
+    tourneyClassic: $("tourneyClassic"), tourneyDK: $("tourneyDK"),
+    unlockLead: $("unlockLead"), unlockGrid: $("unlockGrid"), btnUnlockNext: $("btnUnlockNext"),
+    packKicker: $("packKicker"), packTitle: $("packTitle"), packSub: $("packSub"),
+    packCard: $("packCard"), packArt: $("packArt"), packBack: $("packBack"),
+    packName: $("packName"), packRarity: $("packRarity"), btnPackNext: $("btnPackNext"),
     mapBoard: $("mapBoard"), btnIslandMenu: $("btnIslandMenu"), btnIslandRetire: $("btnIslandRetire"),
     aiName: $("aiName"), plName: $("plName"), aiLP: $("aiLP"), plLP: $("plLP"),
     phaseLabel: $("phaseLabel"), fieldTag: $("fieldTag"),
@@ -1269,6 +1419,16 @@
       const imgId = prev ? prev.id : row[1];
       cardDB[name] = makeCard(name, imgId, row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]);
     });
+    EXODIA_NAMES.forEach((name) => { if (cardDB[name]) cardDB[name].reward = true; });
+    const gods = [
+      ["Obelisk the Tormentor", 10000000, 4000, 4000, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. Unaffected by Spells and Traps. Once per turn: Tribute 2 other monsters; destroy every monster your opponent controls. Obelisk cannot attack the turn this effect is used."],
+      ["Slifer the Sky Dragon", 10000020, null, null, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. ATK and DEF equal the number of cards in your hand × 1000. A monster Summoned to your opponent in face-up Attack Position is destroyed if its ATK is less than or equal to this card. A monster Summoned in Defense Position has 0 DEF. Unaffected by Spells and Traps."],
+      ["The Winged Dragon of Ra", 10000010, null, null, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. When Summoned, pay Life Points; this card's ATK and DEF become the amount paid. Unaffected by Spells and Traps."],
+    ];
+    gods.forEach((row) => {
+      cardDB[row[0]] = makeCard(row[0], row[1], "Effect Monster", "Divine-Beast", "DIVINE", 10, row[2], row[3], row[4], 1);
+      cardDB[row[0]].reward = true;
+    });
     learnFusions();
   }
 
@@ -1292,7 +1452,7 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -1426,7 +1586,41 @@
       }
       p.hand.push(p.deck.pop());
     }
+    if (state && !state.winner && checkExodia(p)) return false;
     return true;
+  }
+
+  function isGodName(name) {
+    return GOD_NAMES.indexOf(name) >= 0;
+  }
+
+  function isGod(card) {
+    if (!card) return false;
+    return isGodName(card.name) || isGodName(card.ref && card.ref.name);
+  }
+
+  function checkExodia(p) {
+    if (!state || state.winner || !p) return false;
+    const have = {};
+    p.hand.forEach((c) => { have[c.name] = true; });
+    if (!EXODIA_NAMES.every((n) => have[n])) return false;
+    endGame(p === state.player ? "player" : "ai", whoName(p) + " holds all five pieces of Exodia.");
+    return true;
+  }
+
+  function openingTurn() {
+    return !!(state && state.rules === "classic" && state.firstTurn && state.turnCount === 1);
+  }
+
+  function fieldBonusOn() {
+    return !!(state && state.rules === "dk" && state.field);
+  }
+
+  function controllerOf(cardInst) {
+    if (!state || !cardInst) return null;
+    if (state.player.monsters.some((m) => m && m.uid === cardInst.uid)) return state.player;
+    if (state.ai.monsters.some((m) => m && m.uid === cardInst.uid)) return state.ai;
+    return null;
   }
 
   function checkLP() {
@@ -1472,7 +1666,17 @@
       def = base && base.def != null ? base.def : 0;
     }
     if (cardInst.swapped) { const t = atk; atk = def; def = t; }
-    if (state && state.field && cardInst.faceup !== false) {
+    if (cardInst.name === "Slifer the Sky Dragon") {
+      const owner = controllerOf(cardInst);
+      const n = owner ? owner.hand.length : 0;
+      atk = n * 1000;
+      def = n * 1000;
+    } else if (cardInst.name === "The Winged Dragon of Ra") {
+      const paid = cardInst.raPower || 0;
+      atk = paid;
+      def = paid;
+    }
+    if (fieldBonusOn() && cardInst.faceup !== false) {
       const types = FIELD_TYPES[state.field] || [];
       if (types.indexOf(cardInst.ref.race) >= 0) {
         atk = Math.floor(atk * 1.3);
@@ -1493,6 +1697,7 @@
         });
       });
     }
+    if (cardInst.defZero) def = 0;
     return { atk: atk, def: def };
   }
 
@@ -1551,19 +1756,33 @@
     return m;
   }
 
-  function destroyMonster(p, idx) {
+  function destroyMonster(p, idx, battleKill) {
     const m = p.monsters[idx];
     if (!m) return;
+    if (!battleKill && isGod(m)) {
+      log(m.name + " is unaffected.");
+      return;
+    }
     sendMonsterToGY(p, idx);
     log(m.name + " is destroyed.");
   }
 
   function destroyAllMonsters(p) {
-    for (let i = 0; i < ZONES; i++) if (p.monsters[i]) destroyMonster(p, i);
+    const spared = [];
+    for (let i = 0; i < ZONES; i++) {
+      const m = p.monsters[i];
+      if (!m) continue;
+      if (isGod(m)) { spared.push(m.name); continue; }
+      destroyMonster(p, i);
+    }
+    if (spared.length) log(spared.join(" and ") + (spared.length > 1 ? " are" : " is") + " unaffected.");
   }
 
-  function tributesNeeded(level) {
+  function tributesNeeded(card) {
     if (!state || state.rules === "dk") return 0;
+    const name = (card && card.name) || "";
+    const level = (card && card.ref && card.ref.level) || 0;
+    if (isGodName(name)) return 3;
     if (level >= 7) return 2;
     if (level >= 5) return 1;
     return 0;
@@ -1702,7 +1921,7 @@
   function placeMonster(p, handIdx, pos, faceup, tributeIdxs) {
     const card = p.hand[handIdx];
     if (!card || !card.ref.isMonster || card.ref.isFusion || !canNormalSummon(card)) return null;
-    const need = tributesNeeded(card.ref.level);
+    const need = tributesNeeded(card);
     const tributes = (tributeIdxs || []).slice().sort((a, b) => b - a);
     if (need > 0) {
       if (tributes.length !== need) return null;
@@ -1784,7 +2003,7 @@
 
   function canEquip(name, monster) {
     const spec = EQUIP[name];
-    if (!spec || !monster || !monster.faceup) return false;
+    if (!spec || !monster || !monster.faceup || isGod(monster)) return false;
     if (spec.race && monster.ref.race !== spec.race) return false;
     return true;
   }
@@ -1878,14 +2097,15 @@
     } else if (name === "Fissure") {
       let best = -1, bestVal = Infinity;
       foe.monsters.forEach((m, i) => {
-        if (!m) return;
+        if (!m || isGod(m)) return;
         const val = m.faceup ? getStats(m).atk : (m.ref.atk || 0);
         if (val < bestVal) { bestVal = val; best = i; }
       });
       if (best >= 0) destroyMonster(foe, best);
+      else if (foe.monsters.some((m) => m && isGod(m))) log("A God is unaffected.");
       else log("Fissure has no target.");
     } else if (name === "Change of Heart") {
-      const idxs = foe.monsters.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
+      const idxs = foe.monsters.map((m, i) => (m && !isGod(m) ? i : -1)).filter((i) => i >= 0);
       if (!idxs.length) log("No monster to take.");
       else {
         let idx = idxs[0];
@@ -1909,7 +2129,7 @@
       destroySpells(foe);
       if (!n) log("No Spell or Trap to destroy.");
     } else if (name === "Monster Reborn") {
-      const pool = owner.gy.concat(foe.gy).filter((c) => c.ref.isMonster);
+      const pool = owner.gy.concat(foe.gy).filter((c) => c.ref.isMonster && !isGodName(c.name));
       if (!pool.length) log("No monster in either Graveyard.");
       else {
         pool.sort((a, b) => (b.ref.atk || 0) - (a.ref.atk || 0));
@@ -2060,6 +2280,14 @@
     if (atkOwner === state.player && state.busy) return;
     let atkM = atkOwner.monsters[atkIdx];
     if (!atkM || atkM.position !== "atk" || !atkM.faceup) return;
+    if (openingTurn()) {
+      if (atkOwner === state.player) toast("No attacks on the first turn.");
+      return;
+    }
+    if (atkM.obeliskSpent === state.turnCount) {
+      if (atkOwner === state.player) toast("Obelisk cannot attack the turn it uses that effect.");
+      return;
+    }
     if (atkOwner.attackedThisTurn.has(atkM.uid)) { toast("Already attacked."); return; }
     if (swordsUp(defOwner)) {
       if (atkOwner === state.player) toast("Swords of Revealing Light prevents attacks.");
@@ -2266,7 +2494,8 @@
     if (!next || next === "end") { log("End Phase."); endTurn(); return; }
     state.phase = next;
     state.pending = null;
-    log("Phase: " + PHASE_LABEL[state.phase]);
+    if (next === "battle" && openingTurn()) log("No attacks on the first turn.");
+    else log("Phase: " + PHASE_LABEL[state.phase]);
     render();
   }
 
@@ -2278,7 +2507,7 @@
     if (card.ref.isFusion) { toast("Fusion Monsters must be Fusion Summoned."); return; }
     if (!canNormalSummon(card)) { toast(noNormalReason(card)); return; }
     if (p.normalSummoned) { toast("Already Normal Summoned this turn."); return; }
-    const need = tributesNeeded(card.ref.level);
+    const need = tributesNeeded(card);
     let tributes = [];
     if (need > 0) {
       const idxs = p.monsters.map((m, i) => (m ? i : -1)).filter((i) => i >= 0);
@@ -2290,6 +2519,48 @@
     if (!res) return;
     log((faceup ? "Summoned " : "Set ") + card.name + ".");
     if (faceup && pos === "atk") tryTrapHole(p, res.slot);
+    render();
+    const live = state && state.player.monsters[res.slot];
+    if (live && live.name === "The Winged Dragon of Ra") beginRaPay(state.player, live);
+  }
+
+  async function beginRaPay(owner, monster) {
+    if (!state || !monster || monster.name !== "The Winged Dragon of Ra") return;
+    let pay = 0;
+    if (owner === state.ai) pay = Math.max(0, owner.lp - 100);
+    else {
+      const opts = ["Pay nothing (ATK 0)"];
+      const amounts = [0];
+      if (owner.lp > 1000) { opts.push("Pay 1000 LP"); amounts.push(1000); }
+      const half = Math.floor(owner.lp / 2);
+      if (half > 0 && amounts.indexOf(half) < 0) { opts.push("Pay half (" + half + ")"); amounts.push(half); }
+      const almost = Math.max(0, owner.lp - 100);
+      if (almost > 0 && amounts.indexOf(almost) < 0) { opts.push("Pay all but 100 (" + almost + ")"); amounts.push(almost); }
+      const pick = await choose("The Winged Dragon of Ra — pay Life Points. ATK and DEF become that number.", opts);
+      pay = pick >= 0 ? amounts[pick] : 0;
+    }
+    if (!state || !monster) return;
+    monster.raPower = pay;
+    owner.lp = Math.max(0, owner.lp - pay);
+    log(whoName(owner) + " pays " + pay + " LP. Ra's ATK and DEF are " + pay + ".");
+    checkLP();
+    render();
+  }
+
+  function obeliskFist(owner, idx) {
+    const m = owner.monsters[idx];
+    if (!m || m.name !== "Obelisk the Tormentor" || !m.faceup) return;
+    if (m.obeliskSpent === state.turnCount) { toast("Already used this turn."); return; }
+    const others = [];
+    owner.monsters.forEach((mon, i) => { if (mon && i !== idx) others.push(i); });
+    if (others.length < 2) { toast("Tribute 2 other monsters for Obelisk."); return; }
+    others.sort((a, b) => (owner.monsters[a].ref.atk || 0) - (owner.monsters[b].ref.atk || 0));
+    const trib = others.slice(0, 2).sort((a, b) => b - a);
+    log(whoName(owner) + " tributes 2 monsters for Obelisk the Tormentor.");
+    trib.forEach((i) => sendMonsterToGY(owner, i));
+    const host = owner.monsters[idx];
+    if (host) host.obeliskSpent = state.turnCount;
+    destroyAllMonsters(oppOf(owner));
     render();
   }
 
@@ -2417,6 +2688,9 @@
       if (main && c.name === "Barrel Dragon" && c.barrelTurn !== state.turnCount) {
         add("Barrel (3 coins)", () => { playerBarrel(ctx.index); });
       }
+      if (main && c.name === "Obelisk the Tormentor" && c.obeliskSpent !== state.turnCount) {
+        add("Tribute 2: destroy their monsters", () => obeliskFist(state.player, ctx.index));
+      }
       if (main && (c.name === "Relinquished" || c.name === "Thousand-Eyes Restrict") && c.absorbTurn !== state.turnCount) {
         add("Absorb", () => {
           state.pending = { type: "absorb", uid: c.uid, index: ctx.index };
@@ -2436,6 +2710,8 @@
       if (state.phase === "battle" && c.position === "atk") {
         const atkLabel = isToon(c) ? "Attack (500 LP)" : (c.name === "Panther Warrior" ? "Attack (Tribute)" : "Attack");
         add(atkLabel, () => {
+          if (openingTurn()) { toast("No attacks on the first turn."); return; }
+          if (c.obeliskSpent === state.turnCount) { toast("Obelisk cannot attack the turn it uses that effect."); return; }
           if (state.player.attackedThisTurn.has(c.uid)) { toast("Already attacked."); return; }
           if (swordsUp(state.ai)) { toast("Swords of Revealing Light prevents attacks."); return; }
           if (terLocks(c)) { toast("Thousand-Eyes Restrict prevents that attack."); return; }
@@ -2599,8 +2875,40 @@
     }
   }
 
+  function punishSlifer(owner, idx) {
+    const m = owner.monsters[idx];
+    if (!m || !m.faceup || isGod(m)) return;
+    const foe = oppOf(owner);
+    const slifer = foe.monsters.find((x) => x && x.faceup && x.name === "Slifer the Sky Dragon");
+    if (!slifer) return;
+    if (m.position !== "atk") {
+      if (!m.defZero) {
+        m.defZero = true;
+        log("Slifer the Sky Dragon reduces " + m.name + " to 0 DEF.");
+      }
+      return;
+    }
+    if (getStats(m).atk <= getStats(slifer).atk) {
+      log("Slifer the Sky Dragon destroys " + m.name + ".");
+      destroyMonster(owner, idx);
+    }
+  }
+
+  function noteFieldSummons() {
+    if (!state || state.winner) return;
+    [state.player, state.ai].forEach((p) => {
+      for (let i = 0; i < ZONES; i++) {
+        const m = p.monsters[i];
+        if (!m || !m.faceup || m.sliferSeen) continue;
+        m.sliferSeen = true;
+        punishSlifer(p, i);
+      }
+    });
+  }
+
   function render() {
     if (!state) return;
+    noteFieldSummons();
     const pl = state.player;
     const ai = state.ai;
     el.plName.textContent = state.playerName;
@@ -2613,9 +2921,11 @@
     el.aiGY.textContent = ai.gy.length;
     el.plExtra.textContent = pl.extra.length;
     el.aiExtra.textContent = ai.extra.length;
-    el.fieldTag.textContent = state.field
+    el.fieldTag.textContent = fieldBonusOn()
       ? "Field: " + state.field + " · +30% " + (FIELD_TYPES[state.field] || []).join(", ")
-      : (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom");
+      : (state.field
+        ? "Field: " + state.field
+        : (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom"));
     const who = state.turn === "player" ? "YOUR TURN" : state.aiName.toUpperCase();
     el.phaseLabel.textContent = who + " · " + (PHASE_LABEL[state.phase] || "").toUpperCase();
     renderZones(el.aiST, ai.spells, "ai", "st");
@@ -2703,7 +3013,7 @@
   }
 
   function raceMatchesField(race) {
-    if (!state || !state.field || !race) return false;
+    if (!fieldBonusOn() || !race) return false;
     return (FIELD_TYPES[state.field] || []).indexOf(race) >= 0;
   }
 
@@ -2781,7 +3091,7 @@
     let best = -1;
     let bestVal = Infinity;
     foe.monsters.forEach((m, i) => {
-      if (!m) return;
+      if (!m || isGod(m)) return;
       const val = m.faceup ? getStats(m).atk : (m.ref.atk || 0);
       if (val < bestVal) { bestVal = val; best = i; }
     });
@@ -2871,7 +3181,7 @@
   }
 
   function planTribute(ai, card) {
-    const need = tributesNeeded(card.ref.level);
+    const need = tributesNeeded(card);
     const idxs = [];
     ai.monsters.forEach((m, i) => { if (m) idxs.push(i); });
     if (need > idxs.length) return null;
@@ -3381,6 +3691,10 @@
 
   async function aiAttack(ai) {
     const pl = state.player;
+    if (openingTurn()) {
+      log("No attacks on the first turn.");
+      return;
+    }
     if (swordsUp(pl)) {
       log("Swords of Revealing Light — " + state.aiName + " cannot attack.");
       return;
@@ -3545,9 +3859,8 @@
     const pCard = cardDB[p.ace];
     const oCard = cardDB[o.ace];
     el.vsMatch.textContent = state.playerName + " vs " + state.aiName;
-    el.vsRules.textContent = state.rules === "classic"
-      ? "Classic Rules"
-      : ("Duelist Kingdom" + (state.field ? " · " + state.field : ""));
+    el.vsRules.textContent = (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom") +
+      (state.field ? " · " + state.field : "");
     if (state.taunt) {
       el.vsTaunt.hidden = false;
       el.vsTaunt.textContent = "\u201C" + state.taunt + "\u201D";
@@ -3573,7 +3886,9 @@
     if ($("duel").classList.contains("active")) return;
     showScreen("duel");
     log(state.playerName + " vs " + state.aiName + " — " + (state.rules === "classic" ? "Classic" : "Duelist Kingdom"));
-    if (state.field) log("Field: " + state.field + " (+30% matching Types)");
+    if (state.rules === "classic") log("No attacks on the first turn.");
+    if (fieldBonusOn()) log("Field: " + state.field + " (+30% matching Types)");
+    else if (state.field) log("Field: " + state.field);
     if (state.mode === "tourney" && state.tourneyKey !== "pegasus") {
       log("Win to take " + (state.stake || 0) + " Star Chip" + (state.stake === 1 ? "" : "s") + ".");
     }
@@ -3600,10 +3915,11 @@
     closeBuildSheet();
     const gen = matchGen;
     const rules = opts.rules || rulesMode;
+    const field = opts.field || (rules === "dk" ? pickField() : null);
     state = {
       gen: gen,
       rules: rules,
-      field: rules === "dk" ? (opts.field || pickField()) : null,
+      field: field,
       mode: opts.mode || "free",
       tourneyKey: opts.tourneyKey || null,
       stake: opts.stake || 0,
@@ -3626,8 +3942,8 @@
       busy: false,
       prompt: false,
     };
-    drawCards(state.player, 5);
-    drawCards(state.ai, 5);
+    if (!drawCards(state.player, 5)) return;
+    if (!state || state.winner || !drawCards(state.ai, 5)) return;
     showVS();
   }
 
@@ -3771,6 +4087,8 @@
       if (main.indexOf(n) >= 0 && c.isFusion) issues.push(n + " belongs in the Extra Deck.");
       if (extra.indexOf(n) >= 0 && !c.isFusion) issues.push(n + " belongs in the Main Deck.");
       const lim = copyLimit(n);
+      const owned = ownedCount(n);
+      if (counts[n] > owned) issues.push("You own " + owned + " " + n + " (deck has " + counts[n] + ").");
       if (counts[n] > lim) {
         if (flEnforce && c.limit === 0) issues.push(n + " is Forbidden.");
         else if (flEnforce && c.limit === 1) issues.push(n + " is Limited to 1.");
@@ -3863,9 +4181,10 @@
     draft = null;
     const sub = document.querySelector("#customs .deck-head p");
     if (sub) {
-      sub.textContent = deckPickMode === "tourney"
+      const owned = "Collection: " + ownedKinds() + " cards.";
+      sub.textContent = (deckPickMode === "tourney"
         ? "A legal saved deck enters the tournament."
-        : "Pick a saved deck. The opponent is Yugi, Kaiba, or Joey.";
+        : "Pick a saved deck. The opponent is Yugi, Kaiba, or Joey.") + " " + owned;
     }
     showScreen("customs");
     renderCustoms();
@@ -3879,7 +4198,7 @@
     if (!savedDecks.length) {
       const note = document.createElement("p");
       note.className = "empty-note";
-      note.textContent = "No saved decks yet. New Deck can start empty, or as a copy of Yugi, Kaiba, or Joey.";
+      note.textContent = "No saved decks yet. Build from cards you own. Yugi, Kaiba, and Joey on the previous screen do not need the collection.";
       el.customList.appendChild(note);
       return;
     }
@@ -4001,6 +4320,7 @@
     draft.savedJSON = draftSnapshot();
     buildFilter = { q: "", kind: "all", attr: "", type: "", level: "", view: "pool" };
     el.buildSearch.value = "";
+    el.buildSearch.placeholder = "Search " + deckCards().length + " cards";
     el.buildName.value = draft.name;
     el.buildAttr.value = "";
     el.buildType.value = "";
@@ -4035,6 +4355,7 @@
     Object.keys(cardDB).forEach((name) => {
       const c = cardDB[name];
       if (!c || /Token|Skill/i.test(c.type)) return;
+      if (c.reward && !collection.unlocked && !ownedCount(name)) return;
       if (c.isMonster || c.isSpell || c.isTrap) list.push(c);
     });
     list.sort((a, b) => a.name.localeCompare(b.name));
@@ -4056,7 +4377,9 @@
     if (!draft) return;
     const counts = countNames(draft.main.concat(draft.extra));
     let cards = deckCards().filter(passesFilter);
-    if (buildFilter.view === "main") {
+    if (buildFilter.view === "owned") {
+      cards = cards.filter((c) => ownedCount(c.name) > 0);
+    } else if (buildFilter.view === "main") {
       const have = countNames(draft.main);
       cards = cards.filter((c) => have[c.name] && !c.isFusion);
     } else if (buildFilter.view === "extra") {
@@ -4069,7 +4392,9 @@
     if (!cards.length) {
       const empty = document.createElement("div");
       empty.className = "pool-empty";
-      empty.textContent = buildFilter.view === "pool" ? "No cards match." : "Nothing in this deck matches.";
+      empty.textContent = buildFilter.view === "owned"
+        ? "You do not own any of these yet. Win a tournament duel to open a pack."
+        : (buildFilter.view === "pool" ? "No cards match." : "Nothing in this deck matches.");
       grid.appendChild(empty);
       return;
     }
@@ -4078,8 +4403,9 @@
       const b = document.createElement("button");
       b.type = "button";
       const qty = counts[c.name] || 0;
+      const owned = ownedCount(c.name);
       const lim = copyLimit(c.name);
-      b.className = "pool-card" + (qty ? " in" : "") + (qty > lim ? " over" : "");
+      b.className = "pool-card" + (qty ? " in" : "") + (qty > lim || qty > owned ? " over" : "") + (owned ? "" : " unowned");
       b.dataset.name = c.name;
       const img = document.createElement("img");
       img.alt = "";
@@ -4097,12 +4423,12 @@
       const name = document.createElement("span");
       name.className = "cname";
       name.textContent = c.name;
-      const q = document.createElement("span");
-      q.className = "qty" + (qty ? " on" : "");
-      q.textContent = qty ? "×" + qty : "";
+      const own = document.createElement("span");
+      own.className = "own" + (owned ? "" : " none");
+      own.textContent = (qty ? "×" + qty + " · " : "") + "own " + owned;
       b.appendChild(img);
       b.appendChild(name);
-      b.appendChild(q);
+      b.appendChild(own);
       const mark = banMark(c);
       if (mark) {
         const m = document.createElement("span");
@@ -4145,11 +4471,12 @@
     el.buildDesc.textContent = c.desc || "";
     const have = (countNames(draft.main.concat(draft.extra)))[name] || 0;
     const lim = copyLimit(name);
+    const owned = ownedCount(name);
     const full = c.isFusion ? draft.extra.length >= 15 : draft.main.length >= 60;
     el.buildCount.textContent = lim === 0
-      ? "Forbidden — 0 allowed while the list is on"
-      : "In deck: " + have + " / " + lim + (c.isFusion ? " · Extra" : " · Main");
-    el.buildAdd.disabled = have >= lim || full;
+      ? "Forbidden — 0 allowed while the list is on. Owned: " + owned
+      : "In deck: " + have + " / " + lim + " · Owned: " + owned + (c.isFusion ? " · Extra" : " · Main");
+    el.buildAdd.disabled = have >= lim || have >= owned || owned <= 0 || full;
     el.buildAdd.textContent = c.isFusion ? "Add to Extra" : "Add to Main";
     el.buildRemove.disabled = have <= 0;
     el.buildOverlay.classList.add("open");
@@ -4160,6 +4487,9 @@
     if (!c || !draft) return;
     const have = (countNames(draft.main.concat(draft.extra)))[name] || 0;
     const lim = copyLimit(name);
+    const owned = ownedCount(name);
+    if (owned <= 0) { toast("You don't own " + name + " yet."); return; }
+    if (have >= owned) { toast("You own " + owned + "."); return; }
     if (lim === 0) { toast(name + " is Forbidden."); return; }
     if (have >= lim) { toast("Max " + lim + (lim === 1 ? " copy." : " copies.")); return; }
     if (c.isFusion) {
@@ -4190,12 +4520,14 @@
     if (buildFilter.view === "pool" && node) {
       const qty = (countNames(draft.main.concat(draft.extra)))[name] || 0;
       const lim = copyLimit(name);
+      const owned = ownedCount(name);
       node.classList.toggle("in", qty > 0);
-      node.classList.toggle("over", qty > lim);
-      const q = node.querySelector(".qty");
-      if (q) {
-        q.textContent = qty ? "×" + qty : "";
-        q.classList.toggle("on", qty > 0);
+      node.classList.toggle("over", qty > lim || qty > owned);
+      node.classList.toggle("unowned", owned <= 0);
+      const own = node.querySelector(".own");
+      if (own) {
+        own.textContent = (qty ? "×" + qty + " · " : "") + "own " + owned;
+        own.classList.toggle("none", owned <= 0);
       }
     } else renderBuilderGrid();
     if (sheetName) openBuildSheet(sheetName);
@@ -4245,7 +4577,7 @@
       o.textContent = label;
       sel.appendChild(o);
     };
-    ["DARK", "LIGHT", "EARTH", "WATER", "FIRE", "WIND"].forEach((a) => { if (attrs[a]) addOpt(el.buildAttr, a, a); });
+    ["DARK", "LIGHT", "EARTH", "WATER", "FIRE", "WIND", "DIVINE"].forEach((a) => { if (attrs[a]) addOpt(el.buildAttr, a, a); });
     const mGroup = document.createElement("optgroup");
     mGroup.label = "Monster";
     Object.keys(monsterRaces).sort().forEach((r) => {
@@ -4419,7 +4751,7 @@
       let best = -1;
       let bestAtk = -1;
       foe.monsters.forEach((tm, i) => {
-        if (!tm) return;
+        if (!tm || isGod(tm)) return;
         const a = tm.faceup ? getStats(tm).atk : (tm.ref.atk || 0);
         if (a > bestAtk) { bestAtk = a; best = i; }
       });
@@ -4730,6 +5062,10 @@
     const foe = oppOf(owner);
     const target = foe.monsters[foeIdx];
     if (!host || !target) return false;
+    if (isGod(target)) {
+      if (owner === state.player) toast(target.name + " is unaffected.");
+      return false;
+    }
     if (host.name !== "Relinquished" && host.name !== "Thousand-Eyes Restrict") return false;
     if (host.absorbTurn === state.turnCount) return false;
     const existing = findAbsorb(host);
@@ -4775,8 +5111,11 @@
     await wait(700);
     if (!state || state.winner) return;
     if (heads >= 2 && foe.monsters[foeIdx]) {
-      log(heads + " heads. " + target.name + " is destroyed.");
-      destroyMonster(foe, foeIdx);
+      if (isGod(foe.monsters[foeIdx])) log(heads + " heads. " + target.name + " is unaffected.");
+      else {
+        log(heads + " heads. " + target.name + " is destroyed.");
+        destroyMonster(foe, foeIdx);
+      }
     } else log("Not enough heads.");
     render();
   }
@@ -4936,7 +5275,7 @@
     let bestAtk = -1;
     let hidden = -1;
     state.player.monsters.forEach((m, i) => {
-      if (!m) return;
+      if (!m || isGod(m)) return;
       if (!m.faceup) { if (hidden < 0) hidden = i; return; }
       const a = m.ref.atk || 0;
       if (a > bestAtk) { bestAtk = a; best = i; }
@@ -4964,6 +5303,187 @@
     await fireBarrel(ai, host, best);
   }
 
+  function ownedCount(name) {
+    const n = collection.counts && collection.counts[name];
+    return typeof n === "number" && n > 0 ? n : 0;
+  }
+
+  function ownedKinds() {
+    return Object.keys(collection.counts || {}).filter((n) => ownedCount(n) > 0).length;
+  }
+
+  function loadCollection() {
+    collection = { counts: {}, unlocked: false };
+    try {
+      const raw = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "null");
+      if (!raw || typeof raw !== "object") return;
+      collection.unlocked = !!raw.unlocked;
+      const counts = {};
+      if (raw.counts && typeof raw.counts === "object") {
+        Object.keys(raw.counts).forEach((name) => {
+          const v = raw.counts[name];
+          if (cardDB[name] && typeof v === "number" && v > 0) counts[name] = Math.floor(v);
+        });
+      }
+      collection.counts = counts;
+    } catch (e) {
+      collection = { counts: {}, unlocked: false };
+    }
+  }
+
+  function saveCollection() {
+    try {
+      localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
+    } catch (e) { toast("Couldn't save the collection."); }
+  }
+
+  function grantCards(names) {
+    (names || []).forEach((name) => {
+      if (!name || !cardDB[name]) return;
+      collection.counts[name] = (collection.counts[name] || 0) + 1;
+    });
+    saveCollection();
+  }
+
+  function pickFrom(list) {
+    if (!list || !list.length) return null;
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function packPools(setName) {
+    const set = (window.PACK_SETS && window.PACK_SETS[setName]) || {};
+    const keep = (list) => (list || []).filter((n) => cardDB[n] && !cardDB[n].reward);
+    return {
+      common: keep(set.Common),
+      rare: keep(set.Rare),
+      holo: keep(set["Super Rare"]).concat(keep(set["Ultra Rare"])),
+    };
+  }
+
+  function pullPack(setName, bonus, allowRewards) {
+    const buckets = packPools(setName);
+    const extras = (window.PACK_EXTRAS || []).filter((n) => cardDB[n] && !cardDB[n].reward);
+    const signatures = (bonus || []).filter((n) => cardDB[n] && !cardDB[n].reward);
+    let any = buckets.common.concat(buckets.rare, buckets.holo, extras);
+    if (!any.length) {
+      any = Object.keys(cardDB).filter((n) => cardDB[n] && !cardDB[n].reward && !cardDB[n].isFusion);
+    }
+    const takeCommon = () => {
+      if (extras.length && Math.random() < 0.14) return { name: pickFrom(extras), rarity: "Common" };
+      return { name: pickFrom(buckets.common) || pickFrom(any), rarity: "Common" };
+    };
+    const cards = [takeCommon(), takeCommon(), takeCommon()];
+    cards.push({ name: pickFrom(buckets.rare) || pickFrom(buckets.common) || pickFrom(any), rarity: "Rare" });
+    const rewards = allowRewards && collection.unlocked ? REWARD_NAMES.filter((n) => cardDB[n]) : [];
+    let holoName = null;
+    let holoRarity = "Ultra Rare";
+    if (rewards.length && Math.random() < 0.18) {
+      holoName = pickFrom(rewards);
+      holoRarity = "Secret Rare";
+    } else if (signatures.length && Math.random() < 0.55) {
+      holoName = pickFrom(signatures);
+      holoRarity = "Super Rare";
+    } else {
+      holoName = pickFrom(buckets.holo) || pickFrom(buckets.rare) || pickFrom(any);
+    }
+    cards.push({ name: holoName, rarity: holoRarity });
+    return cards.filter((c) => c && c.name && cardDB[c.name]);
+  }
+
+  function packBonusFor(key) {
+    if (key === "rival" && tourney && DECKS[tourney.rival]) {
+      return [DECKS[tourney.rival].ace, "Blue-Eyes White Dragon", "Dark Magician", "Red-Eyes Black Dragon"];
+    }
+    return PACK_BONUS[key] || [];
+  }
+
+  function rarityClass(rarity) {
+    if (rarity === "Secret Rare") return "secret";
+    if (rarity === "Ultra Rare") return "ultra";
+    if (rarity === "Super Rare") return "super";
+    if (rarity === "Rare") return "rare";
+    return "common";
+  }
+
+  function paintPack() {
+    if (!prize || !prize.cards.length) return;
+    const card = prize.cards[prize.index];
+    const total = prize.cards.length;
+    el.packKicker.textContent = prize.who + "'s booster";
+    el.packTitle.textContent = prize.setName;
+    el.packSub.textContent = "Card " + (prize.index + 1) + " of " + total;
+    const known = cardDB[card.name];
+    el.packName.textContent = prize.revealed ? card.name : "Face down";
+    el.packRarity.textContent = prize.revealed ? card.rarity : "Tap the card";
+    el.packRarity.className = "pack-rarity " + (prize.revealed ? rarityClass(card.rarity) : "common");
+    if (prize.revealed && known) {
+      el.packArt.hidden = false;
+      el.packArt.src = known.imageFull || known.image;
+      el.packArt.alt = card.name;
+      el.packBack.hidden = true;
+      el.packCard.classList.add("reveal");
+    } else {
+      el.packArt.hidden = true;
+      el.packArt.removeAttribute("src");
+      el.packBack.hidden = false;
+      el.packCard.classList.remove("reveal");
+    }
+    const last = prize.index >= total - 1;
+    el.btnPackNext.textContent = !prize.revealed
+      ? "Reveal"
+      : (last ? (prize.returnTo === "menu" ? "Main Menu" : "Back to the Island") : "Next Card");
+  }
+
+  function showUnlock() {
+    el.unlockLead.textContent = "Exodia wins if all five pieces are in your hand. The Gods need 3 Tributes in Classic rules. Added to your collection.";
+    el.unlockGrid.innerHTML = "";
+    REWARD_NAMES.forEach((name) => {
+      const c = cardDB[name];
+      const fig = document.createElement("figure");
+      fig.className = "unlock-card";
+      const img = document.createElement("img");
+      if (c) { img.src = c.image; img.alt = name; }
+      const cap = document.createElement("figcaption");
+      cap.textContent = REWARD_SHORT[name] || name;
+      fig.appendChild(img);
+      fig.appendChild(cap);
+      el.unlockGrid.appendChild(fig);
+    });
+    showScreen("unlock");
+  }
+
+  function openPrize() {
+    if (!prize || !prize.cards || !prize.cards.length) { showScreen(tourney ? "island" : "menu"); return; }
+    if (prize.firstUnlock && !prize.unlockSeen) {
+      prize.unlockSeen = true;
+      showUnlock();
+      return;
+    }
+    prize.index = 0;
+    prize.revealed = false;
+    paintPack();
+    showScreen("pack");
+  }
+
+  function packAdvance() {
+    if (!prize) { showScreen("menu"); return; }
+    if (!prize.revealed) {
+      prize.revealed = true;
+      paintPack();
+      return;
+    }
+    if (prize.index < prize.cards.length - 1) {
+      prize.index += 1;
+      prize.revealed = false;
+      paintPack();
+      return;
+    }
+    const dest = prize.returnTo;
+    prize = null;
+    if (dest === "island" && tourney) showIsland();
+    else { refreshContinue(); showScreen("menu"); }
+  }
+
   function loadTourney() {
     tourney = null;
     try {
@@ -4973,6 +5493,7 @@
       if (!data || data.version !== 1 || !data.player || !Array.isArray(data.player.main)) return;
       if (!Array.isArray(data.beaten)) data.beaten = [];
       if (typeof data.chips !== "number") data.chips = STAR_START;
+      if (data.rules !== "classic" && data.rules !== "dk") data.rules = "dk";
       tourney = data;
     } catch (e) { tourney = null; }
   }
@@ -4991,9 +5512,11 @@
     } else el.btnContinue.hidden = true;
   }
 
-  function beginTourneyRun(deck) {
+  function beginTourneyRun(deck, rules) {
+    if (rules === "classic" || rules === "dk") tourneyRulesPick = rules;
     tourney = {
       version: 1,
+      rules: tourneyRulesPick === "classic" ? "classic" : "dk",
       chips: STAR_START,
       beaten: [],
       castleOpen: false,
@@ -5008,6 +5531,10 @@
     };
     saveTourney();
     showIsland();
+  }
+
+  function tourneyRules() {
+    return tourney && tourney.rules === "classic" ? "classic" : "dk";
   }
 
   function pathCleared() {
@@ -5107,7 +5634,9 @@
 
   function showIsland() {
     if (!tourney) { showScreen("menu"); refreshContinue(); return; }
-    el.islandDeck.textContent = tourney.player.name + " · Duelist Kingdom";
+    const classic = tourneyRules() === "classic";
+    el.islandTitle.textContent = classic ? "Classic Rules" : "Duelist Kingdom";
+    el.islandDeck.textContent = (classic ? "8000 LP · " : "2000 LP · ") + tourney.player.name;
     el.islandChips.textContent = "★ " + tourney.chips + " / " + STAR_CASTLE;
     el.islandNote.textContent = tourney.castleOpen
       ? "The castle gates are open. Pegasus is waiting."
@@ -5118,17 +5647,18 @@
 
   function startNode(key) {
     if (!tourney || !canDuelNode(key)) return;
+    const rules = tourneyRules();
     if (key === "rival") {
       const id = tourney.rival;
       beginMatch(tourney.player, id, {
-        rules: "dk", field: rivalField(id), mode: "tourney",
+        rules: rules, field: rivalField(id), mode: "tourney",
         tourneyKey: "rival", stake: STAKES.rival, taunt: rivalTaunt(id),
       });
       return;
     }
     const src = TOURNEY[key];
     beginMatch(tourney.player, key, {
-      rules: "dk", field: src.field, mode: "tourney",
+      rules: rules, field: src.field, mode: "tourney",
       tourneyKey: key, stake: src.stake || 0, taunt: src.taunt || "",
     });
   }
@@ -5138,14 +5668,28 @@
     let title = you ? "Victory!" : "Defeat";
     let chipLine = "";
     let primary = "map";
+    const rulesNow = tourneyRules();
     if (!tourney) {
       primary = "menu";
     } else if (key === "pegasus" && you) {
       title = "Champion!";
-      chipLine = "You won Duelist Kingdom.";
+      chipLine = rulesNow === "classic"
+        ? "You won the tournament under Classic rules."
+        : "You won the tournament under Duelist Kingdom rules.";
+      const firstUnlock = !collection.unlocked;
+      if (firstUnlock) {
+        collection.unlocked = true;
+        grantCards(REWARD_NAMES);
+      }
+      const cards = pullPack(PACK_OF.pegasus, packBonusFor("pegasus"), !firstUnlock);
+      grantCards(cards.map((c) => c.name));
+      prize = {
+        cards: cards, index: 0, revealed: false, who: "Pegasus",
+        setName: PACK_OF.pegasus, returnTo: "menu", firstUnlock: firstUnlock,
+      };
       tourney = null;
       saveTourney();
-      primary = "menu";
+      primary = "pack";
     } else if (!you) {
       tourney.chips -= STAR_LOSS;
       if (tourney.chips <= 0) {
@@ -5165,15 +5709,26 @@
       refreshCastleFlag();
       chipLine = "+" + gain + " Star Chip" + (gain === 1 ? "" : "s") + " · ★ " + tourney.chips;
       if (tourney.castleOpen) chipLine += " · Castle open";
+      const who = state.aiName || key;
+      const cards = pullPack(PACK_OF[key] || PACK_OF.weevil, packBonusFor(key), true);
+      grantCards(cards.map((c) => c.name));
+      prize = {
+        cards: cards, index: 0, revealed: false, who: who,
+        setName: PACK_OF[key] || "Legend of Blue Eyes White Dragon",
+        returnTo: "island", firstUnlock: false,
+      };
       saveTourney();
+      primary = "pack";
     }
     endPrimary = primary;
     el.endTitle.textContent = title;
     el.endMsg.textContent = reason;
     el.endChips.hidden = !chipLine;
     el.endChips.textContent = chipLine;
-    el.btnAgain.hidden = primary !== "map";
-    el.btnAgain.textContent = "Back to the Island";
+    el.btnAgain.hidden = primary === "menu";
+    el.btnAgain.textContent = primary === "pack"
+      ? (prize && prize.firstUnlock ? "Your Reward" : "Open Pack")
+      : "Back to the Island";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
     showScreen("end");
@@ -5185,8 +5740,19 @@
     el.ruleClassic.classList.toggle("on", classic);
     el.ruleDK.classList.toggle("on", !classic);
     el.rulesHint.textContent = classic
-      ? "Free Duel: 8000 LP · tributes for Level 5+ · fuse from hand or field"
-      : "Free Duel: 2000 LP · no tributes · random field · fuse from the field";
+      ? "Free Duel: 8000 LP · tributes · no attack on the first turn"
+      : "Free Duel: 2000 LP · no tributes · field bonus · fuse from the field";
+  }
+
+  function syncTourneyPick(mode) {
+    tourneyRulesPick = mode === "classic" ? "classic" : "dk";
+    const classic = tourneyRulesPick === "classic";
+    el.tourneyClassic.classList.toggle("on", classic);
+    el.tourneyDK.classList.toggle("on", !classic);
+    el.tourneyRulesHint.textContent = classic
+      ? "8000 LP · tributes for Level 5+ · Gods need 3 · no attack on the first turn"
+      : "2000 LP · no tributes · arena field bonus · fuse from the field";
+    el.deckRules.textContent = classic ? "Tournament · Classic" : "Tournament · Duelist Kingdom";
   }
 
   el.ruleClassic.addEventListener("click", () => setRules("classic"));
@@ -5195,16 +5761,25 @@
   el.btnHowtoBack.addEventListener("click", () => showScreen("menu"));
   el.btnStart.addEventListener("click", () => {
     deckPickMode = "free";
+    el.tourneyRules.hidden = true;
+    el.tourneyRulesHint.hidden = true;
     el.deckRules.textContent = rulesMode === "classic" ? "Free Duel · Classic" : "Free Duel · Duelist Kingdom";
     paintCustomPicker();
     showScreen("decks");
   });
   el.btnTourney.addEventListener("click", () => {
     deckPickMode = "tourney";
-    el.deckRules.textContent = "Tournament · Duelist Kingdom";
+    el.tourneyRules.hidden = false;
+    el.tourneyRulesHint.hidden = false;
+    syncTourneyPick(rulesMode);
     paintCustomPicker();
     showScreen("decks");
   });
+  el.tourneyClassic.addEventListener("click", () => syncTourneyPick("classic"));
+  el.tourneyDK.addEventListener("click", () => syncTourneyPick("dk"));
+  el.btnUnlockNext.addEventListener("click", () => openPrize());
+  el.btnPackNext.addEventListener("click", () => packAdvance());
+  el.packCard.addEventListener("click", () => { if (prize && !prize.revealed) packAdvance(); });
   el.btnContinue.addEventListener("click", () => { if (tourney) showIsland(); });
   el.btnIslandMenu.addEventListener("click", () => showScreen("menu"));
   el.btnIslandRetire.addEventListener("click", () => {
@@ -5276,11 +5851,12 @@
     }
   });
   el.btnAgain.addEventListener("click", () => {
+    if (endPrimary === "pack") { abandon(); openPrize(); return; }
     if (endPrimary === "map") { abandon(); showIsland(); return; }
     if (!state || !state.playerDeck) { showScreen("menu"); return; }
     beginMatch(state.playerDeck, state.aiId);
   });
-  el.btnEndMenu.addEventListener("click", () => { abandon(); showScreen("menu"); });
+  el.btnEndMenu.addEventListener("click", () => { prize = null; abandon(); showScreen("menu"); });
   el.plExtraBtn.addEventListener("click", () => openExtra("player"));
   el.aiExtraBtn.addEventListener("click", () => openExtra("ai"));
   el.extraClose.addEventListener("click", closeExtra);
@@ -5290,6 +5866,7 @@
 
   hydrateAll();
   loadStore();
+  loadCollection();
   loadTourney();
   fillBuilderSelects();
   syncFL();
@@ -5330,6 +5907,18 @@
     fl: () => flEnforce,
     poolSize: () => Object.keys(cardDB).length,
     tourney: () => tourney,
+    collection: () => collection,
+    owned: (n) => ownedCount(n),
+    pullPack: (setName, bonus, allow) => pullPack(setName, bonus || [], !!allow),
+    endMatch: (winner, reason) => { if (state) endGame(winner || "player", reason || "The duel is over."); },
+    openingTurn: () => openingTurn(),
+    fieldBonusOn: () => fieldBonusOn(),
+    scanHands: () => {
+      if (!state || state.winner) return;
+      checkExodia(state.player);
+      if (state && !state.winner) checkExodia(state.ai);
+    },
+    tributesFor: (name) => tributesNeeded({ name: name, ref: cardDB[name] || { level: 0 } }),
     stakes: () => Object.assign({}, STAKES),
     castleNeed: () => STAR_CASTLE,
     path: () => PATH.slice(),
