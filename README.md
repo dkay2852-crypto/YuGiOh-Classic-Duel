@@ -21,9 +21,11 @@ Turns go Draw → Main 1 → Battle → Main 2 → End. The first player does no
 
 Free Duel opens a picker: **Yugi**, **Kaiba**, **Joey**, or **Custom Deck**. Each duelist deck is 40 cards from the Duelist Kingdom era (LOB, MRD, SRL, and similar). The opponent is a random one of the other two, and their name is shown on the life-point bar. A short VS screen shows both aces before the duel.
 
-**Custom Deck** opens a builder for the classic card pool (Legend of Blue Eyes White Dragon, Metal Raiders, Magic Ruler, Spell Ruler, Pharaoh's Servant, and Labyrinth of Nightmare, plus the few starter-deck cards used by Yugi, Kaiba, and Joey). Each card shows how many copies you own. You can add only cards in your collection. Search by name and filter by Monster/Spell/Trap, Attribute, Type, and Level, or switch the list to Owned. Tap a card to view it and add or remove copies.
+**Custom Deck** opens a builder that lists only cards you own. A new game, and Reset Progress, starts you with two copies of 20 commons — enough for one legal 40-card deck. You cannot add a card you do not own, and you cannot pass 3 copies or the number you own. Preset Yugi, Kaiba, and Joey decks stay playable and do not pour their cards into the collection. Search by name and filter by Monster/Spell/Trap, Attribute, Type, and Level, or look at the Main and Extra lists. **Binder** in the builder opens your collection. Tap a card to view it and add or remove copies.
 
-A legal deck has a 40–60 card Main Deck, at most 3 copies of any card, and an Extra Deck of Fusion Monsters (max 15). The counter turns red when a deck is short, over, or over a copy limit, and Duel stays disabled until it is legal. Up to 3 named decks are saved in `localStorage`. You can edit, copy, or delete them, or start from a copy of Yugi, Kaiba, or Joey. The opponent for a custom deck is Yugi, Kaiba, or Joey at random.
+**Card Binder** on the main menu shows every card in the classic pool, grouped by Legend of Blue Eyes, Metal Raiders, Magic Ruler, Pharaoh's Servant, Labyrinth of Nightmare, and Spell Ruler, plus Exodia, the Egyptian Gods, and the other classic cards. Owned cards show their art and count. Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Tap a card for its text.
+
+A legal deck has a 40–60 card Main Deck, at most 3 copies of any card, and an Extra Deck of Fusion Monsters (max 15). The counter turns red when a deck is short, over, or over a copy limit, and Duel stays disabled until it is legal. Up to 3 named decks are saved in `localStorage`. You can edit, copy, or delete them. New Deck starts empty. The opponent for a custom deck is Yugi, Kaiba, or Joey at random.
 
 The **Forbidden/Limited** switch is off by default. Turn it on to enforce the official TCG list (Forbidden 0, Limited 1, Semi-Limited 2). Cards on that list stay marked either way. The page refreshes the list from YGOPRODeck when it can; `classic-pool.js` holds a snapshot so the builder still works offline.
 
@@ -33,7 +35,11 @@ The **Forbidden/Limited** switch is off by default. Turn it on to enforce the of
 
 The island is one screen: Weevil Underwood, Rex Raptor, Mai Valentine, Bandit Keith, Panik, then a rival, then Pegasus at the castle. The rival is Kaiba, unless you are playing Kaiba, in which case it is Yugi. You can rematch anyone you have already beaten. The next new duelist stays locked until you win the one before them.
 
-You start with 2 Star Chips. Beating a duelist takes their chips: Weevil 1, Rex 1, Mai 1, Keith 2, Panik 1, rival 2. That is 8, so winning each once reaches exactly 10 and opens the castle. A loss costs 1 Star Chip. At 0 the run is over. Pegasus does not give chips; beating him wins the tournament. The castle stays open after you earn it. Progress is stored in `localStorage` (`classicDuel_tournament_v1`). **Retire** erases the run and leaves your card collection.
+You start with 2 Star Chips. Beating a duelist the first time takes their chips: Weevil 1, Rex 1, Mai 1, Keith 2, Panik 1, rival 2. That is 8, so winning each once reaches exactly 10 and opens the castle. A loss costs 1 Star Chip. At 0 the run is over. Pegasus does not give chips; beating him wins the tournament. The castle stays open after you earn it. Progress is stored in `localStorage` (`classicDuel_tournament_v1`). **Retire** erases the run and leaves your card collection.
+
+**Rematch** is available from a beaten duelist on the island, and from **Rematch** on the main menu after the run. The return fight uses a tighter deck and sharper plays. A win pays more Duel Points than the first duel and the reward pack is more likely to contain a rare. Rematches do not change Star Chips.
+
+**Ante** is off unless you turn it on in Settings. Before each tournament duel, both sides put up one card. Yours is a spare card from your collection: preset Yugi, Kaiba, and Joey decks are never edited, and the last copy a saved deck needs is left alone. The winner takes the loser's card. The antes show before the duel, and the result shows after.
 
 Every win opens a 5-card booster themed to that duelist's set. Commons come from the set, and the last card is often one of their signature cards. Pulled cards are saved in `localStorage` (`classicDuel_collection_v1`).
 
