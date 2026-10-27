@@ -17,6 +17,13 @@
       r.style.setProperty("--vv-h", h + "px");
       r.style.setProperty("--vv-off", t + "px");
     }
+    try {
+      var saved = JSON.parse(localStorage.getItem("classicDuel_settings_v1") || "null");
+      var anim = saved && saved.anim;
+      if (anim !== "fast" && anim !== "off" && anim !== "on") anim = "on";
+      document.documentElement.setAttribute("data-anim", anim);
+      document.documentElement.style.setProperty("--fx", anim === "off" ? "0" : anim === "fast" ? "0.45" : "1");
+    } catch (e) {}
     __fit();
     addEventListener("resize", __fit);
     addEventListener("orientationchange", __fit);
@@ -43,6 +50,7 @@
       --hand-w: 74px;
       --hand-card-h: calc(var(--hand-w) * 1.45);
       --hand-h: calc(var(--hand-card-h) + 4px);
+      --fx: 1;
       font-family: "Palatino Linotype", "Book Antiqua", Palatino, "Times New Roman", serif;
     }
     @media (max-height: 640px) {
@@ -62,7 +70,9 @@
       overscroll-behavior: none;
     }
     img { -webkit-touch-callout: none; }
-    button { font: inherit; color: inherit; -webkit-appearance: none; appearance: none; }
+    button { font: inherit; color: inherit; -webkit-appearance: none; appearance: none; cursor: pointer; }
+    button:focus-visible { outline: 2px solid #f0c040; outline-offset: 2px; }
+    button:disabled { cursor: default; }
 
     #app {
       position: fixed;
@@ -83,8 +93,14 @@
     }
 
     .screen { display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }
-    .screen.active { display: flex; }
+    .screen.active { display: flex; animation: screenIn calc(0.26s * var(--fx, 1)) ease; }
     .screen[hidden] { display: none !important; }
+    html[data-anim="off"] .screen.active,
+    html[data-anim="off"] .zone.anim-summon,
+    html[data-anim="off"] .zone.anim-set,
+    html[data-anim="off"] .card.anim-flip,
+    html[data-anim="off"] .hc.anim-draw,
+    html[data-anim="off"] .pile.anim-draw { animation: none; }
 
     /* —— Menu (top-aligned so Start and the rules toggle stay on screen) —— */
     #menu {
@@ -119,7 +135,15 @@
       background: linear-gradient(180deg, #1d6b45, #0c3a28);
       border-color: #8dface; color: #e9fff4;
     }
-    .menu-btn:active { transform: scale(0.98); }
+    .menu-btn:active, .ctrl-btn:active, .mini-btn:active, .deck-opt:active,
+    .saved-actions button:active, .actions button:active, .choice-btns button:active,
+    .fl-switch:active, .rules-row button:active, .seg button:active, .map-node:active {
+      transform: scale(0.98);
+    }
+    .menu-btn.danger {
+      background: linear-gradient(180deg, #6a2430, #3a1218);
+      border-color: #e07080; color: #ffd7dc;
+    }
     .menu-btn[hidden] { display: none !important; }
     .menu-btn:disabled, .mini-btn:disabled { opacity: 0.4; }
     .rules-row { display: flex; gap: 8px; width: min(300px, 88vw); }
@@ -326,7 +350,7 @@
     .build-sheet .ban-note:empty { display: none; }
     .build-sheet .desc {
       font-size: 0.7rem; color: var(--muted); line-height: 1.35; text-align: left;
-      max-height: 4.2em; overflow: auto; white-space: pre-wrap;
+      max-height: min(22dvh, 140px); overflow: auto; white-space: pre-wrap;
     }
     #btnDeckBack { flex-shrink: 0; align-self: center; }
 
@@ -352,8 +376,9 @@
     }
     .vs-side figcaption { margin-top: 4px; font-size: 0.64rem; color: var(--cream); line-height: 1.2; min-height: 0; flex-shrink: 0; }
     .vs-badge { color: var(--gold); font-weight: 700; letter-spacing: 0.12em; font-size: 1.3rem; }
-    .vs-side.l { animation: slideL 0.4s ease-out; }
-    .vs-side.r { animation: slideR 0.4s ease-out; }
+    .vs-side.l { animation: slideL calc(0.4s * var(--fx, 1)) ease-out; }
+    .vs-side.r { animation: slideR calc(0.4s * var(--fx, 1)) ease-out; }
+    html[data-anim="off"] .vs-side.l, html[data-anim="off"] .vs-side.r { animation: none; }
     #btnVsGo { flex-shrink: 0; }
     .vs-taunt {
       margin: 0; max-width: 34rem; font-size: 0.92rem; font-style: italic;
@@ -564,8 +589,44 @@
     }
     .ctrl-btn:disabled { opacity: 0.4; pointer-events: none; }
     .log-line {
-      flex: 1; min-width: 0; font-size: 0.62rem; color: var(--muted);
-      line-height: 1.25; max-height: 2.5em; overflow: hidden; text-align: center;
+      flex: 1; min-width: 0; min-height: 44px; max-width: 100%;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 8px; border-radius: 4px;
+      border: 1px solid var(--zone-line);
+      background: rgba(0,0,0,0.28); color: var(--muted);
+      font-size: 0.68rem; line-height: 1.25; text-align: left; cursor: pointer;
+    }
+    .log-line .log-kicker {
+      flex: 0 0 auto; color: var(--gold); font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.62rem;
+    }
+    .log-line .log-text {
+      flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .log-line.open { border-color: var(--gold); color: var(--cream); }
+    #duel { position: relative; }
+    .duel-log {
+      position: absolute; left: 6px; right: 6px; bottom: 56px; z-index: 8;
+      max-height: min(46%, 300px);
+      display: flex; flex-direction: column; min-height: 0;
+      background: rgba(8, 14, 26, 0.97);
+      border: 1px solid var(--gold-dim); border-radius: 8px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+    }
+    .duel-log[hidden] { display: none !important; }
+    .duel-log-head {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-bottom: 1px solid rgba(212,160,23,0.25);
+      color: var(--gold); font-size: 0.82rem; font-weight: 700;
+    }
+    .duel-log-head span { flex: 1; }
+    .duel-log ol {
+      margin: 0; padding: 4px 10px 8px; list-style: none;
+      overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+      font-size: 0.8rem; line-height: 1.35; color: var(--cream);
+    }
+    .duel-log li {
+      padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
     #end {
@@ -609,7 +670,8 @@
       border: 2px solid rgba(212,160,23,0.55);
     }
     .pack-card .back[hidden], .pack-card img[hidden] { display: none !important; }
-    .pack-card.reveal { animation: packIn 0.35s ease-out; }
+    .pack-card.reveal { animation: packIn calc(0.45s * var(--fx, 1)) ease-out; }
+    html[data-anim="off"] .pack-card.reveal { animation: none; }
     #packName {
       margin: 0; min-height: 1.25em; max-width: 92vw; flex-shrink: 0;
       color: var(--gold); font-size: 0.95rem; line-height: 1.25;
@@ -654,6 +716,9 @@
       top: var(--vv-off, 0px); height: var(--vv-h, 100dvh);
       z-index: 40; display: none;
     }
+    #overlay { z-index: 60; }
+    #choiceOverlay { z-index: 70; }
+    #confirmOverlay { z-index: 80; }
     .overlay { background: rgba(4,8,16,0.72); align-items: flex-end; justify-content: center; }
     .overlay.open { display: flex; }
     .sheet {
@@ -671,7 +736,8 @@
     .sheet-meta { flex: 1; min-width: 0; }
     .sheet-meta h3 { margin: 0 0 4px; color: var(--gold); font-size: 1rem; line-height: 1.2; }
     .sheet-meta .stats { font-size: 0.75rem; color: var(--cream); margin-bottom: 4px; }
-    .sheet-meta .desc { font-size: 0.7rem; color: var(--muted); line-height: 1.35; max-height: 6.8em; overflow: auto; white-space: pre-wrap; }
+    .sheet-meta .desc { font-size: 0.74rem; color: var(--muted); line-height: 1.35; max-height: min(24dvh, 9.2em); overflow: auto; white-space: pre-wrap; }
+    .sheet.inspect .sheet-meta .desc { max-height: min(40dvh, 280px); font-size: 0.8rem; }
     .actions, .choice-btns { display: flex; flex-wrap: wrap; gap: 6px; }
     .actions button, .choice-btns button, .extra-close {
       flex: 1 1 40%; min-height: 44px; padding: 10px 8px; font: inherit; font-size: 0.88rem;
@@ -683,6 +749,9 @@
     .choice-btns button { flex: none; width: 100%; }
     #choiceTitle { margin: 0; color: var(--gold); font-size: 1rem; text-align: center; }
     .extra-list { display: flex; flex-direction: column; gap: 8px; overflow: auto; max-height: 52dvh; }
+    button.extra-row {
+      width: 100%; text-align: left; background: transparent; border: 0; padding: 2px 0; color: inherit;
+    }
     .extra-row { display: flex; gap: 8px; align-items: center; }
     .extra-row img { width: 46px; height: 67px; object-fit: cover; border-radius: 3px; border: 1px solid var(--gold-dim); background: #111; }
     .extra-row .nm { color: var(--gold); font-size: 0.92rem; }
@@ -709,10 +778,121 @@
       transition: opacity 0.15s, transform 0.15s;
     }
     #coin.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    html[data-anim="off"] #coin { transition: none; }
+
+    .lp { transition: background 0.2s; }
+    .lp.lp-hit { animation: lpHit calc(0.5s * var(--fx, 1)) ease; }
+    html[data-anim="off"] .lp.lp-hit { animation: none; }
+
+    .zone.anim-summon { animation: summonFlash calc(0.48s * var(--fx, 1)) ease-out; }
+    .zone.anim-set { animation: setGlow calc(0.32s * var(--fx, 1)) ease-out; }
+    .card.anim-flip { animation: flipReveal calc(0.4s * var(--fx, 1)) ease-out; transform-origin: center; }
+    .card.def.anim-flip { animation-name: flipRevealDef; }
+    .hc.anim-draw { animation: drawIn calc(0.4s * var(--fx, 1)) ease-out; }
+    .pile.anim-draw { animation: deckPop calc(0.35s * var(--fx, 1)) ease; }
+
+    #fxLayer { position: fixed; inset: 0; pointer-events: none; z-index: 55; }
+    .fx-shatter, .fx-swirl, .fx-flip, .fx-reveal { position: fixed; pointer-events: none; }
+    .fx-shatter {
+      background-size: cover; background-position: center;
+      animation: shatterFade calc(0.55s * var(--fx, 1)) ease-in forwards;
+    }
+    .fx-shatter::before, .fx-shatter::after {
+      content: ""; position: absolute; inset: 0;
+      background: inherit; background-size: cover; background-position: center;
+    }
+    .fx-shatter::before {
+      clip-path: polygon(0 0, 58% 0, 46% 48%, 62% 100%, 0 100%);
+      animation: shardL calc(0.55s * var(--fx, 1)) ease-in forwards;
+    }
+    .fx-shatter::after {
+      clip-path: polygon(58% 0, 100% 0, 100% 100%, 62% 100%, 46% 48%);
+      animation: shardR calc(0.55s * var(--fx, 1)) ease-in forwards;
+    }
+    .fx-swirl {
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent, rgba(240,192,64,0.15), #fff6c8, #f0c040, transparent 72%);
+      mix-blend-mode: screen;
+      animation: swirl calc(0.7s * var(--fx, 1)) linear forwards;
+    }
+    .fx-flip {
+      border-radius: 3px;
+      background: linear-gradient(160deg, rgba(255,244,200,0.25), rgba(212,160,23,0.9));
+      animation: flipOverlay calc(0.42s * var(--fx, 1)) ease-out forwards;
+    }
+    .fx-reveal {
+      border-radius: 6px; overflow: hidden; background: #111;
+      border: 1px solid var(--gold);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      animation: revealPop calc(0.62s * var(--fx, 1)) ease-out forwards;
+    }
+    .fx-reveal img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    #settings { padding: 10px 12px 8px; gap: 8px; align-items: center; }
+    #settings .deck-head { width: 100%; }
+    .set-list {
+      width: min(340px, 100%); flex: 1; min-height: 0; overflow: auto;
+      display: flex; flex-direction: column; gap: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .set-block { display: flex; flex-direction: column; gap: 6px; }
+    .set-copy strong { display: block; color: var(--cream); font-size: 0.92rem; }
+    .set-copy span { display: block; color: var(--muted); font-size: 0.72rem; line-height: 1.3; }
+    .set-row { display: flex; align-items: center; gap: 8px; }
+    .vol-row { color: var(--cream); font-size: 0.85rem; }
+    .vol-row input[type="range"] { flex: 1; min-width: 0; accent-color: #d4a017; height: 28px; }
+    #volumeVal { width: 2.2em; text-align: right; font-variant-numeric: tabular-nums; color: var(--gold); }
+    #settings .menu-btn { flex-shrink: 0; }
+    #confirmBody { margin: 0; text-align: center; }
 
     @keyframes slideL { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
     @keyframes slideR { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
     @keyframes packIn { from { opacity: 0; transform: rotateY(88deg) scale(0.9); } to { opacity: 1; transform: none; } }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @keyframes summonFlash {
+      0% { box-shadow: 0 0 0 2px #fff, 0 0 16px #ffe08a; background: rgba(255, 236, 170, 0.9); }
+      100% { box-shadow: none; background: var(--zone); }
+    }
+    @keyframes setGlow {
+      0% { box-shadow: 0 0 0 2px rgba(170, 200, 255, 0.95); }
+      100% { box-shadow: none; }
+    }
+    @keyframes flipReveal {
+      0% { transform: rotateY(90deg) scale(0.92); }
+      100% { transform: rotateY(0deg) scale(1); }
+    }
+    @keyframes flipRevealDef {
+      0% { transform: rotateY(90deg) rotate(90deg) scale(0.5); }
+      100% { transform: rotate(90deg) scale(0.68); }
+    }
+    @keyframes drawIn {
+      from { opacity: 0; transform: translate(28px, 16px) scale(0.86); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes deckPop {
+      40% { box-shadow: 0 0 0 2px var(--gold); transform: translateY(-3px); }
+      100% { box-shadow: none; transform: none; }
+    }
+    @keyframes lpHit {
+      0% { background: rgba(176, 32, 32, 0.92); }
+      100% { background: rgba(0,0,0,0.35); }
+    }
+    @keyframes shatterFade { to { opacity: 0; } }
+    @keyframes shardL { to { transform: translate(-16px, 12px) rotate(-16deg); opacity: 0; } }
+    @keyframes shardR { to { transform: translate(16px, 8px) rotate(14deg); opacity: 0; } }
+    @keyframes swirl {
+      from { transform: rotate(0deg) scale(0.35); opacity: 1; }
+      to { transform: rotate(340deg) scale(1.45); opacity: 0; }
+    }
+    @keyframes flipOverlay {
+      0% { transform: rotateY(88deg); opacity: 1; }
+      100% { transform: rotateY(0deg); opacity: 0; }
+    }
+    @keyframes revealPop {
+      0% { transform: rotateY(88deg) scale(0.82); opacity: 0; }
+      32% { transform: rotateY(0deg) scale(1); opacity: 1; }
+      100% { transform: rotateY(0deg) scale(1); opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -729,6 +909,7 @@
       <button type="button" class="menu-btn tourney" id="btnTourney">Tournament</button>
       <button type="button" class="menu-btn" id="btnContinue" hidden>Continue</button>
       <button type="button" class="menu-btn" id="btnHowto">How to Play</button>
+      <button type="button" class="menu-btn" id="btnSettings">Settings</button>
     </section>
 
     <section id="decks" class="screen" hidden>
@@ -816,6 +997,7 @@
         <p><strong>Time Wizard:</strong> Call Heads or Tails. Right: the opponent’s monsters are destroyed, and Baby Dragon becomes Thousand Dragon. Wrong: your monsters are destroyed and you take damage equal to half their ATK.</p>
         <p><strong>Equips:</strong> Legendary Sword (Warrior), Book of Secret Arts (Spellcaster), Dragon Treasure (Dragon), Black Pendant, Horn of the Unicorn. Tap Equip, then a face-up monster.</p>
         <p>Kuriboh can be discarded so an opponent’s attack deals 0. Swords of Revealing Light stops their attacks for 3 of their turns. Shield &amp; Sword swaps ATK and DEF until the end of the turn. Panther Warrior must tribute a monster to attack.</p>
+        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, and sound on this device.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
     </section>
@@ -834,12 +1016,12 @@
             <div class="zones" id="aiMon"></div>
           </div>
           <div class="mid-row">
-            <button type="button" class="pile gy" id="aiGYBtn" tabindex="-1"><span>GY</span><span class="n" id="aiGY">0</span></button>
-            <div class="pile"><span>DECK</span><span class="n" id="aiDeck">0</span></div>
+            <button type="button" class="pile gy" id="aiGYBtn"><span>GY</span><span class="n" id="aiGY">0</span></button>
+            <div class="pile" id="aiDeckPile"><span>DECK</span><span class="n" id="aiDeck">0</span></div>
             <button type="button" class="pile extra" id="aiExtraBtn"><span>EXTRA</span><span class="n" id="aiExtra">0</span></button>
             <button type="button" class="pile extra" id="plExtraBtn"><span>EXTRA</span><span class="n" id="plExtra">0</span></button>
-            <div class="pile"><span>DECK</span><span class="n" id="plDeck">0</span></div>
-            <button type="button" class="pile gy" id="plGYBtn" tabindex="-1"><span>GY</span><span class="n" id="plGY">0</span></button>
+            <div class="pile" id="plDeckPile"><span>DECK</span><span class="n" id="plDeck">0</span></div>
+            <button type="button" class="pile gy" id="plGYBtn"><span>GY</span><span class="n" id="plGY">0</span></button>
           </div>
           <div class="side me">
             <div class="zones" id="plMon"></div>
@@ -848,11 +1030,65 @@
         </div>
       </div>
       <div class="hand-wrap" id="handWrap"><div class="hand" id="hand"></div></div>
+      <div class="duel-log" id="duelLog" hidden>
+        <div class="duel-log-head">
+          <span>Duel Log</span>
+          <button type="button" class="mini-btn" id="logClose">Close</button>
+        </div>
+        <ol id="logList"></ol>
+      </div>
       <div class="controls">
         <button type="button" class="ctrl-btn" id="btnMenu">Menu</button>
-        <div class="log-line" id="logLine">Duel start</div>
+        <button type="button" class="log-line" id="logLine" aria-expanded="false" aria-controls="duelLog">
+          <span class="log-kicker">Log</span>
+          <span class="log-text" id="logText">Duel start</span>
+        </button>
         <button type="button" class="ctrl-btn primary" id="btnNext">Next Phase</button>
       </div>
+    </section>
+
+    <section id="settings" class="screen" hidden>
+      <div class="deck-head">
+        <h2>Settings</h2>
+        <p>Saved on this device.</p>
+      </div>
+      <div class="set-list">
+        <div class="set-block">
+          <div class="set-copy">
+            <strong>Default rules</strong>
+            <span>Free Duel uses this. The main menu toggle changes it too. A tournament still asks when the run starts.</span>
+          </div>
+          <div class="rules-row" id="setRules">
+            <button type="button" id="setClassic" class="on">Classic</button>
+            <button type="button" id="setDK">Duelist Kingdom</button>
+          </div>
+        </div>
+        <div class="set-block">
+          <div class="set-copy">
+            <strong>Animations</strong>
+            <span>Draw, summon, attack, shatter, Life Points, flips, and fusions. All stay under a second.</span>
+          </div>
+          <div class="rules-row" id="setAnim">
+            <button type="button" data-anim="on" class="on">On</button>
+            <button type="button" data-anim="fast">Fast</button>
+            <button type="button" data-anim="off">Off</button>
+          </div>
+        </div>
+        <div class="set-row">
+          <div class="set-copy">
+            <strong>Sound</strong>
+            <span id="soundHint">Made in the browser. On iPhone, sound starts after your first tap.</span>
+          </div>
+          <button type="button" class="fl-switch on" id="soundToggle" aria-pressed="true">On</button>
+        </div>
+        <label class="set-row vol-row">
+          <span>Volume</span>
+          <input id="volume" type="range" min="0" max="100" value="70" aria-label="Volume" />
+          <span id="volumeVal">70</span>
+        </label>
+      </div>
+      <button type="button" class="menu-btn danger" id="btnReset">Reset Progress</button>
+      <button type="button" class="menu-btn" id="btnSettingsBack">Back</button>
     </section>
 
     <section id="customs" class="screen" hidden>
@@ -942,8 +1178,10 @@
   <div class="toast" id="toast"></div>
   <div id="coin" aria-hidden="true"></div>
 
+  <div id="fxLayer" aria-hidden="true"></div>
+
   <div class="overlay" id="overlay">
-    <div class="sheet">
+    <div class="sheet" id="cardSheet">
       <div class="sheet-top">
         <img class="sheet-art" id="sheetArt" alt="" />
         <div class="sheet-meta">
@@ -984,6 +1222,17 @@
     <div class="sheet">
       <h3 id="choiceTitle"></h3>
       <div class="choice-btns" id="choiceBtns"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="confirmOverlay">
+    <div class="sheet">
+      <h3 id="confirmTitle">Reset progress?</h3>
+      <p id="confirmBody">This erases the tournament, your card collection, and saved decks. Settings stay.</p>
+      <div class="actions">
+        <button type="button" id="confirmYes">Reset</button>
+        <button type="button" class="ghost" id="confirmNo">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -1134,6 +1383,7 @@
   const STAR_LOSS = 1;
   const TOURNEY_KEY = "classicDuel_tournament_v1";
   const COLLECTION_KEY = "classicDuel_collection_v1";
+  const SETTINGS_KEY = "classicDuel_settings_v1";
   const EXODIA_NAMES = [
     "Exodia the Forbidden One",
     "Right Arm of the Forbidden One",
@@ -1342,12 +1592,32 @@
   let tourneyRulesPick = "dk";
   let collection = { counts: {}, unlocked: false };
   let prize = null;
+  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7 };
+  let seenReady = false;
+  let seenHand = new Set();
+  let seenMonsters = new Set();
+  let seenFaceupMon = new Set();
+  let seenFaceupST = new Set();
+  let lpView = { player: null, ai: null };
+  let lpCommit = { player: null, ai: null };
+  let lpToken = { player: 0, ai: 0 };
+  let audioCtx = null;
+  let audioReady = false;
+  let audioResume = null;
+  let lastSfx = { name: "", at: 0 };
+  let logOpen = false;
 
   const $ = (id) => document.getElementById(id);
   const el = {
     ruleClassic: $("ruleClassic"), ruleDK: $("ruleDK"), rulesHint: $("rulesHint"),
     btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnContinue: $("btnContinue"),
-    btnHowto: $("btnHowto"), btnHowtoBack: $("btnHowtoBack"),
+    btnHowto: $("btnHowto"), btnHowtoBack: $("btnHowtoBack"), btnSettings: $("btnSettings"),
+    setClassic: $("setClassic"), setDK: $("setDK"), soundToggle: $("soundToggle"),
+    soundHint: $("soundHint"), volume: $("volume"), volumeVal: $("volumeVal"),
+    btnReset: $("btnReset"), btnSettingsBack: $("btnSettingsBack"),
+    duelLog: $("duelLog"), logList: $("logList"), logClose: $("logClose"), logText: $("logText"),
+    confirmOverlay: $("confirmOverlay"), confirmYes: $("confirmYes"), confirmNo: $("confirmNo"),
+    aiDeckPile: $("aiDeckPile"), plDeckPile: $("plDeckPile"), fxLayer: $("fxLayer"),
     deckRules: $("deckRules"), btnDeckBack: $("btnDeckBack"),
     vsRules: $("vsRules"), vsMatch: $("vsMatch"), vsPArt: $("vsPArt"), vsOArt: $("vsOArt"),
     vsPCap: $("vsPCap"), vsOCap: $("vsOCap"), vsTaunt: $("vsTaunt"), btnVsGo: $("btnVsGo"),
@@ -1365,6 +1635,7 @@
     aiGY: $("aiGY"), aiDeck: $("aiDeck"), aiExtra: $("aiExtra"),
     plDeck: $("plDeck"), plGY: $("plGY"), plExtra: $("plExtra"),
     plExtraBtn: $("plExtraBtn"), aiExtraBtn: $("aiExtraBtn"), extraClose: $("extraClose"),
+    plGYBtn: $("plGYBtn"), aiGYBtn: $("aiGYBtn"),
     hand: $("hand"), handWrap: $("handWrap"),
     btnNext: $("btnNext"), btnMenu: $("btnMenu"), logLine: $("logLine"),
     overlay: $("overlay"), sheetArt: $("sheetArt"), sheetName: $("sheetName"),
@@ -1452,12 +1723,13 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
       node.classList.toggle("active", on);
     });
+    if (name !== "duel") setLogOpen(false);
   }
 
   function toast(msg) {
@@ -1470,13 +1742,483 @@
   function log(msg) {
     if (!state) return;
     state.log.unshift(msg);
-    if (state.log.length > 40) state.log.pop();
-    el.logLine.textContent = msg;
+    if (state.log.length > 100) state.log.pop();
+    if (el.logText) el.logText.textContent = msg;
+    if (logOpen) paintLog();
+  }
+
+  function paintLog() {
+    if (!el.logList || !state) return;
+    el.logList.innerHTML = "";
+    state.log.forEach((line) => {
+      const li = document.createElement("li");
+      li.textContent = line;
+      el.logList.appendChild(li);
+    });
+    el.logList.scrollTop = 0;
+  }
+
+  function setLogOpen(open) {
+    logOpen = !!open && !!state;
+    if (!el.duelLog) return;
+    el.duelLog.hidden = !logOpen;
+    el.logLine.setAttribute("aria-expanded", logOpen ? "true" : "false");
+    el.logLine.classList.toggle("open", logOpen);
+    if (logOpen) paintLog();
+  }
+
+  function animDelay(ms) {
+    if (window.__FAST) return Math.min(ms, 16);
+    if (!settings || settings.anim === "off") return 0;
+    if (settings.anim === "fast") return Math.max(50, Math.min(180, Math.round(ms * 0.45)));
+    return Math.min(ms, 880);
   }
 
   function wait(ms) {
-    const t = window.__FAST ? Math.min(ms, 16) : ms;
+    const t = animDelay(ms);
+    if (t <= 0) return Promise.resolve();
     return new Promise((r) => setTimeout(r, t));
+  }
+
+  function fxOn() {
+    return !window.__FAST && settings && settings.anim !== "off";
+  }
+
+  function applyAnimMode() {
+    const mode = settings.anim === "fast" || settings.anim === "off" ? settings.anim : "on";
+    settings.anim = mode;
+    const fx = mode === "off" ? "0" : mode === "fast" ? "0.45" : "1";
+    document.documentElement.setAttribute("data-anim", mode);
+    document.documentElement.style.setProperty("--fx", fx);
+  }
+
+  function persist(key, value) {
+    try {
+      if (value == null) {
+        localStorage.removeItem(key);
+        return localStorage.getItem(key) == null;
+      }
+      const text = JSON.stringify(value);
+      localStorage.setItem(key, text);
+      return localStorage.getItem(key) === text;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function loadSettings() {
+    settings = { rules: "classic", anim: "on", sound: true, volume: 0.7 };
+    try {
+      const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
+      if (!raw || typeof raw !== "object") return;
+      if (raw.rules === "dk" || raw.rules === "classic") settings.rules = raw.rules;
+      if (raw.anim === "fast" || raw.anim === "off" || raw.anim === "on") settings.anim = raw.anim;
+      if (typeof raw.sound === "boolean") settings.sound = raw.sound;
+      if (typeof raw.volume === "number" && isFinite(raw.volume)) {
+        settings.volume = Math.max(0, Math.min(1, raw.volume));
+      }
+    } catch (e) { /* defaults */ }
+    if (!localStorage.getItem(SETTINGS_KEY) && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      settings.anim = "off";
+    }
+    applyAnimMode();
+  }
+
+  function saveSettings() {
+    if (!persist(SETTINGS_KEY, settings)) toast("Couldn't save settings.");
+  }
+
+  function paintSettings() {
+    const classic = settings.rules !== "dk";
+    if (el.setClassic) {
+      el.setClassic.classList.toggle("on", classic);
+      el.setDK.classList.toggle("on", !classic);
+    }
+    document.querySelectorAll("#setAnim button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.anim === settings.anim);
+    });
+    if (el.soundToggle) {
+      el.soundToggle.classList.toggle("on", !!settings.sound);
+      el.soundToggle.textContent = settings.sound ? "On" : "Off";
+      el.soundToggle.setAttribute("aria-pressed", settings.sound ? "true" : "false");
+    }
+    if (el.volume) {
+      const pct = Math.round((settings.volume || 0) * 100);
+      el.volume.value = String(pct);
+      if (el.volumeVal) el.volumeVal.textContent = String(pct);
+    }
+    applyAnimMode();
+  }
+
+  function unlockAudio() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    if (!audioCtx) audioCtx = new Ctx();
+    try {
+      audioResume = audioCtx.resume();
+      if (audioResume && audioResume.then) {
+        audioResume.then(() => { audioReady = audioCtx.state === "running"; }, () => {});
+      }
+    } catch (e) { /* gesture may be required again */ }
+    try {
+      const buf = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
+      src.buffer = buf;
+      src.connect(audioCtx.destination);
+      src.start(0);
+      if (audioCtx.state === "running") audioReady = true;
+    } catch (e) { /* ignore until a later tap */ }
+  }
+
+  function sfx(name) {
+    if (!settings.sound || settings.volume <= 0.001) return;
+    const nowMs = performance.now();
+    if (lastSfx.name === name && nowMs - lastSfx.at < 90) return;
+    lastSfx = { name: name, at: nowMs };
+    const play = () => {
+      if (!audioCtx || audioCtx.state !== "running") return;
+      const ctx = audioCtx;
+      const t0 = ctx.currentTime;
+      const master = ctx.createGain();
+      master.gain.value = Math.max(0, Math.min(1, settings.volume));
+      master.connect(ctx.destination);
+      const tone = (freq, when, dur, type, gain, slide) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type || "sine";
+        o.frequency.setValueAtTime(freq, when);
+        if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, slide), when + dur);
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), when + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+        o.connect(g);
+        g.connect(master);
+        o.start(when);
+        o.stop(when + dur + 0.02);
+      };
+      const noise = (when, dur, gain) => {
+        const len = Math.max(1, Math.floor(ctx.sampleRate * dur));
+        const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = "bandpass";
+        filter.frequency.value = 900;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(gain, when);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+        src.connect(filter);
+        filter.connect(g);
+        g.connect(master);
+        src.start(when);
+        src.stop(when + dur);
+      };
+      if (name === "draw") {
+        noise(t0, 0.09, 0.12);
+        tone(880, t0, 0.08, "triangle", 0.07);
+        tone(1320, t0 + 0.04, 0.09, "sine", 0.05);
+      } else if (name === "summon") {
+        tone(523, t0, 0.16, "triangle", 0.11);
+        tone(659, t0 + 0.04, 0.18, "triangle", 0.09);
+        tone(784, t0 + 0.08, 0.24, "sine", 0.07);
+      } else if (name === "attack") {
+        noise(t0, 0.16, 0.2);
+        tone(220, t0, 0.14, "sawtooth", 0.07, 70);
+      } else if (name === "destroy") {
+        noise(t0, 0.26, 0.26);
+        tone(170, t0, 0.2, "sawtooth", 0.08, 48);
+      } else if (name === "lp") {
+        tone(466, t0, 0.1, "square", 0.05, 240);
+        tone(311, t0 + 0.06, 0.14, "sine", 0.06, 150);
+      } else if (name === "trap") {
+        tone(1560, t0, 0.06, "square", 0.05);
+        tone(740, t0 + 0.03, 0.12, "triangle", 0.07);
+        noise(t0, 0.07, 0.06);
+      } else if (name === "win") {
+        [523, 659, 784, 1046].forEach((f, i) => tone(f, t0 + i * 0.11, 0.2, "triangle", 0.09));
+      } else if (name === "lose") {
+        [440, 349, 262, 196].forEach((f, i) => tone(f, t0 + i * 0.13, 0.22, "sawtooth", 0.05));
+      } else if (name === "pack") {
+        [988, 1318, 1568, 1976].forEach((f, i) => tone(f, t0 + i * 0.06, 0.14, "sine", 0.07));
+        noise(t0, 0.16, 0.04);
+      }
+      setTimeout(() => { try { master.disconnect(); } catch (e) {} }, 1400);
+    };
+    if (!audioCtx) return;
+    if (audioCtx.state === "running") play();
+    else if (audioCtx.state === "suspended") {
+      const pending = audioCtx.resume();
+      if (pending && pending.then) pending.then(play, () => {});
+    } else if (audioResume && audioResume.then) audioResume.then(play, () => {});
+  }
+
+  function clearFx() {
+    if (el.fxLayer) el.fxLayer.innerHTML = "";
+  }
+
+  function zoneNode(owner, kind, index) {
+    const root = kind === "m"
+      ? (owner === "ai" ? el.aiMon : el.plMon)
+      : (owner === "ai" ? el.aiST : el.plST);
+    return root && root.children[index] ? root.children[index] : null;
+  }
+
+  function fxAt(node, className, ms) {
+    if (!fxOn() || !node || !el.fxLayer) return null;
+    const r = node.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) return null;
+    const n = document.createElement("div");
+    n.className = className;
+    n.style.left = r.left + "px";
+    n.style.top = r.top + "px";
+    n.style.width = r.width + "px";
+    n.style.height = r.height + "px";
+    el.fxLayer.appendChild(n);
+    setTimeout(() => { if (n.parentNode) n.parentNode.removeChild(n); }, ms || 700);
+    return n;
+  }
+
+  function fxShatter(p, kind, idx) {
+    if (!state || !p) return;
+    sfx("destroy");
+    const owner = p === state.player ? "player" : "ai";
+    const node = zoneNode(owner, kind, idx);
+    const card = kind === "m" ? p.monsters[idx] : p.spells[idx];
+    if (!node || (card && node.dataset.name && node.dataset.name !== card.name)) return;
+    const img = node.querySelector("img");
+    const shard = fxAt(node, "fx-shatter", 680);
+    if (shard && img && img.src) shard.style.backgroundImage = "url(\"" + img.src + "\")";
+  }
+
+  function fxFlipZone(p, kind, idx) {
+    if (!state || !p) return;
+    sfx("trap");
+    const owner = p === state.player ? "player" : "ai";
+    fxAt(zoneNode(owner, kind, idx), "fx-flip", 480);
+  }
+
+  function fxRevealCard(card) {
+    sfx("trap");
+    if (!fxOn() || !card || !el.fxLayer) return;
+    const host = document.querySelector("#duel .field");
+    if (!host) return;
+    const r = host.getBoundingClientRect();
+    const w = Math.min(84, Math.max(56, r.width * 0.22));
+    const h = Math.round(w * 1.45);
+    const n = document.createElement("div");
+    n.className = "fx-reveal";
+    n.style.width = w + "px";
+    n.style.height = h + "px";
+    n.style.left = (r.left + (r.width - w) / 2) + "px";
+    n.style.top = (r.top + (r.height - h) / 2) + "px";
+    if (card.ref && card.ref.image) {
+      const img = document.createElement("img");
+      img.alt = "";
+      img.src = card.ref.image;
+      n.appendChild(img);
+    }
+    el.fxLayer.appendChild(n);
+    setTimeout(() => { if (n.parentNode) n.parentNode.removeChild(n); }, 680);
+  }
+
+  function fxSwirl(node) {
+    fxAt(node, "fx-swirl", 760);
+  }
+
+  async function fxLunge(fromP, fromIdx, toP, toIdx) {
+    sfx("attack");
+    if (!fxOn() || !state) return;
+    const from = zoneNode(fromP === state.player ? "player" : "ai", "m", fromIdx);
+    if (!from) return;
+    const card = from.querySelector(".card") || from;
+    let dx = 0;
+    let dy = fromP === state.player ? -28 : 28;
+    const a = from.getBoundingClientRect();
+    let target = null;
+    if (toIdx != null && toIdx >= 0) target = zoneNode(toP === state.player ? "player" : "ai", "m", toIdx);
+    else target = toP === state.player ? document.querySelector("#duel .lp:not(.enemy)") : document.querySelector("#duel .lp.enemy");
+    if (target) {
+      const b = target.getBoundingClientRect();
+      const rawX = (b.left + b.width / 2) - (a.left + a.width / 2);
+      const rawY = (b.top + b.height / 2) - (a.top + a.height / 2);
+      const dist = Math.hypot(rawX, rawY) || 1;
+      const mag = Math.min(34, dist * 0.4);
+      dx = rawX / dist * mag;
+      dy = rawY / dist * mag;
+    }
+    const def = card.classList.contains("def");
+    const base = def ? "rotate(90deg) scale(0.68) " : "";
+    card.style.transition = "transform " + (settings.anim === "fast" ? "80ms" : "160ms") + " ease-out";
+    card.style.zIndex = "6";
+    card.style.transform = base + "translate(" + dx.toFixed(1) + "px," + dy.toFixed(1) + "px)";
+    await wait(180);
+    if (card.isConnected) card.style.transform = base.trim();
+    await wait(80);
+    if (card.isConnected) {
+      card.style.transition = "";
+      card.style.transform = "";
+      card.style.zIndex = "";
+    }
+  }
+
+  function resetBoardMemory() {
+    seenReady = false;
+    seenHand = new Set();
+    seenMonsters = new Set();
+    seenFaceupMon = new Set();
+    seenFaceupST = new Set();
+    lpToken.player += 1;
+    lpToken.ai += 1;
+    lpView = { player: null, ai: null };
+    lpCommit = { player: null, ai: null };
+    clearFx();
+  }
+
+  function snapshotSeen() {
+    seenHand = new Set();
+    seenMonsters = new Set();
+    seenFaceupMon = new Set();
+    seenFaceupST = new Set();
+    if (state) {
+      state.player.hand.forEach((c) => seenHand.add(c.uid));
+      state.ai.hand.forEach((c) => seenHand.add(c.uid));
+      [state.player, state.ai].forEach((p) => {
+        p.monsters.forEach((m) => {
+          if (!m) return;
+          seenMonsters.add(m.uid);
+          if (m.faceup) seenFaceupMon.add(m.uid);
+        });
+        p.spells.forEach((st) => { if (st && st.faceup) seenFaceupST.add(st.uid); });
+      });
+    }
+    seenReady = true;
+  }
+
+  function decorateArrival(zone, node, card, kind) {
+    if (!seenReady || !card) return;
+    if (kind === "m") {
+      const isNew = !seenMonsters.has(card.uid);
+      if (isNew) {
+        seenMonsters.add(card.uid);
+        if (card.faceup) {
+          seenFaceupMon.add(card.uid);
+          zone.classList.add("anim-summon");
+          sfx("summon");
+        } else zone.classList.add("anim-set");
+      } else if (card.faceup && !seenFaceupMon.has(card.uid)) {
+        seenFaceupMon.add(card.uid);
+        if (node) node.classList.add("anim-flip");
+        sfx("trap");
+      }
+      return;
+    }
+    if (card.faceup && !seenFaceupST.has(card.uid)) {
+      seenFaceupST.add(card.uid);
+      if (node) node.classList.add("anim-flip");
+      sfx("trap");
+    }
+  }
+
+  function noteDraws() {
+    if (!seenReady || !state) return;
+    let playerFresh = false;
+    state.player.hand.forEach((c) => {
+      if (!seenHand.has(c.uid)) playerFresh = true;
+    });
+    const aiFresh = state.ai.hand.some((c) => !seenHand.has(c.uid));
+    state.player.hand.forEach((c) => seenHand.add(c.uid));
+    state.ai.hand.forEach((c) => seenHand.add(c.uid));
+    const flashPile = (pile) => {
+      if (!pile || !fxOn()) return;
+      pile.classList.remove("anim-draw");
+      void pile.offsetWidth;
+      pile.classList.add("anim-draw");
+    };
+    if (playerFresh) { sfx("draw"); flashPile(el.plDeckPile); }
+    if (aiFresh) { sfx("draw"); flashPile(el.aiDeckPile); }
+  }
+
+  function paintLP(key, target, node) {
+    if (!node) return;
+    const previous = lpCommit[key];
+    if (previous === target) return;
+    lpCommit[key] = target;
+    const box = node.parentElement;
+    const down = previous != null && target < previous;
+    if (down) {
+      sfx("lp");
+      if (box && fxOn()) {
+        box.classList.remove("lp-hit");
+        void box.offsetWidth;
+        box.classList.add("lp-hit");
+      }
+    }
+    if (previous == null || lpView[key] == null || !settings || settings.anim === "off" || window.__FAST) {
+      lpView[key] = target;
+      node.textContent = String(target);
+      return;
+    }
+    const from = lpView[key];
+    const token = ++lpToken[key];
+    const dur = settings.anim === "fast" ? 220 : 680;
+    const start = performance.now();
+    const step = (now) => {
+      if (lpToken[key] !== token) return;
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const v = Math.round(from + (target - from) * eased);
+      lpView[key] = v;
+      node.textContent = String(v);
+      if (t < 1) requestAnimationFrame(step);
+      else lpView[key] = target;
+    };
+    requestAnimationFrame(step);
+  }
+
+  function bindLongPress(node, fire) {
+    let timer = 0;
+    let held = false;
+    let sx = 0;
+    let sy = 0;
+    const clear = () => { clearTimeout(timer); timer = 0; };
+    node.addEventListener("pointerdown", (e) => {
+      if (e.button != null && e.button !== 0) return;
+      held = false;
+      sx = e.clientX;
+      sy = e.clientY;
+      clear();
+      timer = setTimeout(() => { held = true; fire(); }, 460);
+    });
+    node.addEventListener("pointermove", (e) => {
+      if (Math.hypot(e.clientX - sx, e.clientY - sy) > 14) clear();
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach((ev) => node.addEventListener(ev, clear));
+    node.addEventListener("click", (e) => {
+      if (!held) return;
+      e.preventDefault();
+      e.stopPropagation();
+      held = false;
+    }, true);
+  }
+
+  function flushSaves() {
+    persist(SETTINGS_KEY, settings);
+    persist(STORE_KEY, { fl: flEnforce, decks: savedDecks });
+    persist(COLLECTION_KEY, collection);
+    if (tourney) persist(TOURNEY_KEY, tourney);
+  }
+
+  function cardLine(c, stats) {
+    const ref = (c && c.ref) || {};
+    if (ref.isMonster) {
+      const atk = stats ? stats.atk : (ref.atk == null ? "?" : ref.atk);
+      const def = stats ? stats.def : (ref.def == null ? "?" : ref.def);
+      return [ref.type, ref.attribute, ref.race, "Level " + (ref.level || 0), "ATK " + atk, "DEF " + def]
+        .filter((part) => part != null && part !== "").join(" · ");
+    }
+    return [ref.type, ref.race].filter(Boolean).join(" · ");
   }
 
   function whoName(p) {
@@ -1575,6 +2317,8 @@
     cancelChoice();
     closeSheet();
     closeExtra();
+    setLogOpen(false);
+    resetBoardMemory();
     state = null;
   }
 
@@ -1633,6 +2377,7 @@
   function endGame(winner, reason) {
     if (!state || state.winner) return;
     state.winner = winner;
+    sfx(winner === "player" ? "win" : "lose");
     state.pending = null;
     cancelChoice();
     closeSheet();
@@ -1763,6 +2508,7 @@
       log(m.name + " is unaffected.");
       return;
     }
+    fxShatter(p, "m", idx);
     sendMonsterToGY(p, idx);
     log(m.name + " is destroyed.");
   }
@@ -1805,6 +2551,7 @@
     const i = findSetTrap(trapOwner, "Trap Hole");
     if (i < 0) return false;
     if (trapOwner === state.ai && !aiShouldTrapHole(m)) return false;
+    fxFlipZone(trapOwner, "st", i);
     const st = trapOwner.spells[i];
     trapOwner.spells[i] = null;
     trapOwner.gy.push(strip(st));
@@ -1818,6 +2565,7 @@
     const i = findSetTrap(defender, "Mirror Force");
     if (i < 0) return false;
     if (defender === state.ai && !aiShouldMirror(attacker, atkMonster)) return false;
+    fxFlipZone(defender, "st", i);
     const st = defender.spells[i];
     defender.spells[i] = null;
     defender.gy.push(strip(st));
@@ -1886,10 +2634,13 @@
     if (owner === state.player && !playerMain()) return false;
     let poly = null;
     const hi = owner.hand.findIndex((c) => c.uid === polyUid);
-    if (hi >= 0) poly = owner.hand.splice(hi, 1)[0];
-    else {
+    if (hi >= 0) {
+      poly = owner.hand.splice(hi, 1)[0];
+      fxRevealCard(poly);
+    } else {
       const zi = owner.spells.findIndex((c) => c && c.uid === polyUid);
       if (zi < 0) return false;
+      fxFlipZone(owner, "st", zi);
       poly = owner.spells[zi];
       owner.spells[zi] = null;
     }
@@ -1910,7 +2661,7 @@
     }
     owner.monsters[slot] = {
       uid: fusion.uid, name: fusion.name, ref: fusion.ref,
-      position: "atk", faceup: true, tempControl: null,
+      position: "atk", faceup: true, tempControl: null, justFusion: true,
     };
     owner.summonedThisTurn.add(fusion.uid);
     owner.gy.push(strip(poly));
@@ -1956,9 +2707,14 @@
 
   function takePolyOrSpell(owner, uid) {
     const hi = owner.hand.findIndex((c) => c.uid === uid);
-    if (hi >= 0) return owner.hand.splice(hi, 1)[0];
+    if (hi >= 0) {
+      const card = owner.hand.splice(hi, 1)[0];
+      fxRevealCard(card);
+      return card;
+    }
     const zi = owner.spells.findIndex((c) => c && c.uid === uid);
     if (zi < 0) return null;
+    fxFlipZone(owner, "st", zi);
     const card = owner.spells[zi];
     owner.spells[zi] = null;
     return card;
@@ -2166,7 +2922,7 @@
   function showCoin(heads) {
     el.coin.textContent = heads ? "HEADS" : "TAILS";
     el.coin.classList.add("show");
-    setTimeout(() => el.coin.classList.remove("show"), window.__FAST ? 30 : 880);
+    setTimeout(() => el.coin.classList.remove("show"), animDelay(880) || (window.__FAST ? 30 : 420));
   }
 
   async function activateTimeWizard(owner, uid, call) {
@@ -2196,7 +2952,7 @@
         const td = owner.extra.splice(tdIdx, 1)[0];
         owner.monsters[babyIdx] = {
           uid: td.uid, name: td.name, ref: td.ref,
-          position: "atk", faceup: true, tempControl: null,
+          position: "atk", faceup: true, tempControl: null, justFusion: true,
         };
         owner.summonedThisTurn.add(td.uid);
         log("Baby Dragon grows into Thousand Dragon!");
@@ -2230,6 +2986,7 @@
   async function resolveHats(defender, attacker) {
     const i = findSetTrap(defender, "Magical Hats");
     if (i < 0) return false;
+    fxFlipZone(defender, "st", i);
     const trap = defender.spells[i];
     defender.spells[i] = null;
     defender.gy.push(strip(trap));
@@ -2359,6 +3116,8 @@
         const dmg = getStats(atkM).atk;
         log(atkM.name + " attacks directly.");
         atkOwner.attackedThisTurn.add(atkUid);
+        await fxLunge(atkOwner, atkIdx, defOwner, -1);
+        if (!state || state.winner) return;
         await dealBattleDamage(defOwner, dmg, true);
         render();
         return;
@@ -2379,6 +3138,8 @@
       const dName = defOwner.monsters[defIdx].name;
       const d = dPos === "def" ? dStats.def : dStats.atk;
       log(atkM.name + " (" + a + ") vs " + dName + " (" + d + ")" + (wasHidden ? " [flipped]" : ""));
+      await fxLunge(atkOwner, atkIdx, defOwner, defIdx);
+      if (!state || state.winner) return;
 
       if (dPos === "def") {
         if (a > d) destroyByBattle(defOwner, defIdx);
@@ -2439,6 +3200,7 @@
   }
 
   function beginTurn(who) {
+    if (state) state.ending = false;
     if (!state || state.winner) return;
     state.turn = who;
     state.phase = "draw";
@@ -2464,7 +3226,8 @@
   }
 
   function endTurn() {
-    if (!state || state.winner) return;
+    if (!state || state.winner || state.ending) return;
+    state.ending = true;
     const gen = state.gen;
     clearSwaps();
     const ending = state.turn === "player" ? state.player : state.ai;
@@ -2479,7 +3242,7 @@
       render();
       setTimeout(() => {
         if (state && state.gen === gen && !state.winner) beginTurn("ai");
-      }, window.__FAST ? 20 : 420);
+      }, animDelay(420) || (window.__FAST ? 16 : 16));
     } else {
       state.turnCount++;
       log("Your turn.");
@@ -2488,7 +3251,7 @@
   }
 
   function nextPhase() {
-    if (!state || state.busy || state.winner || state.turn !== "player" || state.prompt) return;
+    if (!state || state.busy || state.winner || state.turn !== "player" || state.prompt || state.ending) return;
     const idx = PHASES.indexOf(state.phase);
     const next = PHASES[idx + 1];
     if (!next || next === "end") { log("End Phase."); endTurn(); return; }
@@ -2597,21 +3360,18 @@
       el.sheetArt.removeAttribute("src");
       el.sheetArt.style.background = "repeating-linear-gradient(45deg,#1a2a4a 0 6px,#243860 6px 12px)";
     }
-    if (known && c.ref.isMonster && ctx.where !== "hand") {
+    const onField = known && c.ref.isMonster && state && ctx.where !== "hand" && ctx.where !== "gy" && ctx.where !== "pack" && ctx.where !== "extra";
+    if (onField) {
       const s = getStats(c);
       const eqs = equipsOf(c).map((e) => e.name).join(", ");
-      el.sheetStats.textContent =
-        (c.ref.attribute || "") + " · " + (c.ref.race || "") + " · Lv" + c.ref.level +
-        " · ATK " + s.atk + " / DEF " + s.def +
-        (c.position ? " · " + (c.faceup ? "" : "FD ") + c.position.toUpperCase() : "") +
+      el.sheetStats.textContent = cardLine(c, s) +
+        (c.position ? " · " + (c.faceup ? "" : "Face-down ") + (c.position === "atk" ? "Attack" : "Defense") : "") +
         (eqs ? " · " + eqs : "");
     } else if (known && c.ref.isMonster) {
-      el.sheetStats.textContent =
-        (c.ref.attribute || "") + " · " + (c.ref.race || "") + " · Lv" + c.ref.level +
-        " · ATK " + (c.ref.atk == null ? "?" : c.ref.atk) + " / DEF " + (c.ref.def == null ? "?" : c.ref.def);
+      el.sheetStats.textContent = cardLine(c, null);
     } else if (known) {
-      let line = c.ref.type || "";
-      if (c.equipTo) {
+      let line = cardLine(c, null);
+      if (c.equipTo && state) {
         const host = state.player.monsters.concat(state.ai.monsters).find((m) => m && m.uid === c.equipTo);
         line += host ? " · Equipped to " + host.name : " · Equip";
       }
@@ -2629,11 +3389,13 @@
     if (known && c.name === "Castle of Dark Illusions") {
       desc += "\n\nDuelist Kingdom: while face-up, every Fiend gains 200 ATK and DEF, plus 200 more on each of your later turns (max +1000).";
     }
-    if (known && isToon(c) && state.rules === "dk") {
+    if (known && isToon(c) && state && state.rules === "dk") {
       desc += "\n\nDuelist Kingdom: no tributes. You need Toon World. A Toon cannot attack the turn it is summoned, pays 500 LP to attack, and can attack directly unless the opponent controls a Toon.";
     }
     el.sheetDesc.textContent = desc;
 
+    const sheetBox = $("cardSheet");
+    if (sheetBox) sheetBox.classList.toggle("inspect", !!ctx.inspect);
     const actions = el.sheetActions;
     actions.innerHTML = "";
     const add = (label, fn, cls, extra) => {
@@ -2645,6 +3407,12 @@
       b.addEventListener("click", () => { closeSheet(); fn(); });
       actions.appendChild(b);
     };
+
+    if (ctx.inspect || !state) {
+      add("Close", () => {}, "ghost");
+      el.overlay.classList.add("open");
+      return;
+    }
 
     const myTurn = state.turn === "player" && !state.busy && !state.winner;
     const main = playerMain();
@@ -2751,10 +3519,18 @@
 
   function onZoneTap(owner, kind, index) {
     if (!state || state.winner || state.prompt) return;
-    if (state.busy && state.turn === "ai") return;
     const p = owner === "player" ? state.player : state.ai;
     const zones = kind === "m" ? p.monsters : p.spells;
     const card = zones[index];
+    if (state.busy && state.turn === "ai") {
+      if (card) {
+        openSheet({
+          owner: owner, where: kind === "m" ? "monster" : "st", index: index, card: card,
+          faceup: owner === "player" || !!card.faceup, inspect: true,
+        });
+      }
+      return;
+    }
 
     if (state.pending && state.turn === "player" && !state.busy) {
       if (state.pending.type === "attack") {
@@ -2800,6 +3576,46 @@
     });
   }
 
+  function openGrave(owner) {
+    if (!state) return;
+    const p = owner === "player" ? state.player : state.ai;
+    const name = owner === "player" ? state.playerName : state.aiName;
+    el.extraTitle.textContent = name + " · Graveyard";
+    el.extraList.innerHTML = "";
+    const cards = p.gy.slice().reverse();
+    if (!cards.length) {
+      const empty = document.createElement("div");
+      empty.textContent = "Graveyard is empty.";
+      empty.style.color = "var(--muted)";
+      el.extraList.appendChild(empty);
+    } else {
+      cards.forEach((c) => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "extra-row";
+        const img = document.createElement("img");
+        img.src = (c.ref && c.ref.image) || "";
+        img.alt = c.name;
+        const meta = document.createElement("div");
+        const nm = document.createElement("div");
+        nm.className = "nm";
+        nm.textContent = c.name;
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        sub.textContent = cardLine(c, null);
+        meta.appendChild(nm);
+        meta.appendChild(sub);
+        row.appendChild(img);
+        row.appendChild(meta);
+        row.addEventListener("click", () => {
+          openSheet({ owner: owner, where: "gy", card: c, faceup: true, inspect: true });
+        });
+        el.extraList.appendChild(row);
+      });
+    }
+    el.extraOverlay.classList.add("open");
+  }
+
   function openExtra(owner) {
     if (!state) return;
     const p = owner === "player" ? state.player : state.ai;
@@ -2813,7 +3629,8 @@
       el.extraList.appendChild(empty);
     } else {
       p.extra.forEach((c) => {
-        const row = document.createElement("div");
+        const row = document.createElement("button");
+        row.type = "button";
         row.className = "extra-row";
         const img = document.createElement("img");
         img.src = c.ref.image || "";
@@ -2824,11 +3641,14 @@
         nm.textContent = c.name;
         const sub = document.createElement("div");
         sub.className = "sub";
-        sub.textContent = "ATK " + (c.ref.atk == null ? "?" : c.ref.atk) + " / DEF " + (c.ref.def == null ? "?" : c.ref.def) + "\n" + fusionLine(c.name);
+        sub.textContent = cardLine(c, null) + "\n" + fusionLine(c.name);
         meta.appendChild(nm);
         meta.appendChild(sub);
         row.appendChild(img);
         row.appendChild(meta);
+        row.addEventListener("click", () => {
+          openSheet({ owner: owner, where: "extra", card: c, faceup: true, inspect: true });
+        });
         el.extraList.appendChild(row);
       });
     }
@@ -2867,10 +3687,26 @@
           z.classList.add("targetable");
         }
       }
-      if (state.spot && state.spot.owner === owner && state.spot.kind === kind && state.spot.index === i) {
+        if (state.spot && state.spot.owner === owner && state.spot.kind === kind && state.spot.index === i) {
         z.classList.add("ai-act");
       }
+      if (card) decorateArrival(z, z.querySelector(".card"), card, kind);
+      if (card && card.justFusion) {
+        delete card.justFusion;
+        const swirlZone = z;
+        requestAnimationFrame(() => { if (swirlZone.isConnected) fxSwirl(swirlZone); });
+      }
       z.addEventListener("click", (e) => { e.stopPropagation(); onZoneTap(owner, kind, i); });
+      bindLongPress(z, () => {
+        if (!state || state.prompt) return;
+        const side = owner === "player" ? state.player : state.ai;
+        const live = (kind === "m" ? side.monsters : side.spells)[i];
+        if (!live) return;
+        openSheet({
+          owner: owner, where: kind === "m" ? "monster" : "st", index: i, card: live,
+          faceup: owner === "player" || !!live.faceup, inspect: true,
+        });
+      });
       container.appendChild(z);
     }
   }
@@ -2913,8 +3749,8 @@
     const ai = state.ai;
     el.plName.textContent = state.playerName;
     el.aiName.textContent = state.aiName;
-    el.plLP.textContent = pl.lp;
-    el.aiLP.textContent = ai.lp;
+    paintLP("player", pl.lp, el.plLP);
+    paintLP("ai", ai.lp, el.aiLP);
     el.plDeck.textContent = pl.deck.length;
     el.aiDeck.textContent = ai.deck.length;
     el.plGY.textContent = pl.gy.length;
@@ -2946,18 +3782,31 @@
         img.draggable = false;
         d.appendChild(img);
       } else d.textContent = c.name;
+      if (seenReady && !seenHand.has(c.uid)) d.classList.add("anim-draw");
       d.addEventListener("click", () => {
         if (!state || state.prompt) return;
-        if (state.busy && state.turn !== "player") return;
+        const ctx = { owner: "player", where: "hand", index: i, card: c, faceup: true };
+        if (state.busy && state.turn !== "player") {
+          ctx.inspect = true;
+          openSheet(ctx);
+          return;
+        }
         state.pending = null;
-        openSheet({ owner: "player", where: "hand", index: i, card: c, faceup: true });
+        openSheet(ctx);
+      });
+      bindLongPress(d, () => {
+        if (!state || state.prompt) return;
+        const live = state.player.hand[i];
+        if (!live) return;
+        openSheet({ owner: "player", where: "hand", index: i, card: live, faceup: true, inspect: true });
       });
       el.hand.appendChild(d);
     });
+    noteDraws();
     layoutHand();
     const pending = !!state.pending && state.turn === "player";
     el.btnNext.textContent = pending ? "Cancel" : "Next Phase";
-    el.btnNext.disabled = state.turn !== "player" || state.busy || !!state.winner || !!state.prompt;
+    el.btnNext.disabled = state.turn !== "player" || state.busy || !!state.winner || !!state.prompt || !!state.ending;
   }
 
   function layoutHand() {
@@ -3942,8 +4791,10 @@
       busy: false,
       prompt: false,
     };
+    resetBoardMemory();
     if (!drawCards(state.player, 5)) return;
     if (!state || state.winner || !drawCards(state.ai, 5)) return;
+    snapshotSeen();
     showVS();
   }
 
@@ -4056,9 +4907,7 @@
   }
 
   function saveStore() {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ fl: flEnforce, decks: savedDecks }));
-    } catch (e) { toast("Couldn't save on this device."); }
+    if (!persist(STORE_KEY, { fl: flEnforce, decks: savedDecks })) toast("Couldn't save decks.");
   }
 
   function copyLimit(name) {
@@ -4720,6 +5569,7 @@
   function sendSpellToGY(owner, i) {
     const st = owner.spells[i];
     if (!st) return;
+    fxShatter(owner, "st", i);
     owner.spells[i] = null;
     const toonWorld = !!(st.faceup && st.name === "Toon World");
     if (st.equipTo || st.absorb || st.cocoon) onEquipLeaves(owner, st);
@@ -5107,7 +5957,7 @@
     log(m.name + " tosses " + flips.join(" ") + ".");
     el.coin.textContent = flips.join(" ");
     el.coin.classList.add("show");
-    setTimeout(() => el.coin.classList.remove("show"), window.__FAST ? 30 : 880);
+    setTimeout(() => el.coin.classList.remove("show"), animDelay(880) || (window.__FAST ? 30 : 420));
     await wait(700);
     if (!state || state.winner) return;
     if (heads >= 2 && foe.monsters[foeIdx]) {
@@ -5332,9 +6182,7 @@
   }
 
   function saveCollection() {
-    try {
-      localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection));
-    } catch (e) { toast("Couldn't save the collection."); }
+    if (!persist(COLLECTION_KEY, collection)) toast("Couldn't save the collection.");
   }
 
   function grantCards(names) {
@@ -5469,6 +6317,7 @@
     if (!prize) { showScreen("menu"); return; }
     if (!prize.revealed) {
       prize.revealed = true;
+      sfx("pack");
       paintPack();
       return;
     }
@@ -5499,8 +6348,8 @@
   }
 
   function saveTourney() {
-    if (!tourney) localStorage.removeItem(TOURNEY_KEY);
-    else localStorage.setItem(TOURNEY_KEY, JSON.stringify(tourney));
+    const ok = tourney ? persist(TOURNEY_KEY, tourney) : persist(TOURNEY_KEY, null);
+    if (!ok) toast("Couldn't save the tournament.");
     refreshContinue();
   }
 
@@ -5734,14 +6583,37 @@
     showScreen("end");
   }
 
+  function closeConfirm() {
+    el.confirmOverlay.classList.remove("open");
+  }
+
+  function resetProgress() {
+    tourney = null;
+    collection = { counts: {}, unlocked: false };
+    savedDecks = [];
+    flEnforce = false;
+    prize = null;
+    const okT = persist(TOURNEY_KEY, null);
+    const okC = persist(COLLECTION_KEY, collection);
+    const okD = persist(STORE_KEY, { fl: false, decks: [] });
+    refreshContinue();
+    syncFL();
+    if ($("customs").classList.contains("active")) renderCustoms();
+    closeConfirm();
+    toast(okT && okC && okD ? "Progress reset." : "Couldn't clear every save.");
+  }
+
   function setRules(mode) {
-    rulesMode = mode;
-    const classic = mode === "classic";
+    rulesMode = mode === "dk" ? "dk" : "classic";
+    settings.rules = rulesMode;
+    const classic = rulesMode === "classic";
     el.ruleClassic.classList.toggle("on", classic);
     el.ruleDK.classList.toggle("on", !classic);
     el.rulesHint.textContent = classic
       ? "Free Duel: 8000 LP · tributes · no attack on the first turn"
       : "Free Duel: 2000 LP · no tributes · field bonus · fuse from the field";
+    saveSettings();
+    paintSettings();
   }
 
   function syncTourneyPick(mode) {
@@ -5757,6 +6629,34 @@
 
   el.ruleClassic.addEventListener("click", () => setRules("classic"));
   el.ruleDK.addEventListener("click", () => setRules("dk"));
+  el.btnSettings.addEventListener("click", () => { paintSettings(); showScreen("settings"); });
+  el.btnSettingsBack.addEventListener("click", () => showScreen("menu"));
+  el.setClassic.addEventListener("click", () => setRules("classic"));
+  el.setDK.addEventListener("click", () => setRules("dk"));
+  $("setAnim").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || !b.dataset.anim) return;
+    settings.anim = b.dataset.anim;
+    paintSettings();
+    saveSettings();
+  });
+  el.soundToggle.addEventListener("click", () => {
+    unlockAudio();
+    settings.sound = !settings.sound;
+    paintSettings();
+    saveSettings();
+    if (settings.sound) sfx("summon");
+  });
+  el.volume.addEventListener("input", () => {
+    settings.volume = Number(el.volume.value) / 100;
+    if (el.volumeVal) el.volumeVal.textContent = el.volume.value;
+    saveSettings();
+  });
+  el.volume.addEventListener("change", () => { unlockAudio(); if (settings.sound) sfx("draw"); });
+  el.btnReset.addEventListener("click", () => el.confirmOverlay.classList.add("open"));
+  el.confirmYes.addEventListener("click", resetProgress);
+  el.confirmNo.addEventListener("click", closeConfirm);
+  el.confirmOverlay.addEventListener("click", (e) => { if (e.target === el.confirmOverlay) closeConfirm(); });
   el.btnHowto.addEventListener("click", () => showScreen("howto"));
   el.btnHowtoBack.addEventListener("click", () => showScreen("menu"));
   el.btnStart.addEventListener("click", () => {
@@ -5832,6 +6732,15 @@
   });
   el.btnVsGo.addEventListener("click", enterDuel);
   $("vs").addEventListener("click", (e) => { if (e.target === $("vs")) enterDuel(); });
+  el.logLine.addEventListener("click", () => { if (state) setLogOpen(!logOpen); });
+  el.logClose.addEventListener("click", () => setLogOpen(false));
+  $("duel").addEventListener("click", (e) => {
+    if (!logOpen) return;
+    if (e.target.closest("#duelLog") || e.target.closest("#logLine")) return;
+    setLogOpen(false);
+  });
+  el.plGYBtn.addEventListener("click", () => { if (state && !state.prompt) openGrave("player"); });
+  el.aiGYBtn.addEventListener("click", () => { if (state && !state.prompt) openGrave("ai"); });
   el.btnNext.addEventListener("click", () => {
     if (!state || state.turn !== "player" || state.busy || state.winner) return;
     if (state.pending) { state.pending = null; toast("Cancelled."); render(); return; }
@@ -5865,6 +6774,8 @@
   window.addEventListener("resize", () => { if (state && $("duel").classList.contains("active")) render(); });
 
   hydrateAll();
+  loadSettings();
+  setRules(settings.rules);
   loadStore();
   loadCollection();
   loadTourney();
@@ -5883,6 +6794,23 @@
   });
   const stakeSum = PATH.reduce((n, k) => n + (STAKES[k] || 0), 0);
   if (STAR_START + stakeSum !== STAR_CASTLE) console.error("Star chip path does not reach the castle", STAR_START + stakeSum);
+  ["pointerdown", "touchend", "keydown"].forEach((ev) => {
+    document.addEventListener(ev, unlockAudio, { capture: true, passive: true });
+  });
+  bindLongPress(el.packCard, () => {
+    if (!prize || !prize.revealed) return;
+    const card = prize.cards[prize.index];
+    const known = card && cardDB[card.name];
+    if (!known) return;
+    openSheet({
+      owner: "player", where: "pack", faceup: true, inspect: true,
+      card: { uid: "pack", name: known.name, ref: known },
+    });
+  });
+  window.addEventListener("pagehide", flushSaves);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushSaves();
+  });
   showScreen("menu");
   refreshCards();
   refreshBanlist();
@@ -5902,6 +6830,8 @@
     aiProfile: () => aiProfile(),
     pegasusEye: () => pegasusEye(),
     rules: () => rulesMode,
+    settings: () => Object.assign({}, settings),
+    sfx: (name) => sfx(name),
     issuesFor: issuesFor,
     saved: () => savedDecks,
     fl: () => flEnforce,
