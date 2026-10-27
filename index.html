@@ -87,12 +87,14 @@
         env(safe-area-inset-left, 0px);
       display: flex; flex-direction: column;
       overflow: hidden;
+      /* Whitespace between screens would otherwise become a flex item and shove the page into the safe area. */
+      font-size: 0; line-height: 0;
       background:
         radial-gradient(ellipse at 50% 0%, #143056 0%, transparent 55%),
         linear-gradient(180deg, var(--bg1), var(--bg0));
     }
 
-    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }
+    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; font-size: 16px; line-height: normal; }
     .screen.active { display: flex; animation: screenIn calc(0.26s * var(--fx, 1)) ease; }
     .screen[hidden] { display: none !important; }
     html[data-anim="off"] .screen.active,
@@ -106,7 +108,7 @@
     #menu {
       align-items: center; justify-content: flex-start;
       padding: 6px 14px 6px;
-      gap: 6px; text-align: center;
+      gap: 5px; text-align: center;
     }
     .brand {
       margin: 0; line-height: 1;
@@ -140,13 +142,26 @@
       background: linear-gradient(180deg, #6a4a12, #3a2808);
       border-color: #e0b050; color: #fff4d4;
     }
+    .menu-btn.puzzle {
+      font-weight: 700;
+      background: linear-gradient(180deg, #243e66, #14243c);
+      border-color: #9ecbff; color: #e7f2ff;
+    }
     #menu .menu-btn {
       min-height: 40px; padding: 6px 10px; font-size: 0.98rem;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    #menu .menu-btn.primary { min-height: 44px; font-size: 1.05rem; }
-    #menu .rules-row button { min-height: 38px; }
-    #menu .rules-hint { font-size: 0.72rem; }
+    #menu .menu-btn.primary { min-height: 46px; font-size: 1.05rem; }
+    #menu .rules-row button { min-height: 36px; }
+    #menu .rules-hint { font-size: 0.72rem; line-height: 1.3; }
+    #btnBinder, #btnBuildBinder { position: relative; }
+    .menu-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-left: 6px; min-width: 1.2em; height: 1.2em; padding: 0 4px;
+      border-radius: 999px; background: #1f9d55; color: #f3fff6;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0; vertical-align: 1px;
+    }
+    .menu-badge[hidden] { display: none !important; }
     .menu-btn:active, .ctrl-btn:active, .mini-btn:active, .deck-opt:active,
     .saved-actions button:active, .actions button:active, .choice-btns button:active,
     .fl-switch:active, .rules-row button:active, .seg button:active, .map-node:active {
@@ -536,6 +551,46 @@
       letter-spacing: 0.08em; text-transform: uppercase; min-height: 14px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 6px;
     }
+    .puzzle-bar {
+      flex-shrink: 0; display: flex; align-items: center; gap: 6px; min-height: 28px;
+    }
+    .puzzle-bar[hidden] { display: none !important; }
+    #puzzleGoal {
+      flex: 1; min-width: 0; color: var(--gold); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .puzzle-bar .mini-btn { min-height: 28px; min-width: 54px; padding: 2px 8px; font-size: 0.78rem; }
+    /* The hint row is extra. Shrink the hand so Leave / Next Phase stay above the home indicator. */
+    #duel:has(#puzzleBar:not([hidden])) {
+      --hand-w: 58px;
+      --hand-card-h: calc(58px * 1.45);
+      --hand-h: calc(58px * 1.45 + 4px);
+      gap: 1px;
+    }
+    #duel:has(#puzzleBar:not([hidden])) .controls { padding: 2px 2px 2px; }
+    #puzzle {
+      align-items: center; justify-content: flex-start; text-align: center;
+      padding: 8px 14px 8px; gap: 6px;
+    }
+    #puzzle .deck-head { width: 100%; }
+    .puzzle-brief {
+      flex: 1; min-height: 0; width: min(340px, 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; padding: 10px 12px;
+      border: 1px solid var(--gold-dim); border-radius: 10px;
+      background: linear-gradient(180deg, rgba(20, 40, 68, 0.95), rgba(10, 18, 32, 0.95));
+    }
+    #puzzleArt {
+      width: 92px; height: 134px; object-fit: cover; border-radius: 6px;
+      border: 1px solid var(--gold); background: #111; flex-shrink: 0;
+    }
+    .puzzle-brief h3 { margin: 0; color: var(--gold); font-size: 1.25rem; line-height: 1.1; }
+    #puzzleRules, #puzzleBlurb, #puzzleReward { margin: 0; }
+    #puzzleRules { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
+    #puzzleBlurb { color: var(--cream); font-size: 0.9rem; line-height: 1.35; max-width: 280px; }
+    #puzzleReward { color: #ffe7a3; font-size: 0.78rem; font-weight: 700; }
+    #puzzle .menu-btn { flex-shrink: 0; }
     .field {
       flex: 1; min-height: 0;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -713,6 +768,32 @@
     .pack-card .back[hidden], .pack-card img[hidden] { display: none !important; }
     .pack-card.reveal { animation: packIn calc(0.45s * var(--fx, 1)) ease-out; }
     html[data-anim="off"] .pack-card.reveal { animation: none; }
+    .pack-card.is-new {
+      border-color: #b6ffd0;
+      box-shadow: 0 0 0 2px #b6ffd0, 0 0 16px rgba(90, 255, 170, 0.8);
+      animation: newPulse calc(1.15s * var(--fx, 1)) ease-in-out infinite;
+    }
+    .pack-card.is-new.reveal {
+      animation:
+        packIn calc(0.45s * var(--fx, 1)) ease-out,
+        newPulse calc(1.15s * var(--fx, 1)) ease-in-out 0.45s infinite;
+    }
+    html[data-anim="off"] .pack-card.is-new,
+    html[data-anim="fast"] .pack-card.is-new { animation: none; }
+    .new-badge {
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      z-index: 2; pointer-events: none;
+      background: #146b38; color: #e9fff4; font-weight: 700;
+      font-size: 0.78rem; letter-spacing: 0.14em;
+      padding: 3px 8px; border-radius: 3px;
+      border: 1px solid #d9ffe8;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+    }
+    .new-badge[hidden] { display: none !important; }
+    @keyframes newPulse {
+      0%, 100% { box-shadow: 0 0 0 2px #9dffc4, 0 0 10px rgba(80, 255, 160, 0.45); }
+      50% { box-shadow: 0 0 0 2px #f3fff8, 0 0 18px rgba(140, 255, 190, 0.95); }
+    }
     #packName {
       margin: 0; min-height: 1.25em; max-width: 92vw; flex-shrink: 0;
       color: var(--gold); font-size: 0.95rem; line-height: 1.25;
@@ -732,9 +813,13 @@
       gap: 6px; align-items: stretch;
     }
     .unlock-card {
-      margin: 0; min-height: 0; min-width: 0;
+      position: relative; margin: 0; min-height: 0; min-width: 0;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
     }
+    .unlock-card.is-new img {
+      box-shadow: 0 0 0 2px #b6ffd0, 0 0 12px rgba(90, 255, 170, 0.75);
+    }
+    .unlock-card .new-badge { top: 2px; font-size: 0.56rem; padding: 1px 4px; letter-spacing: 0.08em; }
     .unlock-card img {
       width: auto; height: auto; max-width: 100%; max-height: calc(100% - 1.5em);
       aspect-ratio: 59 / 86; object-fit: cover; border-radius: 4px;
@@ -1050,6 +1135,15 @@
       font-size: 0.62rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
       background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
     }
+    .binder-card.is-new {
+      border-color: #b6ffd0;
+      box-shadow: 0 0 0 1px #7dffb3, 0 0 8px rgba(90, 255, 170, 0.55);
+    }
+    .binder-card .new-tag {
+      position: absolute; right: 2px; top: 2px; z-index: 1; pointer-events: none;
+      font-size: 0.52rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
+      background: #146b38; color: #e9fff4; font-weight: 700; letter-spacing: 0.04em;
+    }
     #rematch .deck-head { width: 100%; }
     #rematchList { display: flex; flex-direction: column; gap: 6px; }
     #btnBinderBack, #btnRematchBack { flex-shrink: 0; align-self: center; }
@@ -1136,8 +1230,9 @@
       <p class="rules-hint" id="rulesHint">Free Duel: 8000 LP · tributes · no attack on the first turn</p>
       <button type="button" class="menu-btn primary" id="btnStart">Free Duel</button>
       <button type="button" class="menu-btn tourney" id="btnTourney">Tournament</button>
+      <button type="button" class="menu-btn puzzle" id="btnPuzzle">Daily Puzzle</button>
       <button type="button" class="menu-btn" id="btnContinue" hidden>Continue</button>
-      <button type="button" class="menu-btn" id="btnBinder">Card Binder</button>
+      <button type="button" class="menu-btn" id="btnBinder">Card Binder<span class="menu-badge" id="binderBadge" hidden>0</span></button>
       <button type="button" class="menu-btn" id="btnRematch">Rematch</button>
       <button type="button" class="menu-btn shop" id="btnShop">Card Shop</button>
       <button type="button" class="menu-btn" id="btnHowto">How to Play</button>
@@ -1280,6 +1375,22 @@
       <button type="button" class="menu-btn" id="btnRematchBack">Back</button>
     </section>
 
+    <section id="puzzle" class="screen" hidden>
+      <div class="deck-head">
+        <h2>Daily Puzzle</h2>
+        <p id="puzzleDate">Today</p>
+      </div>
+      <div class="puzzle-brief">
+        <img id="puzzleArt" alt="" />
+        <h3 id="puzzleTitle">Puzzle</h3>
+        <p id="puzzleRules">Classic</p>
+        <p id="puzzleBlurb"></p>
+        <p id="puzzleReward">40 DP on the first solve today</p>
+      </div>
+      <button type="button" class="menu-btn primary" id="btnPuzzleStart">Start Puzzle</button>
+      <button type="button" class="menu-btn" id="btnPuzzleBack">Back</button>
+    </section>
+
     <section id="howto" class="screen" hidden>
       <h2>How to Play</h2>
       <div class="scroll">
@@ -1299,6 +1410,8 @@
         <p><strong>Equips:</strong> Legendary Sword (Warrior), Book of Secret Arts (Spellcaster), Dragon Treasure (Dragon), Black Pendant, Horn of the Unicorn. Tap Equip, then a face-up monster.</p>
         <p>Kuriboh can be discarded so an opponent’s attack deals 0. Swords of Revealing Light stops their attacks for 3 of their turns. Shield &amp; Sword swaps ATK and DEF until the end of the turn. Panther Warrior must tribute a monster to attack.</p>
         <p><strong>Story:</strong> A short scene plays when you arrive, before and after each tournament duel, and after you beat Pegasus. Tap to advance, or Skip. Settings can skip every scene. Win and loss have different lines.</p>
+        <p><strong>New cards:</strong> The first copy of a card, from a booster, Grandpa's shop, an ante, or another reward, shows a NEW badge and a glow when it is revealed. The binder keeps NEW on that card until you tap it. A green count on Card Binder is how many of those you have not opened yet. Cards you already owned are treated as seen.</p>
+        <p><strong>Daily Puzzle:</strong> One puzzle for today's date. The board, hands, and Life Points are already set. Win that turn with the rules named on the puzzle, Classic or Duelist Kingdom. Hint and Retry sit on the duel screen. The first solve of the day pays 40 Duel Points. Solving on back-to-back days raises a streak. Reset Progress clears the streak.</p>
         <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
         <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, sound, story skip, and ante rule on this device.</p>
       </div>
@@ -1312,6 +1425,11 @@
         <div class="lp"><span class="who" id="plName">You</span><span class="val" id="plLP">8000</span></div>
       </div>
       <div class="field-tag" id="fieldTag"></div>
+      <div class="puzzle-bar" id="puzzleBar" hidden>
+        <span id="puzzleGoal">Win this turn</span>
+        <button type="button" class="mini-btn" id="btnPuzzleHint">Hint</button>
+        <button type="button" class="mini-btn" id="btnPuzzleRetry">Retry</button>
+      </div>
       <div class="field">
         <div class="cluster">
           <div class="side opp">
@@ -1436,7 +1554,7 @@
       <input id="buildName" type="text" maxlength="24" autocomplete="off" autocapitalize="words" aria-label="Deck name" />
       <div class="build-counts">
         <div class="grow">Main <span class="num" id="buildMain">0</span>/40–60 · Extra <span class="num" id="buildExtra">0</span>/15</div>
-        <button type="button" class="mini-btn" id="btnBuildBinder">Binder</button>
+        <button type="button" class="mini-btn" id="btnBuildBinder">Binder<span class="menu-badge" id="buildBinderBadge" hidden>0</span></button>
         <button type="button" class="fl-switch" id="flToggleBuild" aria-pressed="false">F/L Off</button>
       </div>
       <p class="build-status" id="buildStatus" hidden></p>
@@ -1486,6 +1604,7 @@
         <button type="button" class="pack-card" id="packCard">
           <img id="packArt" alt="" hidden />
           <span class="back" id="packBack">★</span>
+          <span class="new-badge" id="packNew" hidden>NEW</span>
         </button>
       </div>
       <p id="packName"></p>
@@ -1547,7 +1666,7 @@
   <div class="overlay" id="confirmOverlay">
     <div class="sheet">
       <h3 id="confirmTitle">Reset progress?</h3>
-      <p id="confirmBody">This erases the tournament, Duel Points, saved decks, and your collection. A starter pile of commons comes back. Settings stay.</p>
+      <p id="confirmBody">This erases the tournament, Duel Points, the puzzle streak, saved decks, and your collection. A starter pile of commons comes back. Settings stay.</p>
       <div class="actions">
         <button type="button" id="confirmYes">Reset</button>
         <button type="button" class="ghost" id="confirmNo">Cancel</button>
@@ -1704,6 +1823,8 @@
   const COLLECTION_KEY = "classicDuel_collection_v1";
   const SETTINGS_KEY = "classicDuel_settings_v1";
   const WALLET_KEY = "classicDuel_wallet_v1";
+  const PUZZLE_KEY = "classicDuel_puzzle_v1";
+  const PUZZLE_DP = 40;
   const DP_LOSS = 20;
   const REMATCH_PAY = 1.75;
   /* Two copies of each. 20 names × 2 = one legal 40-card deck of commons. */
@@ -1736,6 +1857,141 @@
     { set: "Pharaoh's Servant", short: "Pharaoh's Servant", price: 150, key: "keith", gate: "Keith" },
     { set: "Labyrinth of Nightmare", short: "Labyrinth of Nightmare", price: 180, key: "panik", gate: "Panik" },
     { set: "Spell Ruler", short: "Spell Ruler", price: 220, key: "pegasus", gate: "Pegasus" },
+  ];
+  /* Handcrafted boards. The local calendar day picks one. Win before the turn ends. */
+  const PUZZLES = [
+    {
+      id: "open-field", title: "Open Field", rules: "classic", ace: "Celtic Guardian",
+      goal: "Win this turn",
+      blurb: "Celtic Guardian is on your field. They have 1000 Life Points and no monsters.",
+      hint: "Their field is empty. Attack directly. Celtic Guardian has 1400 ATK.",
+      player: { lp: 4000, hand: [], monsters: [{ name: "Celtic Guardian", pos: "atk" }] },
+      ai: { lp: 1000, hand: [], monsters: [] },
+    },
+    {
+      id: "raigeki", title: "Thunder Strike", rules: "classic", ace: "Raigeki",
+      goal: "Win this turn",
+      blurb: "La Jinn faces Summoned Skull. Raigeki is in your hand.",
+      hint: "Raigeki destroys their monsters and leaves yours. Then attack.",
+      player: { lp: 4000, hand: ["Raigeki"], monsters: [{ name: "La Jinn the Mystical Genie of the Lamp", pos: "atk" }] },
+      ai: { lp: 1500, hand: [], monsters: [{ name: "Summoned Skull", pos: "atk" }] },
+    },
+    {
+      id: "dark-hole", title: "Clear the Board", rules: "classic", ace: "Dark Hole",
+      goal: "Win this turn",
+      blurb: "Two monsters wall you in. Dark Hole and Celtic Guardian are in your hand.",
+      hint: "Dark Hole destroys every monster. Summon Celtic Guardian and attack directly.",
+      player: { lp: 4000, hand: ["Dark Hole", "Celtic Guardian"], monsters: [] },
+      ai: { lp: 800, hand: [], monsters: [
+        { name: "Giant Soldier of Stone", pos: "def" },
+        { name: "Mystical Elf", pos: "def" },
+      ] },
+    },
+    {
+      id: "fissure", title: "Crack the Wall", rules: "classic", ace: "Fissure",
+      goal: "Win this turn",
+      blurb: "A stone soldier sits in Defense. Fissure is in your hand, and Celtic Guardian is ready.",
+      hint: "Fissure destroys their face-up monster. Then attack directly.",
+      player: { lp: 4000, hand: ["Fissure"], monsters: [{ name: "Celtic Guardian", pos: "atk" }] },
+      ai: { lp: 1000, hand: [], monsters: [{ name: "Giant Soldier of Stone", pos: "def" }] },
+    },
+    {
+      id: "reborn", title: "From the Grave", rules: "classic", ace: "Monster Reborn",
+      goal: "Win this turn",
+      blurb: "Blue-Eyes White Dragon is in your Graveyard. Monster Reborn is in your hand.",
+      hint: "Monster Reborn summons Blue-Eyes. It can attack Summoned Skull this turn.",
+      player: { lp: 4000, hand: ["Monster Reborn"], gy: ["Blue-Eyes White Dragon"], monsters: [] },
+      ai: { lp: 400, hand: [], monsters: [{ name: "Summoned Skull", pos: "atk" }] },
+    },
+    {
+      id: "change", title: "Stolen Power", rules: "classic", ace: "Change of Heart",
+      goal: "Win this turn",
+      blurb: "They control Summoned Skull and a stone soldier. Change of Heart is in your hand.",
+      hint: "Change of Heart takes their strongest monster. Attack the stone soldier with it.",
+      player: { lp: 4000, hand: ["Change of Heart"], monsters: [] },
+      ai: { lp: 1000, hand: [], monsters: [
+        { name: "Giant Soldier of Stone", pos: "atk" },
+        { name: "Summoned Skull", pos: "atk" },
+      ] },
+    },
+    {
+      id: "tribute", title: "Two Tributes", rules: "classic", ace: "Gaia The Fierce Knight",
+      goal: "Win this turn",
+      blurb: "Gaia The Fierce Knight is in your hand. Two of your monsters are already on the field. Classic rules.",
+      hint: "Level 7 needs two Tributes in Classic. Summon Gaia, then attack their stone soldier.",
+      player: { lp: 4000, hand: ["Gaia The Fierce Knight"], monsters: [
+        { name: "Beaver Warrior", pos: "atk" },
+        { name: "Silver Fang", pos: "atk" },
+      ] },
+      ai: { lp: 1000, hand: [], monsters: [{ name: "Giant Soldier of Stone", pos: "atk" }] },
+    },
+    {
+      id: "sword", title: "Warrior's Sword", rules: "classic", ace: "Legendary Sword",
+      goal: "Win this turn",
+      blurb: "Celtic Guardian is short of Feral Imp. Legendary Sword is in your hand.",
+      hint: "Legendary Sword equips to a Warrior and adds 300 ATK. Equip Celtic Guardian, then attack.",
+      player: { lp: 4000, hand: ["Legendary Sword"], monsters: [{ name: "Celtic Guardian", pos: "atk" }] },
+      ai: { lp: 300, hand: [], monsters: [{ name: "Feral Imp", pos: "atk" }] },
+    },
+    {
+      id: "mountain", title: "Mountain Wind", rules: "dk", field: "Mountain", ace: "Winged Dragon, Guardian of the Fortress #1",
+      goal: "Win this turn",
+      blurb: "The field is Mountain. Your dragon faces Battle Ox. Duelist Kingdom rules.",
+      hint: "Mountain gives Dragons +30% ATK. 1400 becomes 1820, enough to beat Battle Ox.",
+      player: { lp: 2500, hand: [], monsters: [{ name: "Winged Dragon, Guardian of the Fortress #1", pos: "atk" }] },
+      ai: { lp: 100, hand: [], monsters: [{ name: "Battle Ox", pos: "atk" }] },
+    },
+    {
+      id: "no-tribute", title: "No Tribute", rules: "dk", ace: "Summoned Skull",
+      goal: "Win this turn",
+      blurb: "Summoned Skull is in your hand. Their field is empty. Duelist Kingdom rules.",
+      hint: "Duelist Kingdom does not use Tributes. Summon Summoned Skull in Attack Position and attack directly.",
+      player: { lp: 2000, hand: ["Summoned Skull"], monsters: [] },
+      ai: { lp: 2000, hand: [], monsters: [] },
+    },
+    {
+      id: "field-fusion", title: "Field Fusion", rules: "dk", ace: "Gaia the Dragon Champion",
+      goal: "Win this turn",
+      blurb: "Gaia The Fierce Knight and Curse of Dragon are on the field. Polymerization is in your hand. Duelist Kingdom rules.",
+      hint: "In Duelist Kingdom, Polymerization uses monsters on the field. Fuse Gaia the Dragon Champion, then attack La Jinn.",
+      player: {
+        lp: 2500, hand: ["Polymerization"], extra: ["Gaia the Dragon Champion"],
+        monsters: [
+          { name: "Gaia The Fierce Knight", pos: "atk" },
+          { name: "Curse of Dragon", pos: "def", summoned: true },
+        ],
+      },
+      ai: { lp: 800, hand: [], monsters: [{ name: "La Jinn the Mystical Genie of the Lamp", pos: "atk" }] },
+    },
+    {
+      id: "hand-fusion", title: "Hand Fusion", rules: "classic", ace: "Flame Swordsman",
+      goal: "Win this turn",
+      blurb: "Polymerization, Flame Manipulator, and Masaki the Legendary Swordsman are in your hand. Classic rules.",
+      hint: "Classic Polymerization can use monsters from your hand. Fuse Flame Swordsman and attack directly.",
+      player: {
+        lp: 4000,
+        hand: ["Polymerization", "Flame Manipulator", "Masaki the Legendary Swordsman"],
+        extra: ["Flame Swordsman"],
+        monsters: [],
+      },
+      ai: { lp: 1500, hand: [], monsters: [] },
+    },
+    {
+      id: "mirror", title: "Set Card", rules: "classic", ace: "Harpie's Feather Duster",
+      goal: "Win this turn",
+      blurb: "Summoned Skull is ready, and one card is Set on their side. Harpie's Feather Duster is in your hand.",
+      hint: "The Set card is Mirror Force. Harpie's Feather Duster destroys it. Then attack directly.",
+      player: { lp: 4000, hand: ["Harpie's Feather Duster"], monsters: [{ name: "Summoned Skull", pos: "atk" }] },
+      ai: { lp: 2000, hand: [], monsters: [], spells: [{ name: "Mirror Force", faceup: false }] },
+    },
+    {
+      id: "trap-hole", title: "Quiet Summon", rules: "classic", ace: "Mystical Elf",
+      goal: "Win this turn",
+      blurb: "Trap Hole is Set. Mystical Elf and Celtic Guardian are in your hand. They have 800 Life Points.",
+      hint: "Trap Hole destroys a face-up Normal Summon with 1000 or more ATK. Mystical Elf has 800. Summon her and attack directly.",
+      player: { lp: 4000, hand: ["Mystical Elf", "Celtic Guardian"], monsters: [] },
+      ai: { lp: 800, hand: [], monsters: [], spells: [{ name: "Trap Hole", faceup: false }] },
+    },
   ];
   const GRANDPA_LINES = [
     "Welcome in. These old packs still have a little magic in them.",
@@ -2051,6 +2307,7 @@
   let prize = null;
   let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false };
   let wallet = { coins: 0, sets: [], cleared: [], rivalId: "" };
+  let puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
   let binderFrom = "menu";
   let binderFilter = "all";
   let pendingRematch = null;
@@ -2077,6 +2334,13 @@
     btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnContinue: $("btnContinue"),
     btnShop: $("btnShop"), btnShopBack: $("btnShopBack"),
     btnBinder: $("btnBinder"), btnBinderBack: $("btnBinderBack"),
+    binderBadge: $("binderBadge"), buildBinderBadge: $("buildBinderBadge"),
+    btnPuzzle: $("btnPuzzle"), btnPuzzleBack: $("btnPuzzleBack"), btnPuzzleStart: $("btnPuzzleStart"),
+    btnPuzzleHint: $("btnPuzzleHint"), btnPuzzleRetry: $("btnPuzzleRetry"),
+    puzzleDate: $("puzzleDate"), puzzleArt: $("puzzleArt"), puzzleTitle: $("puzzleTitle"),
+    puzzleRules: $("puzzleRules"), puzzleBlurb: $("puzzleBlurb"), puzzleReward: $("puzzleReward"),
+    puzzleBar: $("puzzleBar"), puzzleGoal: $("puzzleGoal"),
+    packNew: $("packNew"),
     btnRematch: $("btnRematch"), btnRematchBack: $("btnRematchBack"),
     btnBuildBinder: $("btnBuildBinder"),
     binderOverall: $("binderOverall"), binderSub: $("binderSub"),
@@ -2203,7 +2467,7 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -2211,6 +2475,15 @@
     });
     if (name !== "duel") setLogOpen(false);
     if (name === "menu" || name === "island" || name === "shop") paintWallet();
+    if (name === "menu" || name === "builder" || name === "binder") paintNewBadge();
+    syncPuzzleBar();
+  }
+
+  function syncPuzzleBar() {
+    const on = !!(state && state.mode === "puzzle" && $("duel").classList.contains("active") && !state.winner);
+    if (el.puzzleBar) el.puzzleBar.hidden = !on;
+    if (on && el.puzzleGoal) el.puzzleGoal.textContent = (state.puzzle && state.puzzle.goal) || "Win this turn";
+    if (el.btnMenu) el.btnMenu.textContent = on ? "Leave" : "Menu";
   }
 
   function toast(msg) {
@@ -2704,6 +2977,7 @@
     persist(STORE_KEY, { fl: flEnforce, decks: savedDecks });
     persist(COLLECTION_KEY, collection);
     persist(WALLET_KEY, wallet);
+    persist(PUZZLE_KEY, puzzleSave);
     if (tourney) persist(TOURNEY_KEY, tourney);
   }
 
@@ -2883,6 +3157,10 @@
     const msg = reason || (you ? state.playerName + " wins the duel." : state.aiName + " wins the duel.");
     if (state.mode === "tourney") {
       finishTourneyDuel(you, msg);
+      return;
+    }
+    if (state.mode === "puzzle") {
+      finishPuzzle(you, msg);
       return;
     }
     const points = awardMatchPoints(you);
@@ -3729,6 +4007,10 @@
 
   function endTurn() {
     if (!state || state.winner || state.ending) return;
+    if (state.mode === "puzzle" && state.turn === "player") {
+      endGame("ai", "The turn ended before their Life Points hit 0.");
+      return;
+    }
     state.ending = true;
     const gen = state.gen;
     clearSwaps();
@@ -3885,6 +4167,7 @@
       const owned = ownedCount(c.name);
       const extra = owned ? "Owned ×" + owned : "Not in your collection";
       el.sheetStats.textContent = el.sheetStats.textContent ? (el.sheetStats.textContent + " · " + extra) : extra;
+      if (owned) markSeen(c.name);
     }
 
     let desc = known ? (c.ref.desc || "") : "";
@@ -4315,6 +4598,7 @@
     const pending = !!state.pending && state.turn === "player";
     el.btnNext.textContent = pending ? "Cancel" : "Next Phase";
     el.btnNext.disabled = state.turn !== "player" || state.busy || !!state.winner || !!state.prompt || !!state.ending;
+    syncPuzzleBar();
   }
 
   function layoutHand() {
@@ -5269,6 +5553,286 @@
       log("Ante — you: " + yours + ". Opponent: " + theirs + ".");
     }
     beginTurn("player");
+  }
+
+  const PUZZLE_FILLER = ["Silver Fang", "Beaver Warrior", "Hitotsu-Me Giant", "Sparks", "Hinotama"];
+
+  function localDateKey(d) {
+    const dt = d || new Date();
+    const m = dt.getMonth() + 1;
+    const day = dt.getDate();
+    return dt.getFullYear() + "-" + (m < 10 ? "0" : "") + m + "-" + (day < 10 ? "0" : "") + day;
+  }
+
+  function shiftDateKey(key, days) {
+    const parts = String(key || "").split("-");
+    const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    if (isNaN(dt.getTime())) return localDateKey(new Date());
+    dt.setDate(dt.getDate() + days);
+    return localDateKey(dt);
+  }
+
+  function puzzleIndexFor(key) {
+    const parts = String(key || "").split("-");
+    const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    if (isNaN(dt.getTime()) || !PUZZLES.length) return 0;
+    const start = new Date(dt.getFullYear(), 0, 0);
+    const day = Math.round((dt - start) / 86400000);
+    const n = PUZZLES.length;
+    return ((day % n) + n) % n;
+  }
+
+  function puzzleById(id) {
+    return PUZZLES.find((puzzle) => puzzle.id === id) || null;
+  }
+
+  function todayPuzzle() {
+    return PUZZLES[puzzleIndexFor(localDateKey(new Date()))] || PUZZLES[0];
+  }
+
+  function prettyDate(key) {
+    const parts = String(key || "").split("-");
+    const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    if (isNaN(dt.getTime())) return key || "";
+    try {
+      return dt.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    } catch (e) {
+      return key;
+    }
+  }
+
+  function shownStreak() {
+    const today = localDateKey(new Date());
+    const last = puzzleSave.lastSolved;
+    if (last === today || last === shiftDateKey(today, -1)) return puzzleSave.streak || 0;
+    return 0;
+  }
+
+  function loadPuzzle() {
+    puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
+    try {
+      const raw = JSON.parse(localStorage.getItem(PUZZLE_KEY) || "null");
+      if (!raw || typeof raw !== "object") return;
+      if (typeof raw.lastSolved === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.lastSolved)) puzzleSave.lastSolved = raw.lastSolved;
+      if (typeof raw.claimed === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.claimed)) puzzleSave.claimed = raw.claimed;
+      if (typeof raw.streak === "number" && isFinite(raw.streak) && raw.streak > 0) {
+        puzzleSave.streak = Math.min(9999, Math.floor(raw.streak));
+      }
+    } catch (e) {
+      puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
+    }
+  }
+
+  function savePuzzle() {
+    if (!persist(PUZZLE_KEY, puzzleSave)) toast("Couldn't save the puzzle streak.");
+  }
+
+  function recordPuzzleSolve() {
+    const today = localDateKey(new Date());
+    if (puzzleSave.lastSolved === today) {
+      return { gained: 0, streak: puzzleSave.streak || 1, repeat: true };
+    }
+    const prev = puzzleSave.lastSolved;
+    puzzleSave.streak = prev === shiftDateKey(today, -1) ? (puzzleSave.streak || 0) + 1 : 1;
+    puzzleSave.lastSolved = today;
+    let gained = 0;
+    if (puzzleSave.claimed !== today) {
+      gained = PUZZLE_DP;
+      puzzleSave.claimed = today;
+      wallet.coins += gained;
+      saveWallet();
+    }
+    savePuzzle();
+    paintWallet();
+    return { gained: gained, streak: puzzleSave.streak, repeat: false };
+  }
+
+  function puzzleRulesLine(puzzle) {
+    if (!puzzle) return "";
+    if (puzzle.rules === "dk") {
+      return puzzle.field
+        ? "Duelist Kingdom · " + puzzle.field + " · +30% matching Types"
+        : "Duelist Kingdom · no tributes · fuse from the field";
+    }
+    return "Classic · tributes · fuse from the hand or field";
+  }
+
+  function showPuzzle() {
+    const puzzle = todayPuzzle();
+    const today = localDateKey(new Date());
+    const solved = puzzleSave.claimed === today || puzzleSave.lastSolved === today;
+    const streak = shownStreak();
+    if (el.puzzleDate) {
+      el.puzzleDate.textContent = prettyDate(today) + " · streak " + streak;
+    }
+    const art = puzzle && cardDB[puzzle.ace];
+    if (el.puzzleArt) {
+      if (art) {
+        el.puzzleArt.src = art.image;
+        el.puzzleArt.alt = puzzle.title;
+      } else el.puzzleArt.removeAttribute("src");
+    }
+    if (el.puzzleTitle) el.puzzleTitle.textContent = puzzle ? puzzle.title : "Puzzle";
+    if (el.puzzleRules) el.puzzleRules.textContent = puzzleRulesLine(puzzle);
+    if (el.puzzleBlurb) el.puzzleBlurb.textContent = puzzle ? puzzle.blurb : "";
+    if (el.puzzleReward) {
+      el.puzzleReward.textContent = solved
+        ? "Solved today · " + PUZZLE_DP + " DP already claimed"
+        : PUZZLE_DP + " DP the first time you solve today's puzzle";
+    }
+    if (el.btnPuzzleStart) el.btnPuzzleStart.textContent = solved ? "Play Again" : "Start Puzzle";
+    showScreen("puzzle");
+  }
+
+  function puzzleSide(spec) {
+    spec = spec || {};
+    const summoned = new Set();
+    const monsters = emptyZones();
+    (spec.monsters || []).slice(0, ZONES).forEach((item, i) => {
+      if (!item || !cardDB[item.name]) return;
+      const card = inst(item.name);
+      monsters[i] = Object.assign(card, {
+        position: item.pos === "def" ? "def" : "atk",
+        faceup: item.faceup !== false,
+        tempControl: null,
+      });
+      if (item.summoned) summoned.add(card.uid);
+    });
+    const spells = emptyZones();
+    (spec.spells || []).slice(0, ZONES).forEach((item, i) => {
+      if (!item || !cardDB[item.name]) return;
+      const card = Object.assign(strip(inst(item.name)), {
+        faceup: !!item.faceup,
+        setTurn: 0,
+      });
+      if (item.swordsLeft != null) card.swordsLeft = item.swordsLeft;
+      spells[i] = card;
+    });
+    return {
+      lp: typeof spec.lp === "number" ? spec.lp : 4000,
+      deck: (spec.deck && spec.deck.length ? spec.deck : PUZZLE_FILLER).filter((name) => cardDB[name]).map(inst),
+      extra: (spec.extra || []).filter((name) => cardDB[name]).map(inst),
+      hand: (spec.hand || []).filter((name) => cardDB[name]).map(inst),
+      gy: (spec.gy || []).filter((name) => cardDB[name]).map((name) => strip(inst(name))),
+      monsters: monsters,
+      spells: spells,
+      normalSummoned: false,
+      positionChanged: new Set(),
+      summonedThisTurn: summoned,
+      attackedThisTurn: new Set(),
+    };
+  }
+
+  function puzzleCardNames(puzzle) {
+    const names = [];
+    ["player", "ai"].forEach((side) => {
+      const spec = (puzzle && puzzle[side]) || {};
+      ["hand", "deck", "extra", "gy"].forEach((key) => {
+        (spec[key] || []).forEach((name) => names.push(name));
+      });
+      (spec.monsters || []).forEach((item) => { if (item && item.name) names.push(item.name); });
+      (spec.spells || []).forEach((item) => { if (item && item.name) names.push(item.name); });
+    });
+    if (puzzle && puzzle.ace) names.push(puzzle.ace);
+    (puzzle && puzzle.player && puzzle.player.deck ? [] : PUZZLE_FILLER).forEach((name) => names.push(name));
+    (puzzle && puzzle.ai && puzzle.ai.deck ? [] : PUZZLE_FILLER).forEach((name) => names.push(name));
+    return names;
+  }
+
+  function beginPuzzle(puzzle) {
+    if (!puzzle) return;
+    matchGen++;
+    clearTimeout(vsTimer);
+    cancelChoice();
+    closeSheet();
+    closeExtra();
+    closeBuildSheet();
+    const gen = matchGen;
+    const rules = puzzle.rules === "dk" ? "dk" : "classic";
+    const ace = puzzle.ace && cardDB[puzzle.ace] ? puzzle.ace : "Dark Magician";
+    state = {
+      gen: gen,
+      rules: rules,
+      field: puzzle.field || null,
+      mode: "puzzle",
+      puzzle: puzzle,
+      tourneyKey: null,
+      stake: 0,
+      rematch: false,
+      ante: null,
+      taunt: "",
+      playerName: "You",
+      aiName: "Opp",
+      playerId: "puzzle",
+      aiId: "puzzle",
+      playerDeck: { id: "puzzle", name: "You", ace: ace, main: [], extra: [] },
+      aiDeck: { id: "puzzle", name: "Opp", ace: ace, main: [], extra: [] },
+      turn: "player",
+      phase: "main1",
+      turnCount: 2,
+      firstTurn: false,
+      player: puzzleSide(puzzle.player),
+      ai: puzzleSide(puzzle.ai),
+      log: [],
+      winner: null,
+      pending: null,
+      busy: false,
+      prompt: false,
+      ending: false,
+    };
+    resetBoardMemory();
+    showScreen("duel");
+    log(puzzle.title + " — " + (rules === "classic" ? "Classic" : "Duelist Kingdom") + ".");
+    log("Goal: " + (puzzle.goal || "Win this turn") + ". Ending the turn fails the puzzle.");
+    if (rules === "classic") log("Classic rules. This is not the first turn, so you may attack.");
+    else log("Duelist Kingdom rules. No tributes.");
+    if (fieldBonusOn()) log("Field: " + state.field + " (+30% matching Types).");
+    render();
+  }
+
+  function finishPuzzle(you, reason) {
+    const puzzle = state.puzzle;
+    let gained = 0;
+    let streak = shownStreak();
+    let repeat = false;
+    if (you) {
+      const rec = recordPuzzleSolve();
+      gained = rec.gained;
+      streak = rec.streak;
+      repeat = rec.repeat;
+    }
+    endPrimary = "puzzle";
+    el.btnAgain.hidden = false;
+    el.btnAgain.textContent = "Retry";
+    el.btnEndMenu.hidden = false;
+    el.btnEndMenu.textContent = "Daily Puzzle";
+    el.endTitle.textContent = you ? "Solved!" : "Not Yet";
+    el.endMsg.textContent = reason || (you ? "You won this turn." : "The puzzle is still unsolved.");
+    el.endChips.hidden = false;
+    el.endChips.textContent = you
+      ? ("Streak " + streak + (repeat ? " · already solved today" : ""))
+      : ("Streak " + streak);
+    el.endPoints.hidden = !you;
+    el.endPoints.textContent = you
+      ? (gained ? "+" + gained + " Duel Points" : "Duel Points already claimed today")
+      : "";
+    el.endAnte.hidden = true;
+    el.endAnte.textContent = "";
+    showScreen("end");
+    if (puzzle) state.puzzle = puzzle;
+  }
+
+  function puzzleHint() {
+    if (!state || state.mode !== "puzzle" || !state.puzzle) return;
+    const text = state.puzzle.hint || "Win before the turn ends.";
+    log("Hint: " + text);
+    toast(text);
+  }
+
+  function retryPuzzle() {
+    const puzzle = state && state.puzzle;
+    if (!puzzle) { showPuzzle(); return; }
+    beginPuzzle(puzzle);
   }
 
   function beginMatch(playerDeck, aiId, opts) {
@@ -6710,7 +7274,8 @@
   }
 
   function loadCollection() {
-    collection = { counts: {}, unlocked: false, starter: false };
+    collection = { counts: {}, unlocked: false, starter: false, seen: {} };
+    let migrated = false;
     try {
       const raw = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "null");
       if (raw && typeof raw === "object") {
@@ -6724,19 +7289,32 @@
           });
         }
         collection.counts = counts;
+        if (raw.seen && typeof raw.seen === "object") {
+          Object.keys(raw.seen).forEach((name) => {
+            if (raw.seen[name]) collection.seen[name] = true;
+          });
+        } else {
+          Object.keys(counts).forEach((name) => { collection.seen[name] = true; });
+          migrated = true;
+        }
       }
     } catch (e) {
-      collection = { counts: {}, unlocked: false, starter: false };
+      collection = { counts: {}, unlocked: false, starter: false, seen: {} };
     }
     ensureStarter();
+    if (migrated) saveCollection();
   }
 
   function grantStarter() {
     const counts = {};
+    const seen = collection.seen || {};
     STARTER_NAMES.forEach((name) => {
-      if (cardDB[name]) counts[name] = 2;
+      if (!cardDB[name]) return;
+      counts[name] = 2;
+      seen[name] = true;
     });
     collection.counts = counts;
+    collection.seen = seen;
     collection.starter = true;
   }
 
@@ -6794,8 +7372,8 @@
     if (ante.resolved) return ante.line || "";
     ante.resolved = true;
     if (you && ante.ai) {
-      grantCards([ante.ai]);
-      ante.line = "Ante: you won " + ante.ai + ".";
+      const fresh = grantCards([ante.ai]);
+      ante.line = "Ante: you won " + ante.ai + (fresh.length ? " · NEW" : "") + ".";
     } else if (!you && ante.player) {
       ante.line = takeCard(ante.player)
         ? "Ante: you lost " + ante.player + "."
@@ -6833,12 +7411,58 @@
     if (!persist(COLLECTION_KEY, collection)) toast("Couldn't save the collection.");
   }
 
+  function cardSeen(name) {
+    return !!(collection.seen && collection.seen[name]);
+  }
+
+  function unseenNewNames() {
+    return Object.keys(collection.counts || {}).filter((name) => ownedCount(name) > 0 && !cardSeen(name));
+  }
+
+  function paintNewBadge() {
+    const n = unseenNewNames().length;
+    [el.binderBadge, el.buildBinderBadge].forEach((badge) => {
+      if (!badge) return;
+      badge.hidden = n <= 0;
+      badge.textContent = n > 99 ? "99+" : String(n);
+    });
+  }
+
+  function markSeen(name) {
+    if (!name || cardSeen(name) || ownedCount(name) <= 0) return;
+    if (!collection.seen) collection.seen = {};
+    collection.seen[name] = true;
+    saveCollection();
+    paintNewBadge();
+    if ($("binder").classList.contains("active")) renderBinder();
+  }
+
   function grantCards(names) {
+    const fresh = [];
+    const noted = {};
     (names || []).forEach((name) => {
       if (!name || !cardDB[name]) return;
-      collection.counts[name] = (collection.counts[name] || 0) + 1;
+      const had = ownedCount(name);
+      collection.counts[name] = had + 1;
+      if (had === 0 && !cardSeen(name) && !noted[name]) {
+        fresh.push(name);
+        noted[name] = true;
+      }
     });
     saveCollection();
+    paintNewBadge();
+    return fresh;
+  }
+
+  function markPrizeNew(cards, fresh) {
+    const pending = {};
+    (fresh || []).forEach((name) => { pending[name] = true; });
+    (cards || []).forEach((card) => {
+      if (!card || !pending[card.name]) return;
+      card.isNew = true;
+      delete pending[card.name];
+    });
+    return cards;
   }
 
   function pickFrom(list) {
@@ -6920,8 +7544,11 @@
     el.packSub.textContent = "Card " + (prize.index + 1) + " of " + total;
     const known = cardDB[card.name];
     el.packName.textContent = prize.revealed ? card.name : "Face down";
-    el.packRarity.textContent = prize.revealed ? card.rarity : "Tap the card";
+    const showNew = !!(prize.revealed && card.isNew);
+    el.packRarity.textContent = prize.revealed ? ((showNew ? "New · " : "") + card.rarity) : "Tap the card";
     el.packRarity.className = "pack-rarity " + (prize.revealed ? rarityClass(card.rarity) : "common");
+    if (el.packNew) el.packNew.hidden = !showNew;
+    el.packCard.classList.toggle("is-new", showNew);
     if (prize.revealed && known) {
       el.packArt.hidden = false;
       el.packArt.src = known.imageFull || known.image;
@@ -6933,6 +7560,8 @@
       el.packArt.removeAttribute("src");
       el.packBack.hidden = false;
       el.packCard.classList.remove("reveal");
+      el.packCard.classList.remove("is-new");
+      if (el.packNew) el.packNew.hidden = true;
     }
     const last = prize.index >= total - 1;
     const doneLabel = prize.returnTo === "menu" ? "Main Menu"
@@ -6947,12 +7576,19 @@
     REWARD_NAMES.forEach((name) => {
       const c = cardDB[name];
       const fig = document.createElement("figure");
-      fig.className = "unlock-card";
+      const isNew = ownedCount(name) > 0 && !cardSeen(name);
+      fig.className = "unlock-card" + (isNew ? " is-new" : "");
       const img = document.createElement("img");
       if (c) { img.src = c.image; img.alt = name; }
       const cap = document.createElement("figcaption");
       cap.textContent = REWARD_SHORT[name] || name;
       fig.appendChild(img);
+      if (isNew) {
+        const badge = document.createElement("span");
+        badge.className = "new-badge";
+        badge.textContent = "NEW";
+        fig.appendChild(badge);
+      }
       fig.appendChild(cap);
       el.unlockGrid.appendChild(fig);
     });
@@ -7318,7 +7954,7 @@
     if (!cards.length) { toast("That pack came up empty."); return; }
     wallet.coins -= pack.price;
     saveWallet();
-    grantCards(cards.map((c) => c.name));
+    markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
     prize = {
       cards: cards, index: 0, revealed: false, who: "Grandpa",
       setName: pack.set, returnTo: "shop", firstUnlock: false,
@@ -7508,7 +8144,11 @@
           names.push(name);
         });
       }
-      names.sort((a, b) => ((ownedCount(b) > 0) - (ownedCount(a) > 0)) || a.localeCompare(b));
+      names.sort((a, b) => {
+        const aNew = ownedCount(a) > 0 && !cardSeen(a) ? 1 : 0;
+        const bNew = ownedCount(b) > 0 && !cardSeen(b) ? 1 : 0;
+        return (bNew - aNew) || ((ownedCount(b) > 0) - (ownedCount(a) > 0)) || a.localeCompare(b);
+      });
       return { id: group.id, label: group.label, title: group.title, names: names };
     }).filter((group) => group && group.names.length);
   }
@@ -7528,9 +8168,10 @@
   function binderCardButton(name) {
     const card = cardDB[name];
     const owned = ownedCount(name);
+    const isNew = owned > 0 && !cardSeen(name);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "binder-card" + (owned ? "" : " missing");
+    btn.className = "binder-card" + (owned ? "" : " missing") + (isNew ? " is-new" : "");
     const img = document.createElement("img");
     img.alt = "";
     img.src = card.image;
@@ -7546,6 +8187,12 @@
       count.className = "count";
       count.textContent = "×" + owned;
       btn.appendChild(count);
+    }
+    if (isNew) {
+      const tag = document.createElement("span");
+      tag.className = "new-tag";
+      tag.textContent = "NEW";
+      btn.appendChild(tag);
     }
     btn.appendChild(label);
     btn.addEventListener("click", () => {
@@ -7771,7 +8418,7 @@
     const rulesNow = tourneyRules();
     const givePack = (who, setName, hot, firstUnlock) => {
       const cards = pullPack(setName, packBonusFor(key), !firstUnlock, !!hot);
-      grantCards(cards.map((c) => c.name));
+      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
       prize = {
         cards: cards, index: 0, revealed: false, who: who,
         setName: setName, returnTo: tourney ? "island" : "menu", firstUnlock: !!firstUnlock,
@@ -7799,7 +8446,7 @@
       }
       markCleared("pegasus");
       const cards = pullPack(PACK_OF.pegasus, packBonusFor("pegasus"), !firstUnlock, false);
-      grantCards(cards.map((c) => c.name));
+      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
       prize = {
         cards: cards, index: 0, revealed: false, who: "Pegasus",
         setName: PACK_OF.pegasus, returnTo: "menu", firstUnlock: firstUnlock,
@@ -7829,7 +8476,7 @@
       if (tourney.castleOpen) chipLine += " · Castle open";
       const who = state.aiName || key;
       const cards = pullPack(PACK_OF[key] || PACK_OF.weevil, packBonusFor(key), true, false);
-      grantCards(cards.map((c) => c.name));
+      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
       prize = {
         cards: cards, index: 0, revealed: false, who: who,
         setName: PACK_OF[key] || "Legend of Blue Eyes White Dragon",
@@ -7864,17 +8511,20 @@
 
   function resetProgress() {
     tourney = null;
-    collection = { counts: {}, unlocked: false, starter: false };
+    collection = { counts: {}, unlocked: false, starter: false, seen: {} };
     grantStarter();
     savedDecks = [];
     flEnforce = false;
     prize = null;
     pendingRematch = null;
     wallet = { coins: 0, sets: [], cleared: [], rivalId: "" };
+    puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
     const okT = persist(TOURNEY_KEY, null);
     const okC = persist(COLLECTION_KEY, collection);
     const okD = persist(STORE_KEY, { fl: false, decks: [] });
     const okW = persist(WALLET_KEY, wallet);
+    const okP = persist(PUZZLE_KEY, puzzleSave);
+    paintNewBadge();
     refreshContinue();
     syncFL();
     paintWallet();
@@ -7883,7 +8533,7 @@
     if ($("binder").classList.contains("active")) renderBinder();
     if ($("rematch").classList.contains("active")) renderRematch();
     closeConfirm();
-    toast(okT && okC && okD && okW ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
+    toast(okT && okC && okD && okW && okP ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
   }
 
   function setRules(mode) {
@@ -8062,7 +8712,19 @@
     if (state.pending) { state.pending = null; toast("Cancelled."); render(); return; }
     nextPhase();
   });
+  el.btnPuzzle.addEventListener("click", () => showPuzzle());
+  el.btnPuzzleBack.addEventListener("click", () => showScreen("menu"));
+  el.btnPuzzleStart.addEventListener("click", () => beginPuzzle(todayPuzzle()));
+  el.btnPuzzleHint.addEventListener("click", () => puzzleHint());
+  el.btnPuzzleRetry.addEventListener("click", () => retryPuzzle());
   el.btnMenu.addEventListener("click", () => {
+    if (state && state.mode === "puzzle") {
+      if (confirm("Leave this puzzle? You can retry it today.")) {
+        abandon();
+        showPuzzle();
+      }
+      return;
+    }
     if (state && state.mode === "tourney") {
       if (confirm("Return to the island? This duel will not count.")) {
         abandon();
@@ -8078,10 +8740,23 @@
   el.btnAgain.addEventListener("click", () => {
     if (endPrimary === "pack") { abandon(); openPrize(); return; }
     if (endPrimary === "map") { abandon(); showIsland(); return; }
+    if (endPrimary === "puzzle") {
+      const puzzle = state && state.puzzle;
+      abandon();
+      if (puzzle) beginPuzzle(puzzle);
+      else showPuzzle();
+      return;
+    }
     if (!state || !state.playerDeck) { showScreen("menu"); return; }
     beginMatch(state.playerDeck, state.aiId);
   });
-  el.btnEndMenu.addEventListener("click", () => { prize = null; abandon(); showScreen("menu"); });
+  el.btnEndMenu.addEventListener("click", () => {
+    const puzzleEnd = endPrimary === "puzzle";
+    prize = null;
+    abandon();
+    if (puzzleEnd) showPuzzle();
+    else showScreen("menu");
+  });
   el.plExtraBtn.addEventListener("click", () => openExtra("player"));
   el.aiExtraBtn.addEventListener("click", () => openExtra("ai"));
   el.extraClose.addEventListener("click", closeExtra);
@@ -8096,6 +8771,8 @@
   loadCollection();
   loadTourney();
   loadWallet();
+  loadPuzzle();
+  paintNewBadge();
   syncUnlocksFromTourney();
   syncClearedFromTourney();
   fillBuilderSelects();
@@ -8114,6 +8791,21 @@
   const stakeSum = PATH.reduce((n, k) => n + (STAKES[k] || 0), 0);
   if (STAR_START + stakeSum !== STAR_CASTLE) console.error("Star chip path does not reach the castle", STAR_START + stakeSum);
   if (STARTER_NAMES.length !== 20 || STARTER_NAMES.some((n) => !cardDB[n])) console.error("Starter collection is incomplete");
+  if (PUZZLES.length < 10) console.error("Puzzle pool is short", PUZZLES.length);
+  const puzzleIds = {};
+  PUZZLES.forEach((puzzle) => {
+    if (!puzzle || puzzleIds[puzzle.id]) console.error("Duplicate puzzle", puzzle && puzzle.id);
+    puzzleIds[puzzle.id] = true;
+    puzzleCardNames(puzzle).forEach((name) => {
+      if (!cardDB[name]) console.error("Puzzle card missing", puzzle.id, name);
+    });
+    ["player", "ai"].forEach((side) => {
+      const spec = puzzle[side] || {};
+      if ((spec.monsters || []).length > ZONES || (spec.spells || []).length > ZONES) {
+        console.error("Puzzle board does not fit", puzzle.id, side);
+      }
+    });
+  });
   ["pointerdown", "touchend", "keydown"].forEach((ev) => {
     document.addEventListener(ev, unlockAudio, { capture: true, passive: true });
   });
@@ -8159,7 +8851,29 @@
     tourney: () => tourney,
     collection: () => collection,
     owned: (n) => ownedCount(n),
+    grant: (names) => grantCards(Array.isArray(names) ? names : [names]),
+    unseenNew: () => unseenNewNames(),
+    puzzles: () => PUZZLES.map((puzzle) => puzzle.id),
+    puzzleToday: () => (todayPuzzle() ? todayPuzzle().id : ""),
+    puzzleForDate: (key) => {
+      const puzzle = PUZZLES[puzzleIndexFor(key)];
+      return puzzle ? puzzle.id : "";
+    },
+    startPuzzle: (id) => beginPuzzle(puzzleById(id) || todayPuzzle()),
+    puzzleSave: () => Object.assign({}, puzzleSave),
     pullPack: (setName, bonus, allow, hot) => pullPack(setName, bonus || [], !!allow, !!hot),
+    openPack: (names) => {
+      const list = (Array.isArray(names) ? names : [names]).filter((name) => cardDB[name]);
+      const cards = list.map((name) => ({ name: name, rarity: "Rare" }));
+      markPrizeNew(cards, grantCards(list));
+      prize = {
+        cards: cards, index: 0, revealed: true, who: "Grandpa",
+        setName: "Legend of Blue Eyes White Dragon", returnTo: "menu", firstUnlock: false,
+      };
+      paintPack();
+      showScreen("pack");
+      return cards.map((card) => !!card.isNew);
+    },
     endMatch: (winner, reason) => { if (state) endGame(winner || "player", reason || "The duel is over."); },
     openingTurn: () => openingTurn(),
     fieldBonusOn: () => fieldBonusOn(),

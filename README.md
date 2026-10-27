@@ -25,9 +25,15 @@ Free Duel opens a picker: **Yugi**, **Kaiba**, **Joey**, or **Custom Deck**. Eac
 
 **Card Binder** on the main menu shows every card in the classic pool, grouped by Legend of Blue Eyes, Metal Raiders, Magic Ruler, Pharaoh's Servant, Labyrinth of Nightmare, and Spell Ruler, plus Exodia, the Egyptian Gods, and the other classic cards. Owned cards show their art and count. Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Tap a card for its text.
 
+The first time a card enters the collection — a booster, Grandpa's shop, an ante, or another reward — the reveal shows a **NEW** badge and a glow. The binder keeps **NEW** on that card until you tap it. A green count on Card Binder is how many of those you have not opened. Cards already in a save are treated as seen. The starter pile is seen from the start. Seen cards are stored with the collection (`classicDuel_collection_v1`).
+
 A legal deck has a 40–60 card Main Deck, at most 3 copies of any card, and an Extra Deck of Fusion Monsters (max 15). The counter turns red when a deck is short, over, or over a copy limit, and Duel stays disabled until it is legal. Up to 3 named decks are saved in `localStorage`. You can edit, copy, or delete them. New Deck starts empty. The opponent for a custom deck is Yugi, Kaiba, or Joey at random.
 
 The **Forbidden/Limited** switch is off by default. Turn it on to enforce the official TCG list (Forbidden 0, Limited 1, Semi-Limited 2). Cards on that list stay marked either way. The page refreshes the list from YGOPRODeck when it can; `classic-pool.js` holds a snapshot so the builder still works offline.
+
+## Daily Puzzle
+
+**Daily Puzzle** on the main menu opens one board for the local date. Fourteen handcrafted puzzles rotate with that date. Each one names its rules, Classic or Duelist Kingdom, and starts mid-duel: monsters, Spells, Traps, Life Points, and hands are already set. Win that turn. Ending the turn, or hitting 0 Life Points, fails it. **Hint** and **Retry** sit above the field. The first solve of a day pays 40 Duel Points. Solving on back-to-back days raises a streak, saved on this device (`classicDuel_puzzle_v1`). Reset Progress clears the streak.
 
 ## Tournament
 
@@ -39,7 +45,7 @@ You start with 2 Star Chips. Beating a duelist the first time takes their chips:
 
 **Rematch** is available from a beaten duelist on the island, and from **Rematch** on the main menu after the run. The return fight uses a tighter deck and sharper plays. A win pays more Duel Points than the first duel and the reward pack is more likely to contain a rare. Rematches do not change Star Chips.
 
-**Ante** is off unless you turn it on in Settings. Before each tournament duel, both sides put up one card. Yours is a spare card from your collection: preset Yugi, Kaiba, and Joey decks are never edited, and the last copy a saved deck needs is left alone. The winner takes the loser's card. The antes show before the duel, and the result shows after.
+**Ante** is off unless you turn it on in Settings. Before each tournament duel, both sides put up one card. Yours is a spare card from your collection: preset Yugi, Kaiba, and Joey decks are never edited, and the last copy a saved deck needs is left alone. The winner takes the loser's card. The antes show before the duel, and the result shows after. A card you did not own before is marked NEW.
 
 Every win opens a 5-card booster themed to that duelist's set. Commons come from the set, and the last card is often one of their signature cards. Pulled cards are saved in `localStorage` (`classicDuel_collection_v1`).
 
