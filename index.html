@@ -102,15 +102,15 @@
     html[data-anim="off"] .hc.anim-draw,
     html[data-anim="off"] .pile.anim-draw { animation: none; }
 
-    /* —— Menu (top-aligned so Start and the rules toggle stay on screen) —— */
+    /* —— Menu (top-aligned so every button stays on a 390×664 screen) —— */
     #menu {
       align-items: center; justify-content: flex-start;
-      padding: clamp(12px, 3vh, 28px) 16px 12px;
-      gap: 10px; text-align: center;
+      padding: 8px 16px 8px;
+      gap: 8px; text-align: center;
     }
     .brand {
       margin: 0; line-height: 1;
-      font-size: clamp(2rem, 9vw, 2.7rem);
+      font-size: clamp(1.7rem, 8vw, 2.3rem);
       letter-spacing: 0.04em; color: var(--gold);
       text-shadow: 0 2px 0 #3a2a00, 0 0 24px rgba(212,160,23,0.35);
     }
@@ -135,6 +135,13 @@
       background: linear-gradient(180deg, #1d6b45, #0c3a28);
       border-color: #8dface; color: #e9fff4;
     }
+    .menu-btn.shop {
+      font-weight: 700;
+      background: linear-gradient(180deg, #6a4a12, #3a2808);
+      border-color: #e0b050; color: #fff4d4;
+    }
+    #menu .menu-btn { min-height: 44px; padding: 8px 12px; }
+    #menu .menu-btn.primary { min-height: 48px; font-size: 1.08rem; }
     .menu-btn:active, .ctrl-btn:active, .mini-btn:active, .deck-opt:active,
     .saved-actions button:active, .actions button:active, .choice-btns button:active,
     .fl-switch:active, .rules-row button:active, .seg button:active, .map-node:active {
@@ -394,12 +401,20 @@
       margin: 1px 0 0; color: var(--muted); font-size: 0.7rem;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .chip-pill {
+    .island-pills {
       margin-left: auto; flex-shrink: 0;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+    }
+    .chip-pill {
+      flex-shrink: 0;
       border: 1px solid var(--gold); border-radius: 999px;
-      padding: 5px 10px; color: var(--gold); font-weight: 700;
-      background: rgba(212,160,23,0.14); font-size: 0.95rem;
+      padding: 4px 10px; color: var(--gold); font-weight: 700;
+      background: rgba(212,160,23,0.14); font-size: 0.9rem;
       font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+    }
+    .dp-pill {
+      font-size: 0.68rem; font-weight: 700; color: #ffe7a3;
+      letter-spacing: 0.03em; font-variant-numeric: tabular-nums;
     }
     .island-note {
       flex-shrink: 0; margin: 0; text-align: center;
@@ -439,7 +454,7 @@
       background: linear-gradient(180deg, rgba(62, 36, 10, 0.94), rgba(20, 12, 6, 0.94));
     }
     .map-node img {
-      width: 28px; height: 40px; object-fit: cover; border-radius: 3px;
+      width: 22px; height: 32px; object-fit: cover; border-radius: 3px;
       flex-shrink: 0; background: #111; border: 1px solid rgba(212,160,23,0.4);
     }
     .map-node .copy { min-width: 0; flex: 1; }
@@ -455,7 +470,27 @@
     .map-node.now { box-shadow: inset 0 0 0 2px #f0c040; }
     .map-node.done { border-color: rgba(140, 230, 170, 0.85); }
     .map-node:disabled { opacity: 0.4; cursor: default; }
+    .map-shop {
+      position: relative; z-index: 1; flex: 0 0 auto;
+      width: 92%; margin: 0 auto; min-height: 40px;
+      display: flex; align-items: center; gap: 6px;
+      padding: 3px 8px; border-radius: 8px; text-align: left; cursor: pointer;
+      border: 1px solid var(--gold); color: var(--cream);
+      background: linear-gradient(180deg, rgba(90, 62, 16, 0.96), rgba(28, 18, 6, 0.96));
+    }
+    .map-shop .mark {
+      width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--gold); color: #1a1200; font-weight: 700; font-size: 0.8rem;
+    }
+    .map-shop .copy { min-width: 0; flex: 1; display: flex; flex-direction: column; }
+    .map-shop .nm {
+      font-weight: 700; font-size: 0.75rem; color: #ffe7a3; line-height: 1.1;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .map-shop .sub { font-size: 0.62rem; color: var(--cream); line-height: 1.1; }
     #island .footer-row { flex-shrink: 0; }
+    #island .footer-row .menu-btn { min-height: 44px; padding: 8px 10px; }
 
     /* —— How to play —— */
     #howto { padding: 12px 14px 8px; gap: 8px; }
@@ -631,12 +666,12 @@
 
     #end {
       align-items: center; justify-content: flex-start;
-      padding: clamp(28px, 8vh, 64px) 16px 12px; gap: 12px; text-align: center;
+      padding: clamp(16px, 5vh, 40px) 16px 12px; gap: 10px; text-align: center;
     }
-    #end h2 { margin: 0; font-size: 2rem; color: var(--gold); }
+    #end h2 { margin: 0; font-size: 1.85rem; color: var(--gold); }
     #end p { margin: 0; color: var(--muted); max-width: 320px; }
-    #endChips { margin: 0; color: var(--gold); font-size: 1.05rem; font-weight: 700; }
-    #endChips[hidden] { display: none !important; }
+    #endChips, #endPoints { margin: 0; color: var(--gold); font-size: 1.02rem; font-weight: 700; }
+    #endChips[hidden], #endPoints[hidden] { display: none !important; }
 
     #decks .rules-row, #decks .rules-hint { flex-shrink: 0; align-self: center; }
     #tourneyRules[hidden], #tourneyRulesHint[hidden] { display: none !important; }
@@ -845,6 +880,113 @@
     #settings .menu-btn { flex-shrink: 0; }
     #confirmBody { margin: 0; text-align: center; }
 
+    /* —— Story scenes (one screen, tap to advance) —— */
+    #story {
+      padding: 8px 12px 10px; gap: 6px; cursor: pointer;
+      background:
+        radial-gradient(ellipse at 50% 18%, rgba(212,160,23,0.16), transparent 46%),
+        linear-gradient(180deg, #12243c, #07111f);
+    }
+    .story-top { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+    .story-top .vs-kicker { flex: 1; text-align: left; }
+    #btnStorySkip { min-width: 64px; }
+    .story-stage {
+      flex: 1; min-height: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .story-portrait {
+      width: min(42vw, 168px); max-height: 100%;
+      aspect-ratio: 59 / 86;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #storyArt {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 8px;
+      border: 2px solid var(--gold); background: #111;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    }
+    .story-initials {
+      width: min(42vw, 148px); aspect-ratio: 1; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background:
+        radial-gradient(circle at 40% 35%, #f0d48a, #8a6810 72%);
+      color: #1a1200; font-weight: 700; font-size: 2.4rem; letter-spacing: 0.04em;
+      border: 2px solid #fff1c4;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    }
+    #storyArt[hidden], .story-initials[hidden] { display: none !important; }
+    .story-box {
+      flex-shrink: 0; position: relative; width: 100%; margin-top: 14px;
+      text-align: left; border: 2px solid var(--gold); border-radius: 10px;
+      background: linear-gradient(180deg, rgba(16, 28, 48, 0.98), rgba(8, 14, 26, 0.98));
+      padding: 16px 12px 8px; min-height: 108px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .story-name {
+      position: absolute; top: -12px; left: 12px;
+      background: var(--gold); color: #1a1200; font-weight: 700;
+      font-size: 0.82rem; letter-spacing: 0.04em;
+      padding: 2px 10px; border-radius: 4px; max-width: 70%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .story-line {
+      color: var(--cream); font-size: 0.98rem; line-height: 1.35;
+      min-height: 2.7em;
+      animation: storyIn calc(0.22s * var(--fx, 1)) ease;
+    }
+    html[data-anim="off"] .story-line { animation: none; }
+    .story-next {
+      align-self: flex-end; color: var(--gold); font-size: 0.68rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    @keyframes storyIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* —— Grandpa's shop (one screen, list shares the leftover height) —— */
+    #shop { padding: 8px 12px 8px; gap: 6px; }
+    .shop-head { flex-shrink: 0; display: flex; gap: 10px; align-items: center; width: 100%; }
+    .shop-face { width: 58px; height: 58px; font-size: 1.5rem; flex-shrink: 0; }
+    .shop-copy { min-width: 0; flex: 1; text-align: left; }
+    .shop-copy h2 { margin: 0; color: var(--gold); font-size: 1.15rem; line-height: 1.1; }
+    #shopGreet {
+      margin: 3px 0 0; color: var(--cream); font-size: 0.75rem; line-height: 1.3; font-style: italic;
+    }
+    .shop-balance {
+      flex-shrink: 0; margin: 0; text-align: center; color: #ffe7a3;
+      font-weight: 700; font-size: 0.95rem; font-variant-numeric: tabular-nums;
+    }
+    .shop-list {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px;
+      overflow: auto; -webkit-overflow-scrolling: touch;
+    }
+    .shop-row {
+      flex: 1 1 0; min-height: 40px;
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 8px; border-radius: 6px;
+      border: 1px solid var(--gold-dim);
+      background: linear-gradient(180deg, #1a2f4d, #101e33);
+    }
+    .shop-row.locked { opacity: 0.55; }
+    .shop-row .copy { min-width: 0; flex: 1; text-align: left; }
+    .shop-row .nm {
+      color: var(--gold); font-weight: 700; font-size: 0.78rem; line-height: 1.15;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .shop-row .sub {
+      color: var(--muted); font-size: 0.64rem; line-height: 1.15;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .shop-row .price {
+      flex-shrink: 0; color: #ffe7a3; font-weight: 700; font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .shop-row button {
+      flex-shrink: 0; min-width: 64px; min-height: 40px; padding: 4px 8px;
+      font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer;
+      border-radius: 4px; border: 1px solid #f0c040;
+      background: linear-gradient(180deg, #b88912, #7a5608); color: #1a1200;
+    }
+    .shop-row button:disabled { opacity: 0.45; cursor: default; }
+    #btnShopBack { flex-shrink: 0; align-self: center; }
+
     @keyframes slideL { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
     @keyframes slideR { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: none; } }
     @keyframes packIn { from { opacity: 0; transform: rotateY(88deg) scale(0.9); } to { opacity: 1; transform: none; } }
@@ -908,6 +1050,7 @@
       <button type="button" class="menu-btn primary" id="btnStart">Free Duel</button>
       <button type="button" class="menu-btn tourney" id="btnTourney">Tournament</button>
       <button type="button" class="menu-btn" id="btnContinue" hidden>Continue</button>
+      <button type="button" class="menu-btn shop" id="btnShop">Card Shop</button>
       <button type="button" class="menu-btn" id="btnHowto">How to Play</button>
       <button type="button" class="menu-btn" id="btnSettings">Settings</button>
     </section>
@@ -954,7 +1097,10 @@
           <h2 id="islandTitle">Duelist Kingdom</h2>
           <p id="islandDeck">Yugi</p>
         </div>
-        <div class="chip-pill" id="islandChips">★ 2 / 10</div>
+        <div class="island-pills">
+          <div class="chip-pill" id="islandChips">★ 2 / 10</div>
+          <div class="dp-pill" id="islandDp">0 DP</div>
+        </div>
       </div>
       <p class="island-note" id="islandNote"></p>
       <div class="map-board" id="mapBoard"></div>
@@ -982,6 +1128,38 @@
       <button type="button" class="menu-btn primary" id="btnVsGo">Duel!</button>
     </section>
 
+    <section id="story" class="screen" hidden>
+      <div class="story-top">
+        <p class="vs-kicker" id="storyKicker">Duelist Kingdom</p>
+        <button type="button" class="mini-btn" id="btnStorySkip">Skip</button>
+      </div>
+      <div class="story-stage">
+        <div class="story-portrait">
+          <img id="storyArt" alt="" hidden />
+          <div class="story-initials" id="storyInitials" hidden>G</div>
+        </div>
+      </div>
+      <div class="story-box" id="storyBox">
+        <span class="story-name" id="storyName">Weevil</span>
+        <span class="story-line" id="storyLine"></span>
+        <span class="story-next" id="storyNext">Tap to continue</span>
+      </div>
+    </section>
+
+    <section id="shop" class="screen" hidden>
+      <div class="shop-head">
+        <div class="story-initials shop-face" aria-hidden="true">G</div>
+        <div class="shop-copy">
+          <p class="vs-kicker">Card Shop</p>
+          <h2>Grandpa's Shop</h2>
+          <p id="shopGreet">Welcome in. These old packs still have a little magic in them.</p>
+        </div>
+      </div>
+      <p class="shop-balance" id="shopBalance">0 DP</p>
+      <div class="shop-list" id="shopList"></div>
+      <button type="button" class="menu-btn" id="btnShopBack">Back</button>
+    </section>
+
     <section id="howto" class="screen" hidden>
       <h2>How to Play</h2>
       <div class="scroll">
@@ -997,7 +1175,9 @@
         <p><strong>Time Wizard:</strong> Call Heads or Tails. Right: the opponent’s monsters are destroyed, and Baby Dragon becomes Thousand Dragon. Wrong: your monsters are destroyed and you take damage equal to half their ATK.</p>
         <p><strong>Equips:</strong> Legendary Sword (Warrior), Book of Secret Arts (Spellcaster), Dragon Treasure (Dragon), Black Pendant, Horn of the Unicorn. Tap Equip, then a face-up monster.</p>
         <p>Kuriboh can be discarded so an opponent’s attack deals 0. Swords of Revealing Light stops their attacks for 3 of their turns. Shield &amp; Sword swaps ATK and DEF until the end of the turn. Panther Warrior must tribute a monster to attack.</p>
-        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, and sound on this device.</p>
+        <p><strong>Story:</strong> A short scene plays when you arrive, before and after each tournament duel, and after you beat Pegasus. Tap to advance, or Skip. Settings can skip every scene. Win and loss have different lines.</p>
+        <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
+        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, sound, and story skip on this device.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
     </section>
@@ -1086,6 +1266,13 @@
           <input id="volume" type="range" min="0" max="100" value="70" aria-label="Volume" />
           <span id="volumeVal">70</span>
         </label>
+        <div class="set-row">
+          <div class="set-copy">
+            <strong>Skip story scenes</strong>
+            <span>Jump past the talks on arrival, before and after tournament duels, and after Pegasus.</span>
+          </div>
+          <button type="button" class="fl-switch" id="storyToggle" aria-pressed="false">Off</button>
+        </div>
       </div>
       <button type="button" class="menu-btn danger" id="btnReset">Reset Progress</button>
       <button type="button" class="menu-btn" id="btnSettingsBack">Back</button>
@@ -1146,6 +1333,7 @@
     <section id="end" class="screen" hidden>
       <h2 id="endTitle">Victory</h2>
       <p id="endChips" hidden></p>
+      <p id="endPoints" hidden></p>
       <p id="endMsg"></p>
       <button type="button" class="menu-btn primary" id="btnAgain">Duel Again</button>
       <button type="button" class="menu-btn" id="btnEndMenu">Main Menu</button>
@@ -1228,7 +1416,7 @@
   <div class="overlay" id="confirmOverlay">
     <div class="sheet">
       <h3 id="confirmTitle">Reset progress?</h3>
-      <p id="confirmBody">This erases the tournament, your card collection, and saved decks. Settings stay.</p>
+      <p id="confirmBody">This erases the tournament, your card collection, saved decks, and Duel Points. Settings stay.</p>
       <div class="actions">
         <button type="button" id="confirmYes">Reset</button>
         <button type="button" class="ghost" id="confirmNo">Cancel</button>
@@ -1384,6 +1572,124 @@
   const TOURNEY_KEY = "classicDuel_tournament_v1";
   const COLLECTION_KEY = "classicDuel_collection_v1";
   const SETTINGS_KEY = "classicDuel_settings_v1";
+  const WALLET_KEY = "classicDuel_wallet_v1";
+  const DP_LOSS = 20;
+  const DP_WIN = {
+    weevil: 60, rex: 80, mai: 110, keith: 150, panik: 170, rival: 210, pegasus: 280,
+    yugi: 90, kaiba: 90, joey: 90,
+  };
+  const SHOP_PACKS = [
+    { set: "Legend of Blue Eyes White Dragon", short: "Legend of Blue Eyes", price: 80, key: "weevil", gate: "Weevil" },
+    { set: "Metal Raiders", short: "Metal Raiders", price: 100, key: "rex", gate: "Rex" },
+    { set: "Magic Ruler", short: "Magic Ruler", price: 120, key: "mai", gate: "Mai" },
+    { set: "Pharaoh's Servant", short: "Pharaoh's Servant", price: 150, key: "keith", gate: "Keith" },
+    { set: "Labyrinth of Nightmare", short: "Labyrinth of Nightmare", price: 180, key: "panik", gate: "Panik" },
+    { set: "Spell Ruler", short: "Spell Ruler", price: 220, key: "pegasus", gate: "Pegasus" },
+  ];
+  const GRANDPA_LINES = [
+    "Welcome in. These old packs still have a little magic in them.",
+    "Star Chips open the castle. Duel Points open the packs.",
+    "Take your time, kid. A patient draw beats a greedy one.",
+    "Beat a duelist, and I'll set that pack on the counter.",
+  ];
+  const STORY_LINES = {
+    "weevil-pre": { kicker: "Before the duel", who: "Weevil", card: "Great Moth", lines: [
+      "Heh heh... the forest already belongs to my insects. You're just walking through it.",
+      "Smile all you want. I hid the real trap under the leaves.",
+    ]},
+    "weevil-win": { kicker: "After the duel", who: "Weevil", card: "Great Moth", lines: [
+      "My swarm! You weren't supposed to look down!",
+      "Take the Star Chip. Next time the cocoon stays where your cards can't reach.",
+    ]},
+    "weevil-loss": { kicker: "After the duel", who: "Weevil", card: "Great Moth", lines: [
+      "Heheheh. I told you. Careless duelists feed the forest.",
+      "Run along. My moths will remember the taste of that loss.",
+    ]},
+    "rex-pre": { kicker: "Before the duel", who: "Rex", card: "Two-Headed King Rex", lines: [
+      "Wasteland rules! Dinosaurs ran this world, and they still run this arena!",
+      "Hope you brought something with teeth. Mine are bigger.",
+    ]},
+    "rex-win": { kicker: "After the duel", who: "Rex", card: "Two-Headed King Rex", lines: [
+      "What?! Dinosaurs don't go extinct in one duel! ...Mine just did. Rrgh!",
+      "You got lucky. Two-Headed King Rex was only warming up!",
+    ]},
+    "rex-loss": { kicker: "After the duel", who: "Rex", card: "Two-Headed King Rex", lines: [
+      "Hah! Extinct! That's you! Nothing outmuscles a dinosaur on my field!",
+      "Come back with a bigger monster. I'll still stomp it flat.",
+    ]},
+    "mai-pre": { kicker: "Before the duel", who: "Mai", card: "Harpie Lady Sisters", lines: [
+      "Well, well. Someone made it up my mountain. Don't slip on the way in.",
+      "My Harpies have better form than most duelists. Try to keep up.",
+    ]},
+    "mai-win": { kicker: "After the duel", who: "Mai", card: "Harpie Lady Sisters", lines: [
+      "Hmph. You clipped my Harpies. I don't hand out compliments, so remember that.",
+      "Take the chip. A lady pays her bets. Don't expect a second bow.",
+    ]},
+    "mai-loss": { kicker: "After the duel", who: "Mai", card: "Harpie Lady Sisters", lines: [
+      "Gorgeous and victorious. You may applaud if you can still lift your hands.",
+      "The mountain stays mine. Come back when you can fly.",
+    ]},
+    "keith-pre": { kicker: "Before the duel", who: "Keith", card: "Barrel Dragon", lines: [
+      "Outta my way. American machines don't lose to island kids.",
+      "This Slot Machine pays me, not you. Watch it and weep.",
+    ]},
+    "keith-win": { kicker: "After the duel", who: "Keith", card: "Barrel Dragon", lines: [
+      "Tch. Rigged rock. My machines don't jam unless somebody's cheating!",
+      "Keep the chips. I'll win them back with interest, punk.",
+    ]},
+    "keith-loss": { kicker: "After the duel", who: "Keith", card: "Barrel Dragon", lines: [
+      "Hah! That's a real duelist. Go cry into your little magic cards.",
+      "Machines over mystery. Write it down so you don't forget.",
+    ]},
+    "panik-pre": { kicker: "Before the duel", who: "Panik", card: "Castle of Dark Illusions", lines: [
+      "You stepped into my shadow. Most duelists do not step back out.",
+      "The castle drinks the light. Your monsters will forget the way home.",
+    ]},
+    "panik-win": { kicker: "After the duel", who: "Panik", card: "Castle of Dark Illusions", lines: [
+      "The dark... broke. I will not forget your face inside it.",
+      "Take the chip. The next shadow I build will be deeper.",
+    ]},
+    "panik-loss": { kicker: "After the duel", who: "Panik", card: "Castle of Dark Illusions", lines: [
+      "Kneel. The darkness already has your deck.",
+      "Leave the Star Chip and go. This castle is finished with you.",
+    ]},
+    "kaiba-pre": { kicker: "Before the duel", who: "Kaiba", card: "Blue-Eyes White Dragon", lines: [
+      "So you crawled this far. Don't look at me for applause.",
+      "My Blue-Eyes doesn't care about your Star Chips. It ends duels.",
+    ]},
+    "kaiba-win": { kicker: "After the duel", who: "Kaiba", card: "Blue-Eyes White Dragon", lines: [
+      "Hmph. Don't smile. That was a measurement, not a coronation.",
+      "Blue-Eyes will remember you. I won't need to.",
+    ]},
+    "kaiba-loss": { kicker: "After the duel", who: "Kaiba", card: "Blue-Eyes White Dragon", lines: [
+      "Predictable. Power beats speeches. It always has.",
+      "Stay out of my way. I still have a castle to take.",
+    ]},
+    "yugi-pre": { kicker: "Before the duel", who: "Yugi", card: "Dark Magician", lines: [
+      "I've been waiting for a duel like this. Let's both put everything on the line.",
+      "The cards in my hand want to answer yours. I can feel it.",
+    ]},
+    "yugi-win": { kicker: "After the duel", who: "Yugi", card: "Dark Magician", lines: [
+      "You were incredible. The heart of my deck wasn't enough today.",
+      "Take the chips. Next time I'll trust these cards even harder.",
+    ]},
+    "yugi-loss": { kicker: "After the duel", who: "Yugi", card: "Dark Magician", lines: [
+      "Your deck is strong. Believing in mine was stronger.",
+      "Don't walk away from this. A real duel teaches you the next one.",
+    ]},
+    "pegasus-pre": { kicker: "Before the duel", who: "Pegasus", card: "Thousand-Eyes Restrict", lines: [
+      "Welcome, welcome! My little castle has been dying to meet you.",
+      "The Millennium Eye already sees the card you're hoping I don't. Shall we peek?",
+    ]},
+    "pegasus-win": { kicker: "After the duel", who: "Pegasus", card: "Thousand-Eyes Restrict", lines: [
+      "Oh my. You looked away from the Eye and still won. How deliciously rude.",
+      "The castle is yours for the afternoon. Do wipe your boots, darling duelist.",
+    ]},
+    "pegasus-loss": { kicker: "After the duel", who: "Pegasus", card: "Thousand-Eyes Restrict", lines: [
+      "Aww. And I warmed the spotlight just for you.",
+      "The Eye never blinks, my dear. You, on the other hand, just did.",
+    ]},
+  };
   const EXODIA_NAMES = [
     "Exodia the Forbidden One",
     "Right Arm of the Forbidden One",
@@ -1592,7 +1898,11 @@
   let tourneyRulesPick = "dk";
   let collection = { counts: {}, unlocked: false };
   let prize = null;
-  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7 };
+  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false };
+  let wallet = { coins: 0, sets: [] };
+  let story = null;
+  let shopFrom = "menu";
+  let shopGreet = GRANDPA_LINES[0];
   let seenReady = false;
   let seenHand = new Set();
   let seenMonsters = new Set();
@@ -1611,7 +1921,14 @@
   const el = {
     ruleClassic: $("ruleClassic"), ruleDK: $("ruleDK"), rulesHint: $("rulesHint"),
     btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnContinue: $("btnContinue"),
+    btnShop: $("btnShop"), btnShopBack: $("btnShopBack"),
     btnHowto: $("btnHowto"), btnHowtoBack: $("btnHowtoBack"), btnSettings: $("btnSettings"),
+    storyToggle: $("storyToggle"),
+    storyKicker: $("storyKicker"), storyArt: $("storyArt"), storyInitials: $("storyInitials"),
+    storyName: $("storyName"), storyLine: $("storyLine"), storyNext: $("storyNext"),
+    btnStorySkip: $("btnStorySkip"),
+    shopGreet: $("shopGreet"), shopBalance: $("shopBalance"), shopList: $("shopList"),
+    islandDp: $("islandDp"),
     setClassic: $("setClassic"), setDK: $("setDK"), soundToggle: $("soundToggle"),
     soundHint: $("soundHint"), volume: $("volume"), volumeVal: $("volumeVal"),
     btnReset: $("btnReset"), btnSettingsBack: $("btnSettingsBack"),
@@ -1643,7 +1960,7 @@
     extraOverlay: $("extraOverlay"), extraTitle: $("extraTitle"), extraList: $("extraList"),
     choiceOverlay: $("choiceOverlay"), choiceTitle: $("choiceTitle"), choiceBtns: $("choiceBtns"),
     toast: $("toast"), coin: $("coin"),
-    endTitle: $("endTitle"), endMsg: $("endMsg"), endChips: $("endChips"),
+    endTitle: $("endTitle"), endMsg: $("endMsg"), endChips: $("endChips"), endPoints: $("endPoints"),
     btnAgain: $("btnAgain"), btnEndMenu: $("btnEndMenu"),
     customAceImg: $("customAceImg"), customAcePh: $("customAcePh"), customAceText: $("customAceText"),
     flToggle: $("flToggle"), flToggleBuild: $("flToggleBuild"), flHint: $("flHint"),
@@ -1723,13 +2040,14 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
       node.classList.toggle("active", on);
     });
     if (name !== "duel") setLogOpen(false);
+    if (name === "menu" || name === "island" || name === "shop") paintWallet();
   }
 
   function toast(msg) {
@@ -1814,6 +2132,7 @@
       if (raw.rules === "dk" || raw.rules === "classic") settings.rules = raw.rules;
       if (raw.anim === "fast" || raw.anim === "off" || raw.anim === "on") settings.anim = raw.anim;
       if (typeof raw.sound === "boolean") settings.sound = raw.sound;
+      if (typeof raw.skipStory === "boolean") settings.skipStory = raw.skipStory;
       if (typeof raw.volume === "number" && isFinite(raw.volume)) {
         settings.volume = Math.max(0, Math.min(1, raw.volume));
       }
@@ -1846,6 +2165,11 @@
       const pct = Math.round((settings.volume || 0) * 100);
       el.volume.value = String(pct);
       if (el.volumeVal) el.volumeVal.textContent = String(pct);
+    }
+    if (el.storyToggle) {
+      el.storyToggle.classList.toggle("on", !!settings.skipStory);
+      el.storyToggle.textContent = settings.skipStory ? "On" : "Off";
+      el.storyToggle.setAttribute("aria-pressed", settings.skipStory ? "true" : "false");
     }
     applyAnimMode();
   }
@@ -1943,6 +2267,9 @@
       } else if (name === "pack") {
         [988, 1318, 1568, 1976].forEach((f, i) => tone(f, t0 + i * 0.06, 0.14, "sine", 0.07));
         noise(t0, 0.16, 0.04);
+      } else if (name === "talk") {
+        tone(740, t0, 0.05, "sine", 0.04);
+        tone(988, t0 + 0.03, 0.07, "triangle", 0.035);
       }
       setTimeout(() => { try { master.disconnect(); } catch (e) {} }, 1400);
     };
@@ -2207,6 +2534,7 @@
     persist(SETTINGS_KEY, settings);
     persist(STORE_KEY, { fl: flEnforce, decks: savedDecks });
     persist(COLLECTION_KEY, collection);
+    persist(WALLET_KEY, wallet);
     if (tourney) persist(TOURNEY_KEY, tourney);
   }
 
@@ -2388,12 +2716,15 @@
       finishTourneyDuel(you, msg);
       return;
     }
+    const points = awardMatchPoints(you);
     endPrimary = "again";
     el.btnAgain.hidden = false;
     el.btnAgain.textContent = "Duel Again";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
     el.endChips.hidden = true;
+    el.endPoints.hidden = false;
+    el.endPoints.textContent = pointsText(points);
     el.endTitle.textContent = you ? "Victory!" : "Defeat";
     el.endMsg.textContent = msg;
     showScreen("end");
@@ -6277,9 +6608,10 @@
       el.packCard.classList.remove("reveal");
     }
     const last = prize.index >= total - 1;
-    el.btnPackNext.textContent = !prize.revealed
-      ? "Reveal"
-      : (last ? (prize.returnTo === "menu" ? "Main Menu" : "Back to the Island") : "Next Card");
+    const doneLabel = prize.returnTo === "menu" ? "Main Menu"
+      : prize.returnTo === "shop" ? "Back to the Shop"
+      : "Back to the Island";
+    el.btnPackNext.textContent = !prize.revealed ? "Reveal" : (last ? doneLabel : "Next Card");
   }
 
   function showUnlock() {
@@ -6329,7 +6661,8 @@
     }
     const dest = prize.returnTo;
     prize = null;
-    if (dest === "island" && tourney) showIsland();
+    if (dest === "shop") showShop();
+    else if (dest === "island" && tourney) showIsland();
     else { refreshContinue(); showScreen("menu"); }
   }
 
@@ -6361,6 +6694,281 @@
     } else el.btnContinue.hidden = true;
   }
 
+  function initialsOf(name) {
+    const parts = String(name || "").trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return "?";
+    if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+    return (parts[0].slice(0, 1) + parts[parts.length - 1].slice(0, 1)).toUpperCase();
+  }
+
+  function loadWallet() {
+    wallet = { coins: 0, sets: [] };
+    try {
+      const raw = JSON.parse(localStorage.getItem(WALLET_KEY) || "null");
+      if (!raw || typeof raw !== "object") return;
+      if (typeof raw.coins === "number" && isFinite(raw.coins) && raw.coins > 0) {
+        wallet.coins = Math.floor(raw.coins);
+      }
+      const known = {};
+      SHOP_PACKS.forEach((p) => { known[p.set] = true; });
+      if (Array.isArray(raw.sets)) {
+        raw.sets.forEach((name) => {
+          if (known[name] && wallet.sets.indexOf(name) < 0) wallet.sets.push(name);
+        });
+      }
+    } catch (e) { wallet = { coins: 0, sets: [] }; }
+  }
+
+  function saveWallet() {
+    if (!persist(WALLET_KEY, wallet)) toast("Couldn't save Duel Points.");
+  }
+
+  function paintWallet() {
+    const label = wallet.coins + " DP";
+    if (el.btnShop) el.btnShop.textContent = "Card Shop · " + label;
+    if (el.islandDp) el.islandDp.textContent = label;
+    if (el.shopBalance) el.shopBalance.textContent = label;
+  }
+
+  function setForDuelist(key) {
+    if (key === "rival") return "Legend of Blue Eyes White Dragon";
+    const pack = SHOP_PACKS.find((p) => p.key === key);
+    return pack ? pack.set : "";
+  }
+
+  function setUnlocked(setName) {
+    return wallet.sets.indexOf(setName) >= 0;
+  }
+
+  function unlockSetFor(key) {
+    const setName = setForDuelist(key);
+    if (!setName || setUnlocked(setName)) return;
+    wallet.sets.push(setName);
+  }
+
+  function syncUnlocksFromTourney() {
+    if (!tourney || !Array.isArray(tourney.beaten)) return;
+    const before = wallet.sets.length;
+    tourney.beaten.forEach(unlockSetFor);
+    if (wallet.sets.length !== before) saveWallet();
+  }
+
+  function pointsText(points) {
+    if (!points) return "";
+    const line = "+" + points.gain + " Duel Points";
+    return points.bonus ? line + " · half your Life or more left" : line;
+  }
+
+  function awardMatchPoints(you) {
+    const key = state && state.mode === "tourney" ? (state.tourneyKey || "weevil") : ((state && state.aiId) || "yugi");
+    const base = you ? (DP_WIN[key] || 70) : DP_LOSS;
+    let bonus = 0;
+    if (you && state && state.player) {
+      const start = state.rules === "classic" ? 8000 : 2000;
+      if (state.player.lp * 2 >= start) bonus = Math.round(base * 0.5);
+    }
+    const gain = base + bonus;
+    wallet.coins += gain;
+    if (you && state && state.mode === "tourney") unlockSetFor(state.tourneyKey);
+    saveWallet();
+    return { gain: gain, bonus: bonus, base: base };
+  }
+
+  function say(name, card, text) {
+    return { name: name, card: card, text: text };
+  }
+
+  function sayPlayer(text) {
+    const p = tourney && tourney.player;
+    return { name: p ? p.name : "You", card: p ? p.ace : "", text: text };
+  }
+
+  function playerVoice(kind) {
+    const id = tourney && tourney.player ? tourney.player.id : "";
+    const bank = {
+      arrival: {
+        yugi: "So this is Duelist Kingdom. The castle is far, but my deck already knows the way.",
+        kaiba: "An island of amateurs, and one castle worth the trip. Let's not waste daylight.",
+        joey: "Whoa. A whole island of duelists. Brooklyn did not prep me for a castle.",
+      },
+      arrival2: {
+        yugi: "I'll earn the Star Chips one duel at a time. Heart of the cards, stay with me.",
+        kaiba: "Save the act. When I reach that castle, your Eye won't be enough.",
+        joey: "Laugh it up. I'm taking every Star Chip between this beach and that gate.",
+      },
+      ending: {
+        yugi: "We did it. I'll use what was sealed here the right way. That's a promise.",
+        kaiba: "Power like that belongs with me. Your tournament is over, Pegasus.",
+        joey: "Yes! Tell that Eye the kid from Brooklyn just cleared your castle!",
+      },
+    };
+    const table = bank[kind] || {};
+    if (table[id]) return table[id];
+    if (kind === "arrival") return "Duelist Kingdom. Their chips plus mine open that castle. My deck is ready.";
+    if (kind === "arrival2") return "Then I'll learn the island first. One duelist at a time.";
+    return "The tournament's over. Those cards leave the island with me.";
+  }
+
+  function storyScene(id) {
+    const pegCard = "Thousand-Eyes Restrict";
+    if (id === "arrival") {
+      const who = tourney && tourney.player ? tourney.player.id : "";
+      const mid = who === "kaiba"
+        ? "Kaiba, darling! The Millennium Eye has been ever so bored. Do try not to glare a hole in my toons."
+        : who === "joey"
+          ? "A spirited one! The Millennium Eye adores a duelist who leads with his chin."
+          : who === "yugi"
+            ? "A new guest! The Millennium Eye does so enjoy a duelist who believes in his cards."
+            : "A mystery guest! How fun. The Millennium Eye will learn your hand soon enough.";
+      return {
+        kicker: "Arrival",
+        lines: [sayPlayer(playerVoice("arrival")), say("Pegasus", pegCard, mid), sayPlayer(playerVoice("arrival2"))],
+      };
+    }
+    if (id === "ending") {
+      return {
+        kicker: "Champion",
+        lines: [
+          say("Pegasus", pegCard, "Well! The Eye blinked, the toons took a bow, and you are still standing. I despise how charming that is."),
+          say("Pegasus", pegCard, "The sealed cards are yours. Exodia, and three terribly dramatic gods. Try not to spend them all in one duel."),
+          sayPlayer(playerVoice("ending")),
+        ],
+      };
+    }
+    const entry = STORY_LINES[id];
+    if (!entry) return null;
+    return {
+      kicker: entry.kicker,
+      lines: entry.lines.map((text) => ({ name: entry.who, card: entry.card, text: text })),
+    };
+  }
+
+  function paintStory() {
+    if (!story) return;
+    const line = story.lines[story.i];
+    el.storyKicker.textContent = story.kicker || "Duelist Kingdom";
+    el.storyName.textContent = line.name || "";
+    el.storyLine.textContent = line.text || "";
+    el.storyLine.style.animation = "none";
+    void el.storyLine.offsetWidth;
+    el.storyLine.style.animation = "";
+    el.storyNext.textContent = story.i >= story.lines.length - 1 ? "Tap to finish" : "Tap to continue";
+    el.storyInitials.textContent = initialsOf(line.name);
+    const card = line.card && cardDB[line.card];
+    const token = story.i + ":" + (line.card || line.name || "");
+    el.storyArt.dataset.token = token;
+    if (card) {
+      el.storyArt.hidden = false;
+      el.storyArt.alt = line.name || line.card;
+      el.storyInitials.hidden = true;
+      el.storyArt.onerror = () => {
+        if (el.storyArt.dataset.token !== token) return;
+        el.storyArt.hidden = true;
+        el.storyInitials.hidden = false;
+      };
+      el.storyArt.src = card.imageFull || card.image;
+    } else {
+      el.storyArt.hidden = true;
+      el.storyArt.removeAttribute("src");
+      el.storyInitials.hidden = false;
+    }
+  }
+
+  function playStory(id, next) {
+    const scene = storyScene(id);
+    if (settings.skipStory || !scene || !scene.lines.length) {
+      if (next) next();
+      return;
+    }
+    story = { kicker: scene.kicker, lines: scene.lines, i: 0, next: next || null };
+    paintStory();
+    showScreen("story");
+    sfx("talk");
+  }
+
+  function storyAdvance() {
+    if (!story) return;
+    if (story.i < story.lines.length - 1) {
+      story.i += 1;
+      paintStory();
+      sfx("talk");
+      return;
+    }
+    const next = story.next;
+    story = null;
+    if (next) next();
+  }
+
+  function storySkip() {
+    if (!story) return;
+    const next = story.next;
+    story = null;
+    if (next) next();
+  }
+
+  function showShop(from) {
+    if (from) {
+      shopFrom = from;
+      shopGreet = GRANDPA_LINES[Math.floor(Math.random() * GRANDPA_LINES.length)];
+    }
+    paintShop();
+    showScreen("shop");
+  }
+
+  function leaveShop() {
+    if (shopFrom === "island" && tourney) showIsland();
+    else { refreshContinue(); showScreen("menu"); }
+  }
+
+  function paintShop() {
+    if (!el.shopList) return;
+    el.shopGreet.textContent = shopGreet;
+    el.shopBalance.textContent = wallet.coins + " DP";
+    el.shopList.innerHTML = "";
+    SHOP_PACKS.forEach((pack) => {
+      const open = setUnlocked(pack.set);
+      const row = document.createElement("div");
+      row.className = "shop-row" + (open ? "" : " locked");
+      const copy = document.createElement("div");
+      copy.className = "copy";
+      const nm = document.createElement("div");
+      nm.className = "nm";
+      nm.textContent = pack.short;
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = open ? "5 cards" : "Beat " + pack.gate + " to unlock";
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      const price = document.createElement("div");
+      price.className = "price";
+      price.textContent = pack.price + " DP";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "Buy";
+      btn.disabled = !open || wallet.coins < pack.price;
+      btn.addEventListener("click", () => buyPack(pack));
+      row.appendChild(copy);
+      row.appendChild(price);
+      row.appendChild(btn);
+      el.shopList.appendChild(row);
+    });
+  }
+
+  function buyPack(pack) {
+    if (!setUnlocked(pack.set)) { toast("Beat " + pack.gate + " to unlock this set."); return; }
+    if (wallet.coins < pack.price) { toast("Not enough Duel Points."); return; }
+    const cards = pullPack(pack.set, packBonusFor(pack.key), true);
+    if (!cards.length) { toast("That pack came up empty."); return; }
+    wallet.coins -= pack.price;
+    saveWallet();
+    grantCards(cards.map((c) => c.name));
+    prize = {
+      cards: cards, index: 0, revealed: false, who: "Grandpa",
+      setName: pack.set, returnTo: "shop", firstUnlock: false,
+    };
+    openPrize();
+  }
+
   function beginTourneyRun(deck, rules) {
     if (rules === "classic" || rules === "dk") tourneyRulesPick = rules;
     tourney = {
@@ -6379,7 +6987,7 @@
       },
     };
     saveTourney();
-    showIsland();
+    playStory("arrival", showIsland);
   }
 
   function tourneyRules() {
@@ -6479,6 +7087,26 @@
       btn.addEventListener("click", () => startNode(key));
       el.mapBoard.appendChild(btn);
     });
+    const shop = document.createElement("button");
+    shop.type = "button";
+    shop.className = "map-shop";
+    const mark = document.createElement("span");
+    mark.className = "mark";
+    mark.textContent = "G";
+    const copy = document.createElement("span");
+    copy.className = "copy";
+    const nm = document.createElement("span");
+    nm.className = "nm";
+    nm.textContent = "Grandpa's Shop";
+    const sub = document.createElement("span");
+    sub.className = "sub";
+    sub.textContent = wallet.coins + " DP · packs";
+    copy.appendChild(nm);
+    copy.appendChild(sub);
+    shop.appendChild(mark);
+    shop.appendChild(copy);
+    shop.addEventListener("click", () => showShop("island"));
+    el.mapBoard.appendChild(shop);
   }
 
   function showIsland() {
@@ -6497,23 +7125,30 @@
   function startNode(key) {
     if (!tourney || !canDuelNode(key)) return;
     const rules = tourneyRules();
-    if (key === "rival") {
-      const id = tourney.rival;
-      beginMatch(tourney.player, id, {
-        rules: rules, field: rivalField(id), mode: "tourney",
-        tourneyKey: "rival", stake: STAKES.rival, taunt: rivalTaunt(id),
+    const sceneId = (key === "rival" ? (tourney.rival || "kaiba") : key) + "-pre";
+    const go = () => {
+      if (key === "rival") {
+        const id = tourney.rival;
+        beginMatch(tourney.player, id, {
+          rules: rules, field: rivalField(id), mode: "tourney",
+          tourneyKey: "rival", stake: STAKES.rival, taunt: rivalTaunt(id),
+        });
+        return;
+      }
+      const src = TOURNEY[key];
+      beginMatch(tourney.player, key, {
+        rules: rules, field: src.field, mode: "tourney",
+        tourneyKey: key, stake: src.stake || 0, taunt: src.taunt || "",
       });
-      return;
-    }
-    const src = TOURNEY[key];
-    beginMatch(tourney.player, key, {
-      rules: rules, field: src.field, mode: "tourney",
-      tourneyKey: key, stake: src.stake || 0, taunt: src.taunt || "",
-    });
+    };
+    playStory(sceneId, go);
   }
 
   function finishTourneyDuel(you, reason) {
     const key = state.tourneyKey;
+    const rivalWho = (tourney && tourney.rival) || state.aiId || "kaiba";
+    const sceneWho = (key === "rival" ? rivalWho : key) || "weevil";
+    const points = awardMatchPoints(you);
     let title = you ? "Victory!" : "Defeat";
     let chipLine = "";
     let primary = "map";
@@ -6574,13 +7209,17 @@
     el.endMsg.textContent = reason;
     el.endChips.hidden = !chipLine;
     el.endChips.textContent = chipLine;
+    el.endPoints.hidden = false;
+    el.endPoints.textContent = pointsText(points);
     el.btnAgain.hidden = primary === "menu";
     el.btnAgain.textContent = primary === "pack"
       ? (prize && prize.firstUnlock ? "Your Reward" : "Open Pack")
       : "Back to the Island";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
-    showScreen("end");
+    const done = () => showScreen("end");
+    const after = key === "pegasus" && you ? () => playStory("ending", done) : done;
+    playStory(sceneWho + "-" + (you ? "win" : "loss"), after);
   }
 
   function closeConfirm() {
@@ -6593,14 +7232,18 @@
     savedDecks = [];
     flEnforce = false;
     prize = null;
+    wallet = { coins: 0, sets: [] };
     const okT = persist(TOURNEY_KEY, null);
     const okC = persist(COLLECTION_KEY, collection);
     const okD = persist(STORE_KEY, { fl: false, decks: [] });
+    const okW = persist(WALLET_KEY, null);
     refreshContinue();
     syncFL();
+    paintWallet();
+    if ($("shop").classList.contains("active")) paintShop();
     if ($("customs").classList.contains("active")) renderCustoms();
     closeConfirm();
-    toast(okT && okC && okD ? "Progress reset." : "Couldn't clear every save.");
+    toast(okT && okC && okD && okW ? "Progress reset." : "Couldn't clear every save.");
   }
 
   function setRules(mode) {
@@ -6647,6 +7290,11 @@
     saveSettings();
     if (settings.sound) sfx("summon");
   });
+  el.storyToggle.addEventListener("click", () => {
+    settings.skipStory = !settings.skipStory;
+    paintSettings();
+    saveSettings();
+  });
   el.volume.addEventListener("input", () => {
     settings.volume = Number(el.volume.value) / 100;
     if (el.volumeVal) el.volumeVal.textContent = el.volume.value;
@@ -6681,6 +7329,24 @@
   el.btnPackNext.addEventListener("click", () => packAdvance());
   el.packCard.addEventListener("click", () => { if (prize && !prize.revealed) packAdvance(); });
   el.btnContinue.addEventListener("click", () => { if (tourney) showIsland(); });
+  el.btnShop.addEventListener("click", () => showShop("menu"));
+  el.btnShopBack.addEventListener("click", () => leaveShop());
+  $("story").addEventListener("click", (e) => {
+    if (e.target.closest("#btnStorySkip")) return;
+    storyAdvance();
+  });
+  el.btnStorySkip.addEventListener("click", (e) => {
+    e.stopPropagation();
+    storySkip();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (!story || !$("story").classList.contains("active")) return;
+    if (e.key === "Escape") { storySkip(); e.preventDefault(); }
+    else if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+      storyAdvance();
+      e.preventDefault();
+    }
+  });
   el.btnIslandMenu.addEventListener("click", () => showScreen("menu"));
   el.btnIslandRetire.addEventListener("click", () => {
     if (confirm("Retire from the tournament? This run will be erased.")) {
@@ -6779,6 +7445,8 @@
   loadStore();
   loadCollection();
   loadTourney();
+  loadWallet();
+  syncUnlocksFromTourney();
   fillBuilderSelects();
   syncFL();
   refreshContinue();
@@ -6854,6 +7522,15 @@
     path: () => PATH.slice(),
     showIsland: showIsland,
     beginTourneyRun: beginTourneyRun,
+    wallet: () => ({ coins: wallet.coins, sets: wallet.sets.slice() }),
+    story: (id) => {
+      const scene = storyScene(id);
+      if (!scene) return null;
+      return {
+        kicker: scene.kicker,
+        lines: scene.lines.map((line) => ({ name: line.name, text: line.text, card: line.card || "" })),
+      };
+    },
   };
 })();
   </script>
