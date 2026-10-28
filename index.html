@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="theme-color" content="#0a1628" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,28 2,28' fill='%23e0aa2a'/%3E%3Ccircle cx='16' cy='18' r='3' fill='%23140a22'/%3E%3C/svg%3E" />
   <title>Classic Duel</title>
   <script>
     /* Pin the app to the visible viewport. 100vh includes the area under
@@ -23,6 +24,11 @@
       if (anim !== "fast" && anim !== "off" && anim !== "on") anim = "on";
       document.documentElement.setAttribute("data-anim", anim);
       document.documentElement.style.setProperty("--fx", anim === "off" ? "0" : anim === "fast" ? "0.45" : "1");
+      var wallet = JSON.parse(localStorage.getItem("classicDuel_wallet_v1") || "null");
+      var col = JSON.parse(localStorage.getItem("classicDuel_collection_v1") || "null");
+      var beaten = (wallet && wallet.cleared && wallet.cleared.indexOf("pegasus") >= 0) || (col && col.unlocked);
+      var theme = beaten && (!saved || saved.menuTheme !== "castle") ? "city" : "castle";
+      document.documentElement.setAttribute("data-menu", theme);
     } catch (e) {}
     __fit();
     addEventListener("resize", __fit);
@@ -104,22 +110,177 @@
     html[data-anim="off"] .hc.anim-draw,
     html[data-anim="off"] .pile.anim-draw { animation: none; }
 
-    /* —— Menu (top-aligned so every button stays on a 390×664 screen) —— */
+    /* —— Menu: one screen over the castle or Battle City —— */
     #menu {
-      align-items: center; justify-content: flex-start;
-      padding: 6px 14px 6px;
-      gap: 5px; text-align: center;
+      position: relative;
+      align-items: stretch; justify-content: flex-start;
+      padding: 4px 10px 6px;
+      gap: 3px; text-align: center;
+      overflow: hidden;
+      background: #14081c;
     }
+    .menu-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .menu-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 28%; }
+    html[data-menu="castle"] .menu-bg.city, #menu[data-theme="castle"] .menu-bg.city,
+    html[data-menu="city"] .menu-bg.castle, #menu[data-theme="city"] .menu-bg.castle { display: none; }
+    html[data-menu="city"] .menu-bg.city, #menu[data-theme="city"] .menu-bg.city {
+      object-position: center top;
+      top: -92px;
+      height: calc(100% + 120px);
+    }
+    .menu-mon {
+      position: absolute; top: 17%; height: 38%; width: 62%;
+      object-fit: cover; filter: drop-shadow(0 10px 14px rgba(0,0,0,0.65));
+      -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, #000 46%, transparent 78%);
+      mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, #000 46%, transparent 78%);
+      animation: menuBreathe calc(4.8s * var(--fx, 1)) ease-in-out infinite;
+    }
+    .menu-mon.left { left: -14%; object-position: 78% 22%; }
+    .menu-mon.right { right: -16%; object-position: 22% 18%; animation-delay: -1.6s; }
+    .menu-bolt {
+      position: absolute; left: 16%; right: 16%; top: 34%; height: 64px;
+      overflow: visible; opacity: 0;
+      animation: menuBolt calc(8.5s * var(--fx, 1)) linear infinite;
+    }
+    .menu-bolt polyline {
+      fill: none; stroke: #f7f0ff; stroke-width: 3; stroke-linejoin: round; stroke-linecap: round;
+      filter: drop-shadow(0 0 6px #d7b4ff) drop-shadow(0 0 2px #fff);
+    }
+    .menu-fog, .menu-fog.b {
+      position: absolute; left: -20%; right: -20%; bottom: -10%; height: 48%;
+      background: radial-gradient(ellipse at 50% 80%, rgba(150, 90, 210, 0.38), transparent 68%);
+      animation: fogDrift calc(16s * var(--fx, 1)) ease-in-out infinite alternate;
+    }
+    .menu-fog.b { height: 32%; bottom: 18%; opacity: 0.7; animation-duration: calc(22s * var(--fx, 1)); animation-direction: alternate-reverse; }
+    .sparkles i {
+      position: absolute; bottom: 12%; width: 3px; height: 3px; border-radius: 50%;
+      background: #ffe7a2; box-shadow: 0 0 6px #ffd56a; opacity: 0;
+      animation: sparkRise calc(7.5s * var(--fx, 1)) linear infinite;
+    }
+    .sparkles i:nth-child(1) { left: 8%; animation-delay: 0s; }
+    .sparkles i:nth-child(2) { left: 22%; animation-delay: -1.4s; }
+    .sparkles i:nth-child(3) { left: 38%; animation-delay: -3.1s; }
+    .sparkles i:nth-child(4) { left: 54%; animation-delay: -2.2s; }
+    .sparkles i:nth-child(5) { left: 70%; animation-delay: -4.4s; }
+    .sparkles i:nth-child(6) { left: 84%; animation-delay: -0.8s; }
+    .sparkles i:nth-child(7) { left: 46%; animation-delay: -5.5s; width: 4px; height: 4px; }
+    html[data-anim="off"] .menu-mon,
+    html[data-anim="off"] .menu-bolt,
+    html[data-anim="off"] .menu-fog,
+    html[data-anim="off"] .sparkles i,
+    html[data-anim="off"] .puzzle,
+    html[data-anim="off"] #menu .menu-btn,
+    html[data-anim="off"] .brand {
+      animation: none !important;
+    }
+    html[data-anim="off"] .menu-bolt { opacity: 0; }
+    .menu-hud, .menu-brand, .menu-actions, #menu .rules-row, #menu .rules-hint { position: relative; z-index: 2; }
+    .menu-hud { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-shrink: 0; }
+    .hud-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      min-height: 28px; padding: 2px 8px 2px 6px;
+      border-radius: 999px; border: 1px solid rgba(224, 176, 80, 0.85);
+      background: rgba(10, 6, 20, 0.72); color: #ffe7a8;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      box-shadow: 0 0 10px rgba(212,160,23,0.25);
+    }
+    .hud-gem {
+      width: 12px; height: 12px; flex: 0 0 12px;
+      background: linear-gradient(135deg, #e6d0ff, #7a4ad4 55%, #2a1460);
+      clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+      box-shadow: 0 0 6px rgba(170, 110, 255, 0.8);
+    }
+    .hud-star { color: #f0c040; font-size: 0.95rem; line-height: 1; text-shadow: 0 0 6px rgba(240,192,64,0.8); }
+    .menu-brand { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .puzzle { position: relative; width: 34px; height: 30px; filter: drop-shadow(0 0 8px rgba(240,192,64,0.65)); animation: puzzleShimmer calc(3.2s * var(--fx, 1)) ease-in-out infinite; }
+    .puzzle svg { width: 100%; height: 100%; display: block; }
     .brand {
-      margin: 0; line-height: 1;
-      font-size: clamp(1.55rem, 7.2vw, 2.05rem);
-      letter-spacing: 0.04em; color: var(--gold);
-      text-shadow: 0 2px 0 #3a2a00, 0 0 24px rgba(212,160,23,0.35);
+      margin: 0; line-height: 0.95;
+      font-size: clamp(1.35rem, 6.6vw, 1.75rem);
+      letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700;
+      background: linear-gradient(180deg, #fff8dc 0%, #f0c040 42%, #a87410 78%, #ffe7a0 100%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 2px 0 #3a2500) drop-shadow(0 0 10px rgba(240,192,64,0.45));
+      animation: menuBreathe calc(4.8s * var(--fx, 1)) ease-in-out infinite;
     }
-    .tagline {
-      margin: 0; color: var(--muted); font-size: 0.82rem;
-      letter-spacing: 0.14em; text-transform: uppercase;
+    .menu-ornament {
+      width: min(240px, 70%); height: 10px; margin-top: 1px;
+      background:
+        linear-gradient(90deg, transparent, #e0b050 18%, #fff1c2 50%, #e0b050 82%, transparent) center/100% 1px no-repeat;
     }
+    #menu .rules-row { width: 100%; align-self: center; }
+    #menu .rules-row button {
+      min-height: 30px; font-size: 0.78rem;
+      background: rgba(8, 6, 18, 0.72); color: #d9d0c0;
+    }
+    #menu .rules-hint {
+      font-size: 0.64rem; line-height: 1.3; color: #f0e6c8;
+      text-shadow: 0 1px 2px #000; max-width: 100%;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      align-self: center;
+      background: rgba(8, 6, 18, 0.78);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+    .menu-actions {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end;
+      gap: 4px; width: 92%; margin: 0 auto;
+      padding-top: 4px;
+      background: linear-gradient(180deg, transparent 0%, rgba(8, 4, 16, 0.2) 8%, rgba(8, 4, 16, 0.72) 28%);
+    }
+    #menu .menu-btn {
+      width: 100%; min-height: 32px; flex: 1 1 32px; max-height: 44px;
+      padding: 0 8px 0 6px; gap: 8px;
+      display: flex; align-items: center;
+      border-radius: 7px; border: 1px solid #d4b15a;
+      background:
+        linear-gradient(180deg, rgba(42, 24, 68, 0.94), rgba(14, 8, 28, 0.94));
+      color: #f6e2a8; font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      box-shadow: inset 0 0 0 1px rgba(255, 220, 140, 0.18), 0 0 10px rgba(120, 60, 200, 0.25);
+      animation: menuGlow calc(3.8s * var(--fx, 1)) ease-in-out infinite;
+    }
+    #menu .menu-btn:nth-child(2n) { animation-delay: -1.2s; }
+    #menu .menu-btn.primary, #menu .menu-btn.tourney, #menu .menu-btn.shop, #menu .menu-btn.puzzle {
+      background: linear-gradient(180deg, rgba(42, 24, 68, 0.94), rgba(14, 8, 28, 0.94));
+      border-color: #d4b15a; color: #f6e2a8;
+    }
+    #menu .menu-btn.tourney { border-color: #f0d48a; box-shadow: inset 0 0 0 1px rgba(255, 230, 160, 0.35), 0 0 14px rgba(240, 192, 64, 0.28); }
+    .m-ico {
+      width: 26px; height: 26px; flex: 0 0 26px; border-radius: 5px;
+      border: 1px solid #e8c56a;
+      background: radial-gradient(circle at 40% 30%, #5a3d86, #1a1030 72%) center/100% 100% no-repeat;
+      display: grid; place-items: center;
+    }
+    .m-ico::before {
+      content: ""; width: 16px; height: 16px; display: block;
+      background: center/contain no-repeat;
+    }
+    .m-label { flex: 1; min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-go { flex: 0 0 auto; color: #f0c040; font-size: 1.05rem; line-height: 1; }
+    #btnTourney .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M4 16h16v2H4v-2zm.6-1.2 2.7-6.2 3.2 3.6L12 5l1.5 7.2 3.2-3.6 2.7 6.2H4.6z'/></svg>"); }
+    #btnPuzzle .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23c9a6ff' d='M8 3a2 2 0 0 1 2 2h2a2 2 0 1 1 2 2v2h2a2 2 0 1 1 0 4h-2v2a2 2 0 1 1-2 2h-2a2 2 0 1 1-4 0H6v-2H4a2 2 0 1 1 0-4h2V7a2 2 0 0 1 2-2z'/></svg>"); }
+    #btnStart .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M7 3h8l2 2v14l-2 2H7l-2-2V5l2-2zm1 3v12h6V6H8zm9 1 3 2v8l-3 2V4z'/></svg>"); }
+    #btnContinue .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='m12 3 2.4 5.6L20 11l-5.6 2.4L12 19l-2.4-5.6L4 11l5.6-2.4L12 3z'/></svg>"); }
+    #btnRematch .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M12 5V2L7 6l5 4V7a5 5 0 0 1 4.2 7.7l1.5 1.3A7 7 0 0 0 12 5zm0 14v3l5-4-5-4v3a5 5 0 0 1-4.2-7.7L6.3 8A7 7 0 0 0 12 19z'/></svg>"); }
+    #btnBinder .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23d7b4ff' d='M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3V4zm3 3v2h8V7H8zm0 4v2h8v-2H8z'/></svg>"); }
+    #btnShop .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M4 9h16l-1.2 9H5.2L4 9zm2.2-3h11.6l.8 2H5.4l.8-2zM9 13h6v2H9v-2z'/></svg>"); }
+    #btnHowto .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M7 3h8l5 5v13H7V3zm7 1.5V9h4.5L14 4.5zM9 12h8v1.6H9V12zm0 3.2h8v1.6H9v-1.6z'/></svg>"); }
+    #btnSettings .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23c9a6ff' d='M10.2 2h3.6l.4 2.2a7.6 7.6 0 0 1 2.1 1.2l2.1-1 1.8 3.1-1.8 1.4a7.8 7.8 0 0 1 0 2.2l1.8 1.4-1.8 3.1-2.1-1a7.6 7.6 0 0 1-2.1 1.2L13.8 22h-3.6l-.4-2.2a7.6 7.6 0 0 1-2.1-1.2l-2.1 1-1.8-3.1 1.8-1.4a7.8 7.8 0 0 1 0-2.2L2 9.5l1.8-3.1 2.1 1a7.6 7.6 0 0 1 2.1-1.2L10.2 2zM12 9.2A2.8 2.8 0 1 0 12 14.8 2.8 2.8 0 0 0 12 9.2z'/></svg>"); }
+    @keyframes menuBreathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    @keyframes menuGlow {
+      0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,220,140,0.15), 0 0 6px rgba(120,60,200,0.18); }
+      50% { box-shadow: inset 0 0 0 1px rgba(255,230,160,0.55), 0 0 14px rgba(240,192,64,0.32); }
+    }
+    @keyframes fogDrift { from { transform: translateX(-5%); } to { transform: translateX(5%); } }
+    @keyframes sparkRise {
+      0% { transform: translateY(20px) scale(0.5); opacity: 0; }
+      12% { opacity: 0.95; }
+      100% { transform: translateY(-240px) scale(1); opacity: 0; }
+    }
+    @keyframes menuBolt { 0%, 84%, 100% { opacity: 0; } 86% { opacity: 1; } 88% { opacity: 0.15; } 90% { opacity: 1; } 93% { opacity: 0; } }
+    @keyframes puzzleShimmer { 0%, 100% { filter: drop-shadow(0 0 4px rgba(240,192,64,0.35)); } 50% { filter: drop-shadow(0 0 12px rgba(255,230,150,0.95)); } }
     .menu-btn {
       width: min(300px, 88vw); min-height: 48px; padding: 12px 16px;
       border: 1px solid var(--gold-dim); border-radius: 4px;
@@ -147,14 +308,11 @@
       background: linear-gradient(180deg, #243e66, #14243c);
       border-color: #9ecbff; color: #e7f2ff;
     }
-    #menu .menu-btn {
-      min-height: 40px; padding: 6px 10px; font-size: 0.98rem;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    #menu .menu-btn.primary { min-height: 46px; font-size: 1.05rem; }
-    #menu .rules-row button { min-height: 36px; }
-    #menu .rules-hint { font-size: 0.72rem; line-height: 1.3; }
     #btnBinder, #btnBuildBinder { position: relative; }
+    .sr {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
     .menu-badge {
       display: inline-flex; align-items: center; justify-content: center;
       margin-left: 6px; min-width: 1.2em; height: 1.2em; padding: 0 4px;
@@ -264,9 +422,9 @@
     .saved-status { font-size: 0.7rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .saved-status.ok { color: #b7e1c0; }
     .saved-status.bad { color: #ff8a80; }
-    .saved-actions { display: flex; gap: 4px; margin-top: 6px; }
+    .saved-actions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
     .saved-actions button {
-      flex: 1; min-height: 40px; padding: 6px 2px; font: inherit; font-size: 0.78rem;
+      flex: 1 1 30%; min-height: 36px; padding: 6px 2px; font: inherit; font-size: 0.72rem;
       border-radius: 4px; border: 1px solid var(--gold-dim);
       background: #1a2c48; color: var(--cream); cursor: pointer;
     }
@@ -308,7 +466,7 @@
     .build-counts .grow { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .build-counts .num { color: var(--gold); font-weight: 700; }
     .build-counts .num.bad { color: #ff8a80; }
-    #btnBuildBinder { min-width: 0; min-height: 32px; padding: 4px 6px; font-size: 0.72rem; }
+    #btnBuildBinder, #btnAutoBuild { min-width: 0; min-height: 32px; padding: 4px 6px; font-size: 0.68rem; }
     .build-status {
       flex-shrink: 0; margin: 0; min-height: 0;
       font-size: 0.68rem; color: #ff8a80; line-height: 1.2;
@@ -439,7 +597,9 @@
     }
     .island-note {
       flex-shrink: 0; margin: 0; text-align: center;
-      color: var(--muted); font-size: 0.68rem; line-height: 1.3;
+      color: var(--muted); font-size: 0.66rem; line-height: 1.25;
+      display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .map-board {
       flex: 1; min-height: 0; position: relative;
@@ -511,7 +671,7 @@
     }
     .map-shop .sub { font-size: 0.62rem; color: var(--cream); line-height: 1.1; }
     #island .footer-row { flex-shrink: 0; }
-    #island .footer-row .menu-btn { min-height: 44px; padding: 8px 10px; }
+    #island .footer-row .menu-btn { min-height: 40px; padding: 6px 6px; font-size: 0.88rem; }
 
     /* —— How to play —— */
     #howto { padding: 12px 14px 8px; gap: 8px; }
@@ -957,7 +1117,12 @@
     }
     .fx-reveal img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    #settings { padding: 10px 12px 8px; gap: 8px; align-items: center; }
+    #settings { padding: 4px 12px 4px; gap: 4px; align-items: center; }
+    #settings .deck-head h2 { font-size: 1.2rem; }
+    #settings .set-list { gap: 5px; }
+    #settings .set-copy span { font-size: 0.66rem; line-height: 1.25; }
+    #settings .rules-row button { min-height: 34px; padding: 4px 6px; font-size: 0.82rem; }
+    #settings .menu-btn { min-height: 38px; padding: 6px 10px; }
     #settings .deck-head { width: 100%; }
     .set-list {
       width: min(340px, 100%); flex: 1; min-height: 0; overflow: auto;
@@ -1047,18 +1212,25 @@
       flex-shrink: 0; margin: 0; text-align: center; color: #ffe7a3;
       font-weight: 700; font-size: 0.95rem; font-variant-numeric: tabular-nums;
     }
+    #shopMode { flex-shrink: 0; width: 100%; }
+    #shopMode button { min-height: 32px; }
     .shop-list {
       flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px;
       overflow: auto; -webkit-overflow-scrolling: touch;
     }
     .shop-row {
-      flex: 1 1 0; min-height: 40px;
+      flex: 0 0 auto; min-height: 44px;
       display: flex; align-items: center; gap: 8px;
       padding: 4px 8px; border-radius: 6px;
       border: 1px solid var(--gold-dim);
       background: linear-gradient(180deg, #1a2f4d, #101e33);
     }
     .shop-row.locked { opacity: 0.55; }
+    .shop-row.deal { border-color: var(--gold); background: linear-gradient(180deg, #3a2a12, #1a1208); }
+    .shop-row .thumb {
+      width: 28px; height: 40px; object-fit: cover; border-radius: 3px; flex-shrink: 0;
+      border: 1px solid rgba(212,160,23,0.45); background: #111;
+    }
     .shop-row .copy { min-width: 0; flex: 1; text-align: left; }
     .shop-row .nm {
       color: var(--gold); font-weight: 700; font-size: 0.78rem; line-height: 1.15;
@@ -1220,23 +1392,58 @@
 </head>
 <body>
   <div id="app">
-    <section id="menu" class="screen active">
-      <h1 class="brand">Classic Duel</h1>
-      <p class="tagline">Yu-Gi-Oh!</p>
+    <section id="menu" class="screen active" data-theme="castle">
+      <div class="menu-scene" aria-hidden="true">
+        <img class="menu-bg castle" src="art/castle.jpg" alt="" />
+        <img class="menu-bg city" src="art/battle-city.jpg" alt="" />
+        <img class="menu-mon left" src="art/bewd.jpg" alt="" />
+        <img class="menu-mon right" src="art/dm.jpg" alt="" />
+        <svg class="menu-bolt" viewBox="0 0 220 70">
+          <polyline points="8,36 48,14 72,48 112,10 136,50 168,18 212,40" />
+        </svg>
+        <div class="menu-fog"></div>
+        <div class="menu-fog b"></div>
+        <div class="sparkles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="menu-hud">
+        <div class="hud-pill" id="menuDpPill" title="Duel Points"><span class="hud-gem" aria-hidden="true"></span><span id="menuDp">0</span><span class="sr"> Duel Points</span></div>
+        <div class="hud-pill" id="menuChipsPill" title="Star Chips"><span class="hud-star" aria-hidden="true">★</span><span id="menuChips">0</span><span class="sr"> Star Chips</span></div>
+      </div>
+      <div class="menu-brand">
+        <div class="puzzle" aria-hidden="true">
+          <svg viewBox="0 0 64 56">
+            <defs>
+              <linearGradient id="puzzleGold" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#fff6c8"/>
+                <stop offset="0.45" stop-color="#e0aa2a"/>
+                <stop offset="1" stop-color="#8a6410"/>
+              </linearGradient>
+            </defs>
+            <polygon points="32,2 62,54 2,54" fill="url(#puzzleGold)" stroke="#fff1c0" stroke-width="2"/>
+            <polygon points="32,16 46,44 18,44" fill="#14081f"/>
+            <circle cx="32" cy="34" r="5.5" fill="#f0c040"/>
+            <circle cx="32" cy="34" r="2.2" fill="#1a1030"/>
+          </svg>
+        </div>
+        <h1 class="brand">Classic Duel</h1>
+        <div class="menu-ornament" aria-hidden="true"></div>
+      </div>
       <div class="rules-row">
         <button type="button" id="ruleClassic" class="on">Classic</button>
         <button type="button" id="ruleDK">Duelist Kingdom</button>
       </div>
       <p class="rules-hint" id="rulesHint">Free Duel: 8000 LP · tributes · no attack on the first turn</p>
-      <button type="button" class="menu-btn primary" id="btnStart">Free Duel</button>
-      <button type="button" class="menu-btn tourney" id="btnTourney">Tournament</button>
-      <button type="button" class="menu-btn puzzle" id="btnPuzzle">Daily Puzzle</button>
-      <button type="button" class="menu-btn" id="btnContinue" hidden>Continue</button>
-      <button type="button" class="menu-btn" id="btnBinder">Card Binder<span class="menu-badge" id="binderBadge" hidden>0</span></button>
-      <button type="button" class="menu-btn" id="btnRematch">Rematch</button>
-      <button type="button" class="menu-btn shop" id="btnShop">Card Shop</button>
-      <button type="button" class="menu-btn" id="btnHowto">How to Play</button>
-      <button type="button" class="menu-btn" id="btnSettings">Settings</button>
+      <div class="menu-actions">
+        <button type="button" class="menu-btn tourney" id="btnTourney"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Tournament</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn puzzle" id="btnPuzzle"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Daily Puzzle</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn primary" id="btnStart"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Free Duel</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnContinue" hidden><span class="m-ico" aria-hidden="true"></span><span class="m-label" id="continueLabel">Continue</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnRematch"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Rematch</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnBinder"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Card Binder<span class="menu-badge" id="binderBadge" hidden>0</span></span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn shop" id="btnShop"><span class="m-ico" aria-hidden="true"></span><span class="m-label" id="shopLabel">Card Shop</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnHowto"><span class="m-ico" aria-hidden="true"></span><span class="m-label">How to Play</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnSettings"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Settings</span><span class="m-go" aria-hidden="true">›</span></button>
+      </div>
     </section>
 
     <section id="decks" class="screen" hidden>
@@ -1289,6 +1496,7 @@
       <p class="island-note" id="islandNote"></p>
       <div class="map-board" id="mapBoard"></div>
       <div class="footer-row">
+        <button type="button" class="menu-btn" id="btnIslandDeck">Deck</button>
         <button type="button" class="menu-btn" id="btnIslandRetire">Retire</button>
         <button type="button" class="menu-btn" id="btnIslandMenu">Main Menu</button>
       </div>
@@ -1351,6 +1559,10 @@
         </div>
       </div>
       <p class="shop-balance" id="shopBalance">0 DP</p>
+      <div class="seg" id="shopMode">
+        <button type="button" data-mode="buy" class="on">Buy</button>
+        <button type="button" data-mode="sell">Sell</button>
+      </div>
       <div class="shop-list" id="shopList"></div>
       <button type="button" class="menu-btn" id="btnShopBack">Back</button>
     </section>
@@ -1395,11 +1607,11 @@
       <h2>How to Play</h2>
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
-        <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. A loss costs 1. At 0 the run is over. Each first win opens a booster from that duelist's set. Progress is saved on this device. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods.</p>
+        <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods, and the main menu can switch to Battle City.</p>
         <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set. Owned cards show their art and how many you have. Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Tap a card to read it.</p>
-        <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips do not move.</p>
+        <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips stay put, except when the path is clear and you still need chips for Pegasus. Those island rematches pay the same chips as the first win, and a loss costs 1.</p>
         <p><strong>Ante:</strong> Settings has an Ante rule, off unless you turn it on. Before a tournament duel, you and the opponent each put up one card. You put up a spare card from your collection. The last copy a saved deck needs stays, and preset Yugi, Kaiba, and Joey decks are never edited. The winner takes the loser's card. Both cards show before the duel, and the result shows after.</p>
-        <p><strong>Custom decks:</strong> The builder lists only cards you own, and it will not add more copies than you have (max 3). A new collection starts with a 40-card pile of commons, so one legal deck is possible right away. Preset Yugi, Kaiba, and Joey decks stay playable and do not add their cards to the collection. Owned counts show on each card. Binder in the builder opens the full pool. A main deck is 40–60 cards. Fusion Monsters go in the Extra Deck (max 15). Save up to 3 decks on this device. The Forbidden/Limited switch is off unless you turn it on.</p>
+        <p><strong>Custom decks:</strong> The builder lists only cards you own, and it will not add more copies than you have (max 3). Search by name, and filter by Monster, Spell, Trap, Level, Attribute, and Type. Auto-Build fills a legal 40-card deck from the strongest cards you own. A new collection starts with a 40-card pile of commons, so one legal deck is possible right away. Preset Yugi, Kaiba, and Joey decks stay playable and do not add their cards to the collection. Owned counts show on each card. Binder in the builder opens the full pool. A main deck is 40–60 cards. Fusion Monsters go in the Extra Deck (max 15). Save up to 8 decks on this device. Rename, copy, or delete them, and pick which one to use before a free duel, a tournament, a rematch, or the next duel in a run. An older saved deck still loads. The Forbidden/Limited switch is off unless you turn it on.</p>
         <p><strong>Goal:</strong> Drop their Life Points to 0, or deck them out.</p>
         <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Next Phase advances. You do not draw on your first turn.</p>
         <p><strong>Classic:</strong> 8000 LP. Level 5–6 needs 1 tribute; 7+ needs 2. Egyptian Gods need 3. No attacks on the very first turn. Polymerization can use monsters from your hand or field.</p>
@@ -1412,8 +1624,8 @@
         <p><strong>Story:</strong> A short scene plays when you arrive, before and after each tournament duel, and after you beat Pegasus. Tap to advance, or Skip. Settings can skip every scene. Win and loss have different lines.</p>
         <p><strong>New cards:</strong> The first copy of a card, from a booster, Grandpa's shop, an ante, or another reward, shows a NEW badge and a glow when it is revealed. The binder keeps NEW on that card until you tap it. A green count on Card Binder is how many of those you have not opened yet. Cards you already owned are treated as seen.</p>
         <p><strong>Daily Puzzle:</strong> One puzzle for today's date. The board, hands, and Life Points are already set. Win that turn with the rules named on the puzzle, Classic or Duelist Kingdom. Hint and Retry sit on the duel screen. The first solve of the day pays 40 Duel Points. Solving on back-to-back days raises a streak. Reset Progress clears the streak.</p>
-        <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
-        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, sound, story skip, and ante rule on this device.</p>
+        <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. A daily deal, picked from today's date, sells one card at a discount. Sell gives Duel Points for a spare copy. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
+        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, sound, story skip, ante rule, and main-menu theme on this device.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
     </section>
@@ -1514,6 +1726,16 @@
           </div>
           <button type="button" class="fl-switch" id="storyToggle" aria-pressed="false">Off</button>
         </div>
+        <div class="set-block" id="setMenuBlock">
+          <div class="set-copy">
+            <strong>Main menu</strong>
+            <span id="menuThemeHint">Castle until you beat Pegasus. Then you can pick Battle City.</span>
+          </div>
+          <div class="rules-row" id="setMenuTheme">
+            <button type="button" id="setMenuCastle" class="on">Castle</button>
+            <button type="button" id="setMenuCity">Battle City</button>
+          </div>
+        </div>
         <div class="set-row">
           <div class="set-copy">
             <strong>Ante rule</strong>
@@ -1554,6 +1776,7 @@
       <input id="buildName" type="text" maxlength="24" autocomplete="off" autocapitalize="words" aria-label="Deck name" />
       <div class="build-counts">
         <div class="grow">Main <span class="num" id="buildMain">0</span>/40–60 · Extra <span class="num" id="buildExtra">0</span>/15</div>
+        <button type="button" class="mini-btn" id="btnAutoBuild">Auto-Build</button>
         <button type="button" class="mini-btn" id="btnBuildBinder">Binder<span class="menu-badge" id="buildBinderBadge" hidden>0</span></button>
         <button type="button" class="fl-switch" id="flToggleBuild" aria-pressed="false">F/L Off</button>
       </div>
@@ -1683,6 +1906,7 @@
   const API = "https://db.ygoprodeck.com/api/v7/cardinfo.php";
   const CACHE_KEY = "classicDuel_cardCache_v2";
   const STORE_KEY = "classicDuel_customDecks_v1";
+  const MAX_DECKS = 8;
   const ZONES = 5;
   const PHASES = ["draw", "main1", "battle", "main2", "end"];
   const PHASE_LABEL = { draw: "Draw", main1: "Main 1", battle: "Battle", main2: "Main 2", end: "End" };
@@ -2305,7 +2529,9 @@
   let tourneyRulesPick = "dk";
   let collection = { counts: {}, unlocked: false };
   let prize = null;
-  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false };
+  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false, menuTheme: "" };
+  let shopMode = "buy";
+  let savesReady = false;
   let wallet = { coins: 0, sets: [], cleared: [], rivalId: "" };
   let puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
   let binderFrom = "menu";
@@ -2332,7 +2558,10 @@
   const el = {
     ruleClassic: $("ruleClassic"), ruleDK: $("ruleDK"), rulesHint: $("rulesHint"),
     btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnContinue: $("btnContinue"),
-    btnShop: $("btnShop"), btnShopBack: $("btnShopBack"),
+    btnShop: $("btnShop"), btnShopBack: $("btnShopBack"), shopLabel: $("shopLabel"),
+    menuDp: $("menuDp"), menuChips: $("menuChips"), continueLabel: $("continueLabel"),
+    setMenuCastle: $("setMenuCastle"), setMenuCity: $("setMenuCity"), menuThemeHint: $("menuThemeHint"),
+    btnAutoBuild: $("btnAutoBuild"), btnIslandDeck: $("btnIslandDeck"),
     btnBinder: $("btnBinder"), btnBinderBack: $("btnBinderBack"),
     binderBadge: $("binderBadge"), buildBinderBadge: $("buildBinderBadge"),
     btnPuzzle: $("btnPuzzle"), btnPuzzleBack: $("btnPuzzleBack"), btnPuzzleStart: $("btnPuzzleStart"),
@@ -2475,6 +2704,7 @@
     });
     if (name !== "duel") setLogOpen(false);
     if (name === "menu" || name === "island" || name === "shop") paintWallet();
+    if (name === "menu") paintMenu();
     if (name === "menu" || name === "builder" || name === "binder") paintNewBadge();
     syncPuzzleBar();
   }
@@ -2561,7 +2791,7 @@
   }
 
   function loadSettings() {
-    settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false };
+    settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false, menuTheme: "" };
     try {
       const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
       if (!raw || typeof raw !== "object") return;
@@ -2570,6 +2800,7 @@
       if (typeof raw.sound === "boolean") settings.sound = raw.sound;
       if (typeof raw.skipStory === "boolean") settings.skipStory = raw.skipStory;
       if (raw.ante === true) settings.ante = true;
+      if (raw.menuTheme === "castle" || raw.menuTheme === "city") settings.menuTheme = raw.menuTheme;
       if (typeof raw.volume === "number" && isFinite(raw.volume)) {
         settings.volume = Math.max(0, Math.min(1, raw.volume));
       }
@@ -2613,7 +2844,52 @@
       el.anteToggle.textContent = settings.ante ? "On" : "Off";
       el.anteToggle.setAttribute("aria-pressed", settings.ante ? "true" : "false");
     }
+    const beaten = pegasusBeaten();
+    const theme = menuTheme();
+    if (el.setMenuCastle) {
+      el.setMenuCastle.classList.toggle("on", theme === "castle");
+      el.setMenuCity.classList.toggle("on", theme === "city");
+      el.setMenuCity.disabled = !beaten;
+      el.menuThemeHint.textContent = beaten
+        ? "Castle or the Battle City skyline. Switch any time."
+        : "Battle City unlocks after you beat Pegasus.";
+    }
     applyAnimMode();
+    if (savesReady) paintMenu();
+  }
+
+  function pegasusBeaten() {
+    return !!((collection && collection.unlocked) || (wallet && wallet.cleared && wallet.cleared.indexOf("pegasus") >= 0));
+  }
+
+  function menuTheme() {
+    if (!pegasusBeaten()) return "castle";
+    return settings.menuTheme === "castle" ? "castle" : "city";
+  }
+
+  function groupNum(n) {
+    const v = Math.max(0, Math.floor(Number(n) || 0));
+    return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function paintMenu() {
+    const theme = menuTheme();
+    document.documentElement.setAttribute("data-menu", theme);
+    const menu = $("menu");
+    if (menu) menu.setAttribute("data-theme", theme);
+    if (el.menuDp) el.menuDp.textContent = groupNum(wallet && wallet.coins);
+    const chips = tourney && typeof tourney.chips === "number" ? tourney.chips : 0;
+    if (el.menuChips) el.menuChips.textContent = groupNum(chips);
+  }
+
+  function setMenuTheme(mode) {
+    if (mode === "city" && !pegasusBeaten()) {
+      toast("Beat Pegasus to unlock the Battle City menu.");
+      return;
+    }
+    settings.menuTheme = mode === "city" ? "city" : "castle";
+    paintSettings();
+    saveSettings();
   }
 
   function unlockAudio() {
@@ -5865,6 +6141,7 @@
       tourneyKey: opts.tourneyKey || null,
       stake: opts.stake || 0,
       rematch: !!opts.rematch,
+      chipHunt: !!opts.chipHunt,
       ante: null,
       taunt: opts.taunt || "",
       playerName: deck.name,
@@ -5901,6 +6178,7 @@
       id: d.id, name: d.name, ace: d.ace,
       main: d.main.slice(), extra: d.extra.slice(),
     };
+    if (deckPickMode === "swap") { applyRunDeck(deck); return; }
     if (deckPickMode === "rematch" && pendingRematch) {
       const key = pendingRematch;
       pendingRematch = null;
@@ -5910,6 +6188,24 @@
     }
     if (deckPickMode === "tourney") beginTourneyRun(deck);
     else beginMatch(deck, pickOpponent(id));
+  }
+
+  function applyRunDeck(deck) {
+    if (!tourney || !deck) return;
+    const issues = String(deck.id || "").indexOf("custom:") === 0 || savedDecks.some((d) => d.id === deck.id)
+      ? issuesFor(deck.main, deck.extra)
+      : [];
+    if (issues.length) { toast(issues[0]); return; }
+    tourney.player = {
+      id: deck.id,
+      name: deck.name,
+      ace: deck.ace || pickAce(deck.main, deck.extra),
+      main: deck.main.slice(),
+      extra: (deck.extra || []).slice(),
+    };
+    saveTourney();
+    toast("This run will use " + deck.name + ".");
+    showIsland();
   }
 
   async function refreshCards() {
@@ -5966,19 +6262,36 @@
   function loadStore() {
     flEnforce = false;
     savedDecks = [];
+    let migrated = false;
     try {
       const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-      if (!raw || typeof raw !== "object") return;
-      flEnforce = !!raw.fl;
-      if (!Array.isArray(raw.decks)) return;
-      raw.decks.slice(0, 3).forEach((d) => {
+      let list = [];
+      if (Array.isArray(raw)) {
+        list = raw;
+        migrated = true;
+      } else if (raw && typeof raw === "object") {
+        flEnforce = !!raw.fl;
+        if (Array.isArray(raw.decks)) list = raw.decks;
+        else if (Array.isArray(raw.main)) {
+          list = [raw];
+          migrated = true;
+        }
+        if (raw.deck && typeof raw.deck === "object" && !Array.isArray(raw.decks)) {
+          list = list.concat([raw.deck]);
+          migrated = true;
+        }
+      }
+      list.slice(0, MAX_DECKS).forEach((d) => {
+        if (!d || typeof d.id !== "string" || !d.id) migrated = true;
         const deck = normalizeDeck(d);
         if (deck) savedDecks.push(deck);
       });
+      if (list.length > MAX_DECKS) migrated = true;
     } catch (e) {
       flEnforce = false;
       savedDecks = [];
     }
+    if (migrated) saveStore();
   }
 
   function normalizeDeck(d) {
@@ -6130,12 +6443,17 @@
   function openCustoms() {
     closeBuildSheet();
     draft = null;
-    const sub = document.querySelector("#customs .deck-head p");
+      const sub = document.querySelector("#customs .deck-head p");
     if (sub) {
       const owned = "Collection: " + ownedKinds() + " cards.";
-      sub.textContent = (deckPickMode === "tourney"
+      const lead = deckPickMode === "tourney"
         ? "A legal saved deck enters the tournament."
-        : "Pick a saved deck. The opponent is Yugi, Kaiba, or Joey.") + " " + owned;
+        : deckPickMode === "swap"
+          ? "This run uses the deck you pick. Chips and progress stay."
+          : deckPickMode === "rematch"
+            ? "This deck fights the rematch."
+            : "Pick a saved deck. The opponent is Yugi, Kaiba, or Joey.";
+      sub.textContent = lead + " " + owned;
     }
     showScreen("customs");
     renderCustoms();
@@ -6144,7 +6462,7 @@
   function renderCustoms() {
     syncFL();
     paintCustomPicker();
-    el.btnNewDeck.disabled = savedDecks.length >= 3;
+    el.btnNewDeck.disabled = savedDecks.length >= MAX_DECKS;
     el.customList.innerHTML = "";
     if (!savedDecks.length) {
       const note = document.createElement("p");
@@ -6183,7 +6501,7 @@
       const duel = document.createElement("button");
       duel.type = "button";
       duel.className = "primary";
-      duel.textContent = deckPickMode === "tourney" ? "Enter" : "Duel";
+      duel.textContent = deckPickMode === "tourney" ? "Enter" : deckPickMode === "swap" ? "Use" : "Duel";
       duel.disabled = issues.length > 0;
       duel.addEventListener("click", () => startCustom(deck));
       const edit = document.createElement("button");
@@ -6193,14 +6511,19 @@
       const copyBtn = document.createElement("button");
       copyBtn.type = "button";
       copyBtn.textContent = "Copy";
-      copyBtn.disabled = savedDecks.length >= 3;
+      copyBtn.disabled = savedDecks.length >= MAX_DECKS;
       copyBtn.addEventListener("click", () => copySaved(deck));
+      const rename = document.createElement("button");
+      rename.type = "button";
+      rename.textContent = "Rename";
+      rename.addEventListener("click", () => renameSaved(deck));
       const del = document.createElement("button");
       del.type = "button";
       del.textContent = "Delete";
       del.addEventListener("click", () => deleteSaved(deck));
       actions.appendChild(duel);
       actions.appendChild(edit);
+      actions.appendChild(rename);
       actions.appendChild(copyBtn);
       actions.appendChild(del);
       card.appendChild(top);
@@ -6219,6 +6542,7 @@
       main: deck.main.slice(),
       extra: deck.extra.slice(),
     };
+    if (deckPickMode === "swap") { applyRunDeck(built); return; }
     if (deckPickMode === "rematch" && pendingRematch) {
       const key = pendingRematch;
       pendingRematch = null;
@@ -6231,7 +6555,7 @@
   }
 
   function copySaved(deck) {
-    if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+    if (savedDecks.length >= MAX_DECKS) { toast("You can save " + MAX_DECKS + " decks. Delete one first."); return; }
     let name = deck.name + " copy";
     if (name.length > 24) name = deck.name.slice(0, 19).trim() + " copy";
     savedDecks.push({ id: newId(), name: name, main: deck.main.slice(), extra: deck.extra.slice() });
@@ -6247,8 +6571,19 @@
     renderCustoms();
   }
 
+  function renameSaved(deck) {
+    const next = prompt("Rename deck", deck.name);
+    if (next == null) return;
+    const name = next.trim().slice(0, 24);
+    if (!name) { toast("The deck needs a name."); return; }
+    deck.name = name;
+    saveStore();
+    renderCustoms();
+    toast("Renamed to " + name + ".");
+  }
+
   function promptNewDeck() {
-    if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+    if (savedDecks.length >= MAX_DECKS) { toast("You can save " + MAX_DECKS + " decks. Delete one first."); return; }
     openBuilder({ id: null, name: "My Deck", main: [], extra: [] });
   }
 
@@ -6502,7 +6837,7 @@
       if (i < 0) { toast("That deck was deleted."); return; }
       savedDecks[i] = record;
     } else {
-      if (savedDecks.length >= 3) { toast("You can save 3 decks. Delete one first."); return; }
+      if (savedDecks.length >= MAX_DECKS) { toast("You can save " + MAX_DECKS + " decks. Delete one first."); return; }
       draft.id = record.id;
       savedDecks.push(record);
     }
@@ -6518,6 +6853,120 @@
     draft.name = el.buildName.value;
     if (draftSnapshot() !== draft.savedJSON && !confirm("Leave without saving changes?")) return;
     openCustoms();
+  }
+
+  const CARD_POWER = {
+    "Raigeki": 1000, "Dark Hole": 970, "Harpie's Feather Duster": 960, "Monster Reborn": 940,
+    "Change of Heart": 920, "Pot of Greed": 910, "Heavy Storm": 890, "Delinquent Duo": 870,
+    "Giant Trunade": 860, "Confiscation": 840, "The Forceful Sentry": 830, "Snatch Steal": 820,
+    "Mystical Space Typhoon": 810, "Premature Burial": 800, "Painful Choice": 790,
+    "Swords of Revealing Light": 780, "Fissure": 720, "Tribute to the Doomed": 710,
+    "Polymerization": 640, "Axe of Despair": 560, "Megamorph": 540, "Horn of the Unicorn": 500,
+    "Black Pendant": 480, "Mirror Force": 1000, "Solemn Judgment": 900, "Magic Cylinder": 860,
+    "Torrential Tribute": 850, "Call of the Haunted": 840, "Trap Hole": 760, "Horn of Heaven": 730,
+    "Magic Jammer": 710, "Mirror Wall": 700, "Dust Tornado": 690, "Seven Tools of the Bandit": 670,
+  };
+
+  function roughSummon(c) {
+    if (!c || !c.isMonster || c.isFusion) return false;
+    if (/Toon/i.test(c.name) || /Toon/i.test(c.type) || /Ritual/i.test(c.type)) return false;
+    if (c.name === "Relinquished" || c.name === "Harpie Lady Sisters" || c.name === "Great Moth" || c.name === "Larvae Moth") return false;
+    if (/cannot be Normal Summoned/i.test(c.desc || "")) return false;
+    return true;
+  }
+
+  function cardPower(c) {
+    if (!c) return 0;
+    if (CARD_POWER[c.name] != null && !c.isMonster) return CARD_POWER[c.name];
+    if (c.isFusion) return (c.atk || 0) + 80;
+    if (c.isMonster) {
+      let score = (c.atk || 0) + Math.round((c.def || 0) * 0.1);
+      const lv = c.level || 0;
+      if (lv >= 7) score -= 220;
+      else if (lv >= 5) score -= 90;
+      else score += 80;
+      if (c.name === "Panther Warrior") score -= 200;
+      if (!roughSummon(c)) score -= 1400;
+      if (c.reward && GOD_NAMES.indexOf(c.name) >= 0) score += 2600;
+      return score;
+    }
+    if (c.isSpell) return c.race === "Equip" ? 320 : 430;
+    if (c.isTrap) return 400;
+    return 0;
+  }
+
+  function autoBuild() {
+    if (!draft) return;
+    const dirty = draft.main.length || draft.extra.length;
+    if (dirty && !confirm("Replace this deck with the strongest legal 40-card deck from cards you own?")) return;
+    const copies = {};
+    Object.keys(cardDB).forEach((name) => {
+      const c = cardDB[name];
+      if (!c || /Token|Skill/i.test(c.type)) return;
+      const lim = Math.min(ownedCount(name), copyLimit(name), 3);
+      if (lim > 0) copies[name] = lim;
+    });
+    const main = [];
+    const extra = [];
+    const take = (name) => {
+      if (!copies[name]) return false;
+      copies[name] -= 1;
+      if (copies[name] <= 0) delete copies[name];
+      return true;
+    };
+    const takeBest = (pred, n, into) => {
+      const rows = [];
+      Object.keys(copies).forEach((name) => {
+        const c = cardDB[name];
+        if (!c || !copies[name] || !pred(c)) return;
+        rows.push({ name: name, score: cardPower(c), left: copies[name] });
+      });
+      rows.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+      let got = 0;
+      rows.forEach((row) => {
+        while (row.left > 0 && got < n) {
+          if (!take(row.name)) break;
+          into.push(row.name);
+          row.left -= 1;
+          got += 1;
+        }
+      });
+      return got;
+    };
+    if (EXODIA_NAMES.every((name) => (copies[name] || 0) >= 1 && copyLimit(name) > 0)) {
+      EXODIA_NAMES.forEach((name) => { if (take(name)) main.push(name); });
+    }
+    const monsterGoal = 18 - main.filter((name) => cardDB[name] && cardDB[name].isMonster).length;
+    if (monsterGoal > 0) takeBest((c) => c.isMonster && !c.isFusion && roughSummon(c), monsterGoal, main);
+    const stillMon = 18 - main.filter((name) => cardDB[name] && cardDB[name].isMonster).length;
+    if (stillMon > 0) takeBest((c) => c.isMonster && !c.isFusion, stillMon, main);
+    takeBest((c) => c.isSpell && !c.isFusion, 12, main);
+    takeBest((c) => c.isTrap, 8, main);
+    while (main.length < 40) {
+      const before = main.length;
+      takeBest((c) => !c.isFusion, 40 - main.length, main);
+      if (main.length === before) break;
+    }
+    main.splice(40);
+    takeBest((c) => c.isFusion, 15, extra);
+    const monsters = [];
+    const spells = [];
+    const traps = [];
+    main.forEach((name) => {
+      const c = cardDB[name];
+      if (c && c.isTrap) traps.push(name);
+      else if (c && c.isSpell) spells.push(name);
+      else monsters.push(name);
+    });
+    draft.main = monsters.concat(spells, traps);
+    draft.extra = extra;
+    paintDraft();
+    renderBuilderGrid();
+    if (sheetName) openBuildSheet(sheetName);
+    const issues = issuesFor(draft.main, draft.extra);
+    toast(issues.length
+      ? "Auto-Build used every legal card you own. " + issues[0]
+      : "Auto-Build made a 40-card deck from your strongest cards.");
   }
 
   function fillBuilderSelects() {
@@ -7653,8 +8102,9 @@
     if (!el.btnContinue) return;
     if (tourney && tourney.player) {
       el.btnContinue.hidden = false;
-      el.btnContinue.textContent = "Continue · ★ " + tourney.chips;
+      if (el.continueLabel) el.continueLabel.textContent = "Continue · ★ " + tourney.chips;
     } else el.btnContinue.hidden = true;
+    if (savesReady) paintMenu();
   }
 
   function initialsOf(name) {
@@ -7695,9 +8145,10 @@
 
   function paintWallet() {
     const label = wallet.coins + " DP";
-    if (el.btnShop) el.btnShop.textContent = "Card Shop · " + label;
+    if (el.shopLabel) el.shopLabel.textContent = "Card Shop";
     if (el.islandDp) el.islandDp.textContent = label;
     if (el.shopBalance) el.shopBalance.textContent = label;
+    if (savesReady && el.menuDp) el.menuDp.textContent = groupNum(wallet.coins);
   }
 
   function setForDuelist(key) {
@@ -7913,11 +8364,113 @@
     else { refreshContinue(); showScreen("menu"); }
   }
 
+  function hashString(text) {
+    let h = 2166136261;
+    const s = String(text || "");
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function printedRarity(name) {
+    const rank = { Common: 1, Rare: 2, "Super Rare": 3, "Ultra Rare": 4 };
+    let best = "";
+    let bestN = 0;
+    const sets = window.PACK_SETS || {};
+    Object.keys(sets).forEach((setName) => {
+      const set = sets[setName] || {};
+      Object.keys(rank).forEach((rarity) => {
+        if ((set[rarity] || []).indexOf(name) >= 0 && rank[rarity] > bestN) {
+          best = rarity;
+          bestN = rank[rarity];
+        }
+      });
+    });
+    if (cardDB[name] && cardDB[name].reward) return "Secret Rare";
+    if (!best && (window.PACK_EXTRAS || []).indexOf(name) >= 0) return "Rare";
+    return best || "Common";
+  }
+
+  const DEAL_PRICE = { Common: 40, Rare: 90, "Super Rare": 160, "Ultra Rare": 240, "Secret Rare": 400 };
+  const SELL_PRICE = { Common: 12, Rare: 28, "Super Rare": 50, "Ultra Rare": 80, "Secret Rare": 120 };
+
+  function dealPrice(rarity) {
+    const full = DEAL_PRICE[rarity] || 40;
+    return Math.max(20, Math.round((full * 0.75) / 5) * 5);
+  }
+
+  function sellPrice(name) {
+    return SELL_PRICE[printedRarity(name)] || 12;
+  }
+
+  function spareCount(name) {
+    return Math.max(0, ownedCount(name) - ((copiesReserved()[name]) || 0));
+  }
+
+  function dailyDeal() {
+    const key = localDateKey(new Date());
+    const catalog = Object.keys(cardDB).filter((name) => {
+      const card = cardDB[name];
+      if (!card || card.isFusion || /Token|Skill/i.test(card.type || "")) return false;
+      if (card.reward) return false;
+      return true;
+    }).sort();
+    if (!catalog.length) return null;
+    const name = catalog[hashString("deal:" + key) % catalog.length];
+    const rarity = printedRarity(name);
+    return { date: key, name: name, rarity: rarity, price: dealPrice(rarity) };
+  }
+
+  function shopThumb(name) {
+    const img = document.createElement("img");
+    img.className = "thumb";
+    img.alt = "";
+    const card = cardDB[name];
+    if (card) img.src = card.image;
+    return img;
+  }
+
   function paintShop() {
     if (!el.shopList) return;
-    el.shopGreet.textContent = shopGreet;
+    document.querySelectorAll("#shopMode button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.mode === shopMode);
+    });
+    el.shopGreet.textContent = shopMode === "sell"
+      ? "Bring the extras. I will not take a copy your decks still need."
+      : shopGreet;
     el.shopBalance.textContent = wallet.coins + " DP";
     el.shopList.innerHTML = "";
+    if (shopMode === "sell") { paintSellList(); return; }
+    const deal = dailyDeal();
+    if (deal) {
+      const row = document.createElement("div");
+      row.className = "shop-row deal";
+      const copy = document.createElement("div");
+      copy.className = "copy";
+      const nm = document.createElement("div");
+      nm.className = "nm";
+      nm.textContent = "Daily deal · " + deal.name;
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = deal.rarity + " · own " + ownedCount(deal.name) + " · " + prettyDate(deal.date);
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      const price = document.createElement("div");
+      price.className = "price";
+      price.textContent = deal.price + " DP";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "Buy";
+      btn.disabled = wallet.coins < deal.price;
+      btn.addEventListener("click", () => buyDeal(deal));
+      row.appendChild(shopThumb(deal.name));
+      row.appendChild(copy);
+      row.appendChild(price);
+      row.appendChild(btn);
+      el.shopList.appendChild(row);
+    }
     SHOP_PACKS.forEach((pack) => {
       const open = setUnlocked(pack.set);
       const row = document.createElement("div");
@@ -7945,6 +8498,91 @@
       row.appendChild(btn);
       el.shopList.appendChild(row);
     });
+  }
+
+  function paintSellList() {
+    const names = Object.keys(collection.counts || {}).filter((name) => spareCount(name) > 0 && cardDB[name]);
+    names.sort((a, b) => spareCount(b) - spareCount(a) || a.localeCompare(b));
+    if (!names.length) {
+      const note = document.createElement("p");
+      note.className = "empty-note";
+      note.textContent = "No spare cards. Saved decks keep every copy they use, and the last copy of a card stays if a deck needs it.";
+      el.shopList.appendChild(note);
+      return;
+    }
+    names.forEach((name) => {
+      const spare = spareCount(name);
+      const price = sellPrice(name);
+      const row = document.createElement("div");
+      row.className = "shop-row";
+      const copy = document.createElement("div");
+      copy.className = "copy";
+      const nm = document.createElement("div");
+      nm.className = "nm";
+      nm.textContent = name;
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = "Spare " + spare + " · own " + ownedCount(name) + " · " + printedRarity(name);
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      const priceEl = document.createElement("div");
+      priceEl.className = "price";
+      priceEl.textContent = price + " DP";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "Sell";
+      btn.addEventListener("click", () => sellOne(name));
+      row.appendChild(shopThumb(name));
+      row.appendChild(copy);
+      row.appendChild(priceEl);
+      row.appendChild(btn);
+      el.shopList.appendChild(row);
+    });
+  }
+
+  function buyDeal(deal) {
+    const current = dailyDeal();
+    if (!current || current.name !== deal.name || current.price !== deal.price) {
+      toast("That deal changed. Have another look.");
+      paintShop();
+      return;
+    }
+    if (wallet.coins < current.price) { toast("Not enough Duel Points."); return; }
+    wallet.coins -= current.price;
+    saveWallet();
+    const card = { name: current.name, rarity: current.rarity };
+    markPrizeNew([card], grantCards([current.name]));
+    prize = {
+      cards: [card], index: 0, revealed: false, who: "Grandpa",
+      setName: "Daily deal", returnTo: "shop", firstUnlock: false,
+    };
+    openPrize();
+  }
+
+  function sellOne(name) {
+    const spare = spareCount(name);
+    if (spare <= 0 || !cardDB[name]) {
+      toast("A saved deck still needs that copy.");
+      paintShop();
+      return;
+    }
+    const price = sellPrice(name);
+    const left = ownedCount(name) - 1;
+    if (!confirm("Sell 1 " + name + " for " + price + " DP? You will have " + left + " left. Saved decks keep the copies they use.")) return;
+    if (ownedCount(name) - 1 < (copiesReserved()[name] || 0)) {
+      toast("A saved deck still needs that copy.");
+      paintShop();
+      return;
+    }
+    collection.counts[name] -= 1;
+    if (collection.counts[name] <= 0) delete collection.counts[name];
+    wallet.coins += price;
+    saveCollection();
+    saveWallet();
+    paintWallet();
+    paintShop();
+    paintNewBadge();
+    toast("Sold " + name + " for " + price + " DP.");
   }
 
   function buyPack(pack) {
@@ -7991,6 +8629,22 @@
     return !!(tourney && PATH.every((k) => tourney.beaten.indexOf(k) >= 0));
   }
 
+  function chipHunt() {
+    return !!(tourney && pathCleared() && !tourney.castleOpen && tourney.chips > 0 && tourney.chips < STAR_CASTLE);
+  }
+
+  function stakeOf(key) {
+    if (key === "rival") return STAKES.rival || 0;
+    if (STAKES[key]) return STAKES[key];
+    const src = TOURNEY[key];
+    return src && src.stake ? src.stake : 0;
+  }
+
+  function chipsStillNeeded() {
+    if (!tourney || tourney.castleOpen) return 0;
+    return Math.max(0, STAR_CASTLE - tourney.chips);
+  }
+
   function refreshCastleFlag() {
     if (!tourney || tourney.castleOpen) return;
     if (pathCleared() && tourney.chips >= STAR_CASTLE) tourney.castleOpen = true;
@@ -8021,29 +8675,35 @@
   function nodeMeta(key) {
     if (key === "pegasus") {
       const src = TOURNEY.pegasus;
-      let sub = "★ " + tourney.chips + " / " + STAR_CASTLE;
+      const need = chipsStillNeeded();
+      let sub = "Need " + need + " more ★ to face Pegasus";
       if (tourney.castleOpen) sub = "Enter the castle";
       else if (!pathCleared() && tourney.chips >= STAR_CASTLE) sub = "Clear the path first";
-      else if (pathCleared()) sub = "★ " + tourney.chips + " / " + STAR_CASTLE + " to enter";
-      return { name: "Pegasus", sub: sub, ace: src.ace, stake: "", side: "castle", done: false, now: !!tourney.castleOpen };
+      else if (need === 0) sub = "Enter the castle";
+      return { name: "Pegasus", sub: sub, ace: src.ace, stake: need && !tourney.castleOpen ? (tourney.chips + "/" + STAR_CASTLE) : "", side: "castle", done: false, now: !!tourney.castleOpen };
     }
     if (key === "rival") {
       const d = DECKS[tourney.rival];
       const beaten = tourney.beaten.indexOf("rival") >= 0;
       const open = canDuelNode("rival");
+      const hunting = beaten && chipHunt();
       return {
-        name: d.name, ace: d.ace, stake: beaten ? "DP+" : "★ " + STAKES.rival, side: "right",
-        sub: beaten ? "Rematch · no chips" : (open ? rivalField(tourney.rival) + " · Duel" : "Locked"),
+        name: d.name, ace: d.ace,
+        stake: hunting ? ("★ " + STAKES.rival) : (beaten ? "DP+" : "★ " + STAKES.rival),
+        side: "right",
+        sub: hunting ? ("Rematch · win ★ " + STAKES.rival) : (beaten ? "Rematch · no chips" : (open ? rivalField(tourney.rival) + " · Duel" : "Locked")),
         done: beaten, now: !beaten && open,
       };
     }
     const src = TOURNEY[key];
     const beaten = tourney.beaten.indexOf(key) >= 0;
     const open = canDuelNode(key);
+    const hunting = beaten && chipHunt();
     return {
-      name: src.name, ace: src.ace, stake: beaten ? "DP+" : "★ " + src.stake,
+      name: src.name, ace: src.ace,
+      stake: hunting ? ("★ " + src.stake) : (beaten ? "DP+" : "★ " + src.stake),
       side: PATH.indexOf(key) % 2 === 0 ? "left" : "right",
-      sub: beaten ? "Rematch · no chips" : (open ? src.field + " · Duel" : "Locked"),
+      sub: hunting ? ("Rematch · win ★ " + src.stake) : (beaten ? "Rematch · no chips" : (open ? src.field + " · Duel" : "Locked")),
       done: beaten, now: !beaten && open,
     };
   }
@@ -8108,9 +8768,14 @@
     el.islandTitle.textContent = classic ? "Classic Rules" : "Duelist Kingdom";
     el.islandDeck.textContent = (classic ? "8000 LP · " : "2000 LP · ") + tourney.player.name;
     el.islandChips.textContent = "★ " + tourney.chips + " / " + STAR_CASTLE;
-    el.islandNote.textContent = tourney.castleOpen
-      ? "The castle gates are open. Pegasus is waiting."
-      : "Their Star Chips total 8. With your 2, one win each opens the castle. A loss costs 1.";
+    const need = chipsStillNeeded();
+    if (tourney.castleOpen) {
+      el.islandNote.textContent = "The castle gates are open. Pegasus is waiting.";
+    } else if (chipHunt()) {
+      el.islandNote.textContent = "Need " + need + " more ★ to face Pegasus (" + tourney.chips + "/" + STAR_CASTLE + "). Rematch a beaten duelist to win their chips. A loss costs 1.";
+    } else {
+      el.islandNote.textContent = "Pegasus needs " + STAR_CASTLE + " ★. You have " + tourney.chips + (need ? " · " + need + " to go" : "") + ". One first win each opens the castle. A loss costs 1.";
+    }
     renderMap();
     showScreen("island");
   }
@@ -8345,17 +9010,19 @@
   function startNode(key) {
     if (!tourney || !canDuelNode(key)) return;
     const rematch = key !== "pegasus" && tourney.beaten.indexOf(key) >= 0;
+    const hunting = rematch && chipHunt();
     const sceneId = (key === "rival" ? (tourney.rival || "kaiba") : key) + "-pre";
-    playStory(sceneId, () => launchDuelist(key, tourney.player, tourneyRules(), rematch));
+    playStory(sceneId, () => launchDuelist(key, tourney.player, tourneyRules(), rematch, hunting));
   }
 
-  function launchDuelist(key, deck, rules, rematch) {
+  function launchDuelist(key, deck, rules, rematch, hunting) {
+    const hunt = !!hunting && !!rematch && key !== "pegasus";
     if (key === "rival") {
       const id = (tourney && tourney.rival) || wallet.rivalId || "kaiba";
       beginMatch(deck, id, {
         rules: rules, field: rivalField(id), mode: "tourney",
-        tourneyKey: "rival", stake: rematch ? 0 : STAKES.rival,
-        taunt: rivalTaunt(id), rematch: !!rematch,
+        tourneyKey: "rival", stake: hunt ? stakeOf("rival") : (rematch ? 0 : STAKES.rival),
+        taunt: rivalTaunt(id), rematch: !!rematch, chipHunt: hunt,
       });
       return;
     }
@@ -8363,8 +9030,8 @@
     if (!src) return;
     beginMatch(deck, key, {
       rules: rules, field: src.field, mode: "tourney",
-      tourneyKey: key, stake: rematch ? 0 : (src.stake || 0),
-      taunt: src.taunt || "", rematch: !!rematch,
+      tourneyKey: key, stake: hunt ? stakeOf(key) : (rematch ? 0 : (src.stake || 0)),
+      taunt: src.taunt || "", rematch: !!rematch, chipHunt: hunt,
     });
   }
 
@@ -8429,7 +9096,28 @@
       chipLine = "Rematch · Star Chips unchanged";
       if (you) {
         markCleared(key);
+        if (state.chipHunt && tourney) {
+          const gain = state.stake || stakeOf(key) || 1;
+          tourney.chips += gain;
+          refreshCastleFlag();
+          chipLine = "+" + gain + " Star Chip" + (gain === 1 ? "" : "s") + " · ★ " + tourney.chips;
+          if (tourney.castleOpen) chipLine += " · Castle open";
+          else chipLine += " · need " + chipsStillNeeded() + " more for Pegasus";
+        }
         givePack(state.aiName || key, PACK_OF[key] || "Legend of Blue Eyes White Dragon", true, false);
+      } else if (state.chipHunt && tourney) {
+        tourney.chips -= STAR_LOSS;
+        if (tourney.chips <= 0) {
+          title = "Eliminated";
+          chipLine = "You lost your last Star Chip.";
+          tourney = null;
+          saveTourney();
+          primary = "menu";
+        } else {
+          chipLine = "−1 Star Chip · ★ " + tourney.chips + " left · need " + chipsStillNeeded() + " more for Pegasus";
+          saveTourney();
+          primary = "map";
+        }
       } else primary = tourney ? "map" : "menu";
       if (tourney) saveTourney();
     } else if (!tourney) {
@@ -8590,6 +9278,14 @@
     paintSettings();
     saveSettings();
   });
+  el.setMenuCastle.addEventListener("click", () => setMenuTheme("castle"));
+  el.setMenuCity.addEventListener("click", () => setMenuTheme("city"));
+  $("shopMode").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || !b.dataset.mode) return;
+    shopMode = b.dataset.mode === "sell" ? "sell" : "buy";
+    paintShop();
+  });
   el.btnBinder.addEventListener("click", () => showBinder("menu"));
   el.btnBinderBack.addEventListener("click", leaveBinder);
   el.btnRematch.addEventListener("click", openRematch);
@@ -8648,6 +9344,15 @@
     }
   });
   el.btnIslandMenu.addEventListener("click", () => showScreen("menu"));
+  el.btnIslandDeck.addEventListener("click", () => {
+    if (!tourney) return;
+    deckPickMode = "swap";
+    el.tourneyRules.hidden = true;
+    el.tourneyRulesHint.hidden = true;
+    el.deckRules.textContent = "Tournament deck · " + tourney.player.name;
+    paintCustomPicker();
+    showScreen("decks");
+  });
   el.btnIslandRetire.addEventListener("click", () => {
     if (confirm("Retire from the tournament? This run will be erased.")) {
       tourney = null;
@@ -8661,6 +9366,7 @@
   el.flToggleBuild.addEventListener("click", toggleFL);
   el.btnBuildBack.addEventListener("click", leaveBuilder);
   el.btnBuildSave.addEventListener("click", saveDraft);
+  el.btnAutoBuild.addEventListener("click", () => autoBuild());
   el.buildName.addEventListener("input", () => { if (draft) draft.name = el.buildName.value; });
   el.buildSearch.addEventListener("input", () => {
     clearTimeout(buildTimer);
@@ -8692,7 +9398,11 @@
   el.buildRemove.addEventListener("click", () => { if (sheetName) removeDraftCard(sheetName); });
   el.buildClose.addEventListener("click", closeBuildSheet);
   el.buildOverlay.addEventListener("click", (e) => { if (e.target === el.buildOverlay) closeBuildSheet(); });
-  el.btnDeckBack.addEventListener("click", () => { pendingRematch = null; showScreen("menu"); });
+  el.btnDeckBack.addEventListener("click", () => {
+    pendingRematch = null;
+    if (deckPickMode === "swap" && tourney) { showIsland(); return; }
+    showScreen("menu");
+  });
   document.querySelectorAll(".deck-opt").forEach((btn) => {
     btn.addEventListener("click", () => chooseDeck(btn.dataset.deck));
   });
@@ -8772,6 +9482,7 @@
   loadTourney();
   loadWallet();
   loadPuzzle();
+  savesReady = true;
   paintNewBadge();
   syncUnlocksFromTourney();
   syncClearedFromTourney();
@@ -8892,6 +9603,14 @@
     addToDraft: (n) => addDraftCard(n),
     draftMain: () => (draft ? draft.main.slice() : null),
     safeAnte: () => safeAnteNames(),
+    chipHunt: () => chipHunt(),
+    menuTheme: () => menuTheme(),
+    dailyDeal: () => {
+      const deal = dailyDeal();
+      return deal ? { name: deal.name, price: deal.price, rarity: deal.rarity, date: deal.date } : null;
+    },
+    spare: (n) => spareCount(n),
+    sellPrice: (n) => sellPrice(n),
     binderStats: () => binderCatalog().map((g) => ({ id: g.id, title: g.title, ...groupStat(g.names) })),
     story: (id) => {
       const scene = storyScene(id);
