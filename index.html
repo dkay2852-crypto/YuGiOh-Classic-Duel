@@ -125,8 +125,24 @@
     html[data-menu="city"] .menu-bg.castle, #menu[data-theme="city"] .menu-bg.castle { display: none; }
     html[data-menu="city"] .menu-bg.city, #menu[data-theme="city"] .menu-bg.city {
       object-position: center top;
-      top: -92px;
-      height: calc(100% + 120px);
+      top: 78px;
+      height: calc(100% - 8px);
+      filter: brightness(1.38) contrast(1.08) saturate(1.2);
+    }
+    html[data-menu="city"] .menu-mon,
+    html[data-menu="city"] .menu-bolt,
+    html[data-menu="city"] .menu-fog,
+    html[data-menu="city"] .sparkles,
+    #menu[data-theme="city"] .menu-mon,
+    #menu[data-theme="city"] .menu-bolt,
+    #menu[data-theme="city"] .menu-fog,
+    #menu[data-theme="city"] .sparkles { display: none; }
+    html[data-menu="city"] #menu::before,
+    #menu[data-theme="city"]::before {
+      content: "";
+      position: absolute; left: 0; right: 0; top: 0; height: 108px; z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(4, 6, 18, 0.62), rgba(4, 6, 18, 0.18) 72%, transparent);
     }
     .menu-mon {
       position: absolute; top: 17%; height: 38%; width: 62%;
@@ -229,6 +245,19 @@
       padding-top: 4px;
       background: linear-gradient(180deg, transparent 0%, rgba(8, 4, 16, 0.2) 8%, rgba(8, 4, 16, 0.72) 28%);
     }
+    html[data-menu="city"] .menu-actions,
+    #menu[data-theme="city"] .menu-actions {
+      flex: 0 0 auto;
+      margin-top: auto;
+      width: 94%;
+      gap: 3px;
+      padding-top: 10px;
+      background: linear-gradient(180deg, rgba(6, 8, 24, 0) 0%, rgba(6, 8, 24, 0.22) 22%, rgba(6, 8, 24, 0.42) 100%);
+    }
+    html[data-menu="city"] .menu-brand .puzzle,
+    #menu[data-theme="city"] .menu-brand .puzzle { width: 26px; height: 22px; }
+    html[data-menu="city"] .brand,
+    #menu[data-theme="city"] .brand { font-size: clamp(1.2rem, 5.8vw, 1.5rem); }
     #menu .menu-btn {
       width: 100%; min-height: 32px; flex: 1 1 32px; max-height: 44px;
       padding: 0 8px 0 6px; gap: 8px;
@@ -245,6 +274,28 @@
     #menu .menu-btn.primary, #menu .menu-btn.tourney, #menu .menu-btn.shop, #menu .menu-btn.puzzle {
       background: linear-gradient(180deg, rgba(42, 24, 68, 0.94), rgba(14, 8, 28, 0.94));
       border-color: #d4b15a; color: #f6e2a8;
+    }
+    html[data-menu="city"] #menu .menu-btn,
+    #menu[data-theme="city"] .menu-btn {
+      flex: 0 0 auto;
+      min-height: 30px;
+      max-height: 34px;
+      background: linear-gradient(180deg, rgba(32, 20, 58, 0.4), rgba(10, 8, 24, 0.48));
+      border-color: rgba(232, 196, 110, 0.78);
+      box-shadow: inset 0 0 0 1px rgba(255, 220, 140, 0.14);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    }
+    html[data-menu="city"] #menu .menu-btn.primary,
+    html[data-menu="city"] #menu .menu-btn.tourney,
+    html[data-menu="city"] #menu .menu-btn.shop,
+    html[data-menu="city"] #menu .menu-btn.puzzle,
+    #menu[data-theme="city"] .menu-btn.primary,
+    #menu[data-theme="city"] .menu-btn.tourney,
+    #menu[data-theme="city"] .menu-btn.shop,
+    #menu[data-theme="city"] .menu-btn.puzzle {
+      background: linear-gradient(180deg, rgba(32, 20, 58, 0.42), rgba(10, 8, 24, 0.5));
+      border-color: rgba(240, 212, 138, 0.88);
+      color: #f6e2a8;
     }
     #menu .menu-btn.tourney { border-color: #f0d48a; box-shadow: inset 0 0 0 1px rgba(255, 230, 160, 0.35), 0 0 14px rgba(240, 192, 64, 0.28); }
     .m-ico {
@@ -503,7 +554,7 @@
       font-size: 0.62rem; padding: 4px; text-align: center;
     }
     .pool-card .cname {
-      position: absolute; left: 0; right: 0; bottom: 0;
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
       font-size: 0.56rem; line-height: 1.15; text-align: left;
       background: rgba(0,0,0,0.75); color: var(--cream);
       padding: 2px 3px 3px; max-height: 2.5em; overflow: hidden; pointer-events: none;
@@ -525,7 +576,9 @@
     .pool-empty { grid-column: 1 / -1; color: var(--muted); text-align: center; padding: 16px 8px; font-size: 0.85rem; }
     input, select { user-select: text; -webkit-user-select: text; }
     .build-sheet { align-items: stretch; }
-    .build-sheet .big-wrap { display: flex; justify-content: center; }
+    .build-sheet .big-wrap { display: flex; justify-content: center; position: relative; }
+    .build-sheet .big-wrap.has-foil { width: 132px; height: 192px; margin: 0 auto; overflow: hidden; border-radius: 6px; }
+    .build-sheet .big-wrap.has-foil .big { width: 100%; height: 100%; }
     .build-sheet .big {
       width: 132px; height: 192px; object-fit: cover; border-radius: 6px;
       border: 1px solid var(--gold-dim); background: #111;
@@ -540,10 +593,14 @@
     }
     #btnDeckBack { flex-shrink: 0; align-self: center; }
 
-    /* —— VS —— */
+    /* —— VS intro —— */
     #vs {
       align-items: center; justify-content: flex-start;
       padding: 8px 12px 8px; gap: 6px; text-align: center;
+      cursor: pointer;
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(212, 160, 23, 0.16), transparent 46%),
+        linear-gradient(180deg, #101a30, #07111f);
     }
     .vs-kicker { margin: 0; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem; flex-shrink: 0; }
     .vs-match { margin: 0; color: var(--gold); font-size: clamp(1.35rem, 6vw, 1.85rem); line-height: 1.05; flex-shrink: 0; }
@@ -552,23 +609,48 @@
       gap: 8px; width: 100%;
     }
     .vs-side {
-      margin: 0; width: 28vw; max-width: 112px; min-height: 0; height: 100%;
+      margin: 0; min-width: 0; min-height: 0; height: auto;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .vs-side img {
-      width: auto; height: auto; max-width: 100%; max-height: min(168px, 32vh);
-      aspect-ratio: 59 / 86; object-fit: cover; border-radius: 6px;
-      border: 1px solid var(--gold-dim); background: #111; display: block;
+    .vs-portrait {
+      position: relative; overflow: hidden; flex-shrink: 0;
+      height: min(168px, 26vh); width: calc(min(168px, 26vh) * 0.78);
+      border-radius: 12px; border: 2px solid #f0c040;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 236, 180, 0.35);
+      background: #111;
     }
-    .vs-side figcaption { margin-top: 4px; font-size: 0.64rem; color: var(--cream); line-height: 1.2; min-height: 0; flex-shrink: 0; }
-    .vs-badge { color: var(--gold); font-weight: 700; letter-spacing: 0.12em; font-size: 1.3rem; }
-    .vs-side.l { animation: slideL calc(0.4s * var(--fx, 1)) ease-out; }
-    .vs-side.r { animation: slideR calc(0.4s * var(--fx, 1)) ease-out; }
-    html[data-anim="off"] .vs-side.l, html[data-anim="off"] .vs-side.r { animation: none; }
-    #btnVsGo { flex-shrink: 0; }
+    .vs-side.r .vs-portrait { border-color: #ff8a80; }
+    .vs-portrait img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center 22%;
+      display: block; border: 0; border-radius: 0; background: #111;
+    }
+    .vs-who {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      padding: 18px 4px 6px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.88));
+      color: #fff6d4; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .vs-side figcaption {
+      margin-top: 4px; max-width: 28vw; font-size: 0.62rem; color: var(--cream); line-height: 1.2;
+      min-height: 0; flex-shrink: 0;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .vs-badge { color: var(--gold); font-weight: 700; letter-spacing: 0.14em; font-size: 1.55rem; text-shadow: 0 2px 0 #3a2500, 0 0 12px rgba(240, 192, 64, 0.65); }
+    #vs.slam .vs-side.l { animation: slamL calc(0.52s * var(--fx, 1)) cubic-bezier(.15, .8, .2, 1) both; }
+    #vs.slam .vs-side.r { animation: slamR calc(0.52s * var(--fx, 1)) cubic-bezier(.15, .8, .2, 1) both; }
+    #vs.slam .vs-badge { animation: slamVS calc(0.46s * var(--fx, 1)) cubic-bezier(.2, .7, .2, 1) 0.1s both; }
+    html[data-anim="off"] #vs.slam .vs-side.l,
+    html[data-anim="off"] #vs.slam .vs-side.r,
+    html[data-anim="off"] #vs.slam .vs-badge { animation: none; }
+    #btnVsGo { flex-shrink: 0; min-height: 42px; }
+    .vs-skip {
+      margin: 0; flex-shrink: 0; color: var(--muted); font-size: 0.66rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+    }
     .vs-taunt {
-      margin: 0; max-width: 34rem; font-size: 0.92rem; font-style: italic;
-      color: var(--cream); line-height: 1.35;
+      margin: 0; max-width: 22rem; font-size: 0.92rem; font-style: italic;
+      color: var(--cream); line-height: 1.35; flex-shrink: 0;
     }
     .vs-taunt[hidden] { display: none !important; }
 
@@ -752,16 +834,98 @@
     #puzzleReward { color: #ffe7a3; font-size: 0.78rem; font-weight: 700; }
     #puzzle .menu-btn { flex-shrink: 0; }
     .field {
-      flex: 1; min-height: 0;
+      flex: 1; min-height: 0; position: relative;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       gap: 3px; border-radius: 8px; padding: 4px;
-      background:
-        radial-gradient(ellipse at 50% 50%, #145c42 0%, var(--felt) 55%, var(--felt-edge) 100%);
+      background: #07140f;
       border: 1px solid rgba(212,160,23,0.25);
       box-shadow: inset 0 0 30px rgba(0,0,0,0.35);
       overflow: hidden;
     }
-    .cluster { display: flex; flex-direction: column; align-items: center; gap: 3px; max-width: 100%; }
+    .arena-bg {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(5, 14, 12, 0.28), rgba(5, 16, 12, 0.18) 46%, rgba(5, 12, 10, 0.34)),
+        radial-gradient(ellipse at 50% 50%, #145c42 0%, var(--felt) 55%, var(--felt-edge) 100%);
+      transform: scale(1.04);
+    }
+    #duel[data-arena="generic"] .arena-bg { filter: none; }
+    #duel:not([data-arena="generic"]) .arena-bg {
+      filter: blur(1.5px) saturate(0.92) brightness(0.92);
+    }
+    .cluster { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; max-width: 100%; width: 100%; }
+    #duel[data-arena="yugi"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(8, 10, 18, 0.48), rgba(8, 14, 16, 0.32) 42%, rgba(6, 12, 10, 0.55)),
+        radial-gradient(ellipse at 50% 82%, rgba(22, 120, 58, 0.95) 0%, rgba(22, 110, 50, 0.2) 42%, transparent 62%),
+        linear-gradient(180deg, #f2c06a 0%, #e06a3a 20%, #5c3470 46%, #1a3048 74%, #102018 100%);
+    }
+    #duel[data-arena="kaiba"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(6, 10, 24, 0.5), rgba(6, 12, 28, 0.36) 40%, rgba(4, 8, 18, 0.58)),
+        url("art/battle-city.jpg") center 18% / cover no-repeat;
+    }
+    #duel[data-arena="joey"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(10, 6, 12, 0.48), rgba(16, 8, 8, 0.34) 46%, rgba(8, 6, 6, 0.55)),
+        radial-gradient(ellipse at 78% 16%, rgba(255, 90, 30, 0.7), transparent 36%),
+        linear-gradient(180deg, #2a1430 0%, #8a3a28 34%, #3a1c14 70%, #140c0c 100%);
+    }
+    #duel[data-arena="weevil"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(4, 12, 8, 0.46), rgba(4, 16, 8, 0.32) 48%, rgba(4, 10, 6, 0.55)),
+        radial-gradient(ellipse at 18% 0%, rgba(170, 210, 80, 0.45), transparent 42%),
+        radial-gradient(ellipse at 80% 12%, rgba(20, 70, 24, 0.85), transparent 46%),
+        linear-gradient(180deg, #12301c 0%, #1c4a28 42%, #07140c 100%);
+    }
+    #duel[data-arena="rex"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(20, 10, 4, 0.42), rgba(16, 10, 4, 0.3) 46%, rgba(10, 6, 2, 0.55)),
+        radial-gradient(ellipse at 50% 88%, rgba(90, 50, 18, 0.85), transparent 50%),
+        linear-gradient(180deg, #e0b06a 0%, #b06830 30%, #6a3818 62%, #241408 100%);
+    }
+    #duel[data-arena="mai"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(8, 14, 22, 0.4), rgba(8, 14, 18, 0.28) 46%, rgba(6, 12, 14, 0.52)),
+        linear-gradient(165deg, transparent 36%, rgba(90, 100, 110, 0.9) 37%, rgba(70, 78, 84, 0.2) 58%, transparent 59%),
+        linear-gradient(200deg, transparent 42%, rgba(120, 130, 140, 0.75) 43%, transparent 68%),
+        linear-gradient(180deg, #9ed4ff 0%, #d5ecff 28%, #8aa4b4 50%, #243028 100%);
+    }
+    #duel[data-arena="keith"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(6, 8, 12, 0.5), rgba(8, 8, 10, 0.34) 46%, rgba(6, 6, 8, 0.58)),
+        repeating-linear-gradient(90deg, rgba(255, 180, 80, 0.16) 0 2px, transparent 2px 22px),
+        linear-gradient(180deg, #243040 0%, #4a4038 36%, #2a241c 68%, #12100e 100%);
+    }
+    #duel[data-arena="panik"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(4, 2, 10, 0.55), rgba(8, 2, 16, 0.38) 46%, rgba(4, 2, 8, 0.62)),
+        radial-gradient(ellipse at 50% 28%, rgba(110, 20, 150, 0.55), transparent 48%),
+        linear-gradient(180deg, #100818 0%, #2a0840 42%, #0a0610 100%);
+    }
+    #duel[data-arena="pegasus"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(10, 6, 16, 0.5), rgba(12, 8, 18, 0.36) 44%, rgba(6, 4, 12, 0.58)),
+        url("art/castle.jpg") center 28% / cover no-repeat;
+    }
+    #duel[data-arena="mako"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(4, 14, 28, 0.46), rgba(4, 18, 32, 0.28) 48%, rgba(4, 10, 20, 0.52)),
+        radial-gradient(ellipse 90% 14% at 50% 58%, rgba(255, 255, 255, 0.2), transparent 70%),
+        radial-gradient(ellipse 100% 16% at 30% 72%, rgba(140, 220, 240, 0.45), transparent 68%),
+        radial-gradient(ellipse 80% 12% at 70% 84%, rgba(255, 255, 255, 0.16), transparent 70%),
+        radial-gradient(ellipse at 50% 100%, rgba(40, 180, 200, 0.85), transparent 55%),
+        linear-gradient(180deg, #9ad8f2 0%, #1a6ea0 28%, #0a3058 58%, #061828 100%);
+    }
+    #duel[data-arena="bonz"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(6, 8, 10, 0.5), rgba(8, 8, 8, 0.32) 46%, rgba(4, 4, 6, 0.58)),
+        radial-gradient(circle at 76% 16%, #efe8c4 0 2.1%, rgba(239, 232, 196, 0.2) 2.4%, transparent 9%),
+        radial-gradient(ellipse 7% 16% at 24% 74%, #4a463c 0 60%, transparent 70%),
+        radial-gradient(ellipse 5% 13% at 46% 78%, #3a3830 0 60%, transparent 70%),
+        radial-gradient(ellipse 6% 15% at 68% 72%, #524e44 0 60%, transparent 70%),
+        linear-gradient(180deg, #141820 0%, #2a2830 26%, #3a3428 58%, #12100c 100%);
+    }
     .side { display: flex; flex-direction: column; gap: 3px; align-items: center; }
     .zones { display: flex; justify-content: center; gap: 3px; }
     .zone {
@@ -942,7 +1106,7 @@
     html[data-anim="fast"] .pack-card.is-new { animation: none; }
     .new-badge {
       position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-      z-index: 2; pointer-events: none;
+      z-index: 4; pointer-events: none;
       background: #146b38; color: #e9fff4; font-weight: 700;
       font-size: 0.78rem; letter-spacing: 0.14em;
       padding: 3px 8px; border-radius: 3px;
@@ -990,7 +1154,7 @@
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .pool-card .own {
-      position: absolute; left: 2px; top: 2px; z-index: 1; pointer-events: none;
+      position: absolute; left: 2px; top: 2px; z-index: 4; pointer-events: none;
       font-size: 0.52rem; line-height: 1.15; padding: 2px 3px; border-radius: 2px;
       background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
     }
@@ -1285,7 +1449,7 @@
       padding: 4px 2px; background: rgba(7, 17, 31, 0.94);
       color: var(--gold); font-size: 0.72rem; font-weight: 700;
     }
-    .binder-head span { color: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .binder-head span { color: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.62rem; text-align: right; }
     .binder-grid {
       display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; align-content: start;
     }
@@ -1303,7 +1467,7 @@
     }
     .binder-card.missing .cname { color: #7d8796; }
     .binder-card .count {
-      position: absolute; left: 2px; top: 2px; z-index: 1; pointer-events: none;
+      position: absolute; left: 2px; top: 2px; z-index: 4; pointer-events: none;
       font-size: 0.62rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
       background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
     }
@@ -1312,9 +1476,167 @@
       box-shadow: 0 0 0 1px #7dffb3, 0 0 8px rgba(90, 255, 170, 0.55);
     }
     .binder-card .new-tag {
-      position: absolute; right: 2px; top: 2px; z-index: 1; pointer-events: none;
+      position: absolute; right: 2px; top: 2px; z-index: 4; pointer-events: none;
       font-size: 0.52rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
       background: #146b38; color: #e9fff4; font-weight: 700; letter-spacing: 0.04em;
+    }
+    .foil-pips {
+      position: absolute; right: 2px; bottom: 16px; z-index: 4; pointer-events: none;
+      display: flex; gap: 2px;
+    }
+    .foil-pips i {
+      font-style: normal; font-size: 0.48rem; font-weight: 700; line-height: 1;
+      padding: 1px 2px; border-radius: 2px; background: rgba(0, 0, 0, 0.8);
+    }
+    .foil-pips .super { color: #e8eef8; }
+    .foil-pips .ultra { color: #ffd56a; }
+    .foil-pips .secret { color: #ffb0e4; }
+    .has-foil { position: relative; }
+    .foil-shine, .foil-burst {
+      position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+      overflow: hidden; z-index: 2;
+    }
+    .foil-burst { z-index: 3; opacity: 0; }
+    .foil-flash > .foil-burst {
+      opacity: 1;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.82), rgba(255, 230, 160, 0.2) 42%, transparent 70%);
+      animation: foilBurst calc(0.7s * var(--fx, 1)) ease-out forwards;
+    }
+    .foil-secret.foil-flash > .foil-burst {
+      background: linear-gradient(115deg, rgba(255, 60, 100, 0.55), rgba(255, 220, 70, 0.5), rgba(70, 230, 180, 0.5), rgba(80, 140, 255, 0.55), rgba(200, 80, 255, 0.5));
+    }
+    .foil-ultra > .foil-shine::before {
+      content: "";
+      position: absolute; left: 6%; right: 7%; top: 4.2%; height: 8%;
+      background: linear-gradient(90deg, rgba(255, 186, 40, 0.25), #ffe7a0, rgba(255, 176, 20, 0.9));
+      animation: goldPulse calc(1.7s * var(--fx, 1)) ease-in-out infinite;
+    }
+    .foil-super > .foil-shine {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0 16%, #000 20% 58%, transparent 64% 100%);
+      mask-image: linear-gradient(to bottom, transparent 0 16%, #000 20% 58%, transparent 64% 100%);
+    }
+    .foil-super > .foil-shine::after,
+    .foil-ultra > .foil-shine::after,
+    .foil-secret > .foil-shine::after {
+      content: "";
+      position: absolute; top: -10%; bottom: -10%; width: 34%; left: -40%;
+      transform: translateX(0) skewX(-16deg);
+      animation: foilSlide calc(2.6s * var(--fx, 1)) ease-in-out infinite;
+    }
+    .foil-super > .foil-shine::after {
+      background: linear-gradient(90deg, transparent, rgba(236, 244, 255, 0.08) 35%, rgba(255, 255, 255, 0.55) 50%, rgba(220, 230, 245, 0.08) 65%, transparent);
+    }
+    .foil-ultra > .foil-shine::after {
+      width: 28%;
+      background: linear-gradient(90deg, transparent, rgba(255, 214, 90, 0.08) 38%, rgba(255, 248, 210, 0.62) 50%, rgba(255, 190, 40, 0.16) 60%, transparent);
+      animation-duration: calc(2.1s * var(--fx, 1));
+    }
+    .foil-secret > .foil-shine::after {
+      width: 46%;
+      background: linear-gradient(90deg, transparent, rgba(255, 60, 90, 0.42), rgba(255, 210, 50, 0.48), rgba(70, 255, 180, 0.4), rgba(70, 140, 255, 0.48), rgba(210, 70, 255, 0.42), transparent);
+      animation: foilSlide calc(2.15s * var(--fx, 1)) linear infinite;
+    }
+    .foil-face {
+      position: relative; display: block; width: 100%; height: 100%;
+    }
+    .foil-face.def { transform: rotate(90deg) scale(0.68); }
+    .foil-face .card { width: 100%; height: 100%; }
+    .pool-card .own.foil, .shop-row .sub .foil-note { color: #ffe7a3; }
+    @keyframes foilSlide {
+      0% { transform: translateX(0) skewX(-16deg); }
+      100% { transform: translateX(420%) skewX(-16deg); }
+    }
+    @keyframes goldPulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.78; }
+    }
+    @keyframes foilBurst {
+      0% { opacity: 0.95; }
+      100% { opacity: 0; }
+    }
+    @keyframes slamL {
+      0% { opacity: 0; transform: translateX(-78%) scale(1.12); }
+      68% { opacity: 1; transform: translateX(8px) scale(1); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes slamR {
+      0% { opacity: 0; transform: translateX(78%) scale(1.12); }
+      68% { opacity: 1; transform: translateX(-8px) scale(1); }
+      100% { opacity: 1; transform: none; }
+    }
+    @keyframes slamVS {
+      0% { opacity: 0; transform: scale(2.35); }
+      70% { opacity: 1; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes cineIn {
+      0% { opacity: 0; transform: scale(1.28); filter: brightness(2.1); }
+      58% { opacity: 1; transform: scale(0.97); filter: brightness(1.15); }
+      100% { opacity: 1; transform: none; filter: none; }
+    }
+    @keyframes cineTitle {
+      0% { opacity: 0; transform: translateY(16px) scale(1.08); }
+      100% { opacity: 1; transform: none; }
+    }
+    #cine {
+      position: fixed; left: 0; right: 0;
+      top: var(--vv-off, 0px); height: var(--vv-h, 100dvh);
+      z-index: 65;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(4, 6, 14, 0.62);
+      padding:
+        calc(12px + env(safe-area-inset-top, 0px))
+        calc(12px + env(safe-area-inset-right, 0px))
+        calc(12px + env(safe-area-inset-bottom, 0px))
+        calc(12px + env(safe-area-inset-left, 0px));
+    }
+    #cine[hidden] { display: none !important; }
+    .cine-btn {
+      width: min(86vw, 320px); max-height: 100%;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 0; border: 0; background: transparent; color: var(--cream);
+    }
+    #cineArt {
+      width: min(62vw, 220px); aspect-ratio: 59 / 86; object-fit: cover;
+      border-radius: 10px; border: 2px solid #f0c040; background: #111;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), 0 0 24px rgba(240, 192, 64, 0.35);
+    }
+    #cine.go #cineArt { animation: cineIn calc(0.48s * var(--fx, 1)) cubic-bezier(.16, .8, .2, 1) both; }
+    .cine-copy { text-align: center; max-width: 100%; }
+    #cineKicker {
+      display: block; color: var(--gold); letter-spacing: 0.16em; text-transform: uppercase;
+      font-size: 0.68rem;
+    }
+    #cineTitle {
+      display: block; margin-top: 2px; color: #fff6d4; font-size: clamp(1rem, 4.6vw, 1.25rem);
+      line-height: 1.15;
+    }
+    #cine.go #cineTitle { animation: cineTitle calc(0.4s * var(--fx, 1)) ease-out 0.08s both; }
+    .cine-tap {
+      color: var(--muted); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    html[data-anim="off"] #cine.go #cineArt,
+    html[data-anim="off"] #cine.go #cineTitle,
+    html[data-anim="off"] .foil-shine::before,
+    html[data-anim="off"] .foil-shine::after,
+    html[data-anim="off"] .foil-burst { animation: none !important; }
+    html[data-anim="off"] .foil-super > .foil-shine { background: linear-gradient(180deg, transparent 18%, rgba(255, 255, 255, 0.28) 40%, transparent 62%); }
+    html[data-anim="off"] .foil-ultra > .foil-shine { background: linear-gradient(180deg, rgba(255, 210, 80, 0.55) 0 9%, transparent 12%); }
+    html[data-anim="off"] .foil-secret > .foil-shine {
+      background: linear-gradient(115deg, rgba(255, 80, 110, 0.32), rgba(255, 210, 70, 0.32), rgba(80, 230, 180, 0.32), rgba(80, 140, 255, 0.32), rgba(200, 80, 255, 0.32));
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #vs.slam .vs-side.l, #vs.slam .vs-side.r, #vs.slam .vs-badge,
+      #cine.go #cineArt, #cine.go #cineTitle,
+      .foil-shine::before, .foil-shine::after, .foil-burst,
+      .pack-card.reveal, .screen.active {
+        animation: none !important;
+      }
+      .foil-super > .foil-shine { background: linear-gradient(180deg, transparent 18%, rgba(255, 255, 255, 0.28) 40%, transparent 62%); }
+      .foil-ultra > .foil-shine { background: linear-gradient(180deg, rgba(255, 210, 80, 0.55) 0 9%, transparent 12%); }
+      .foil-secret > .foil-shine {
+        background: linear-gradient(115deg, rgba(255, 80, 110, 0.32), rgba(255, 210, 70, 0.32), rgba(80, 230, 180, 0.32), rgba(80, 140, 255, 0.32), rgba(200, 80, 255, 0.32));
+      }
     }
     #rematch .deck-head { width: 100%; }
     #rematchList { display: flex; flex-direction: column; gap: 6px; }
@@ -1519,15 +1841,22 @@
       </div>
       <div class="vs-row">
         <figure class="vs-side l">
-          <img id="vsPArt" alt="" />
+          <div class="vs-portrait">
+            <img id="vsPArt" alt="" />
+            <span class="vs-who" id="vsPName">You</span>
+          </div>
           <figcaption id="vsPCap"></figcaption>
         </figure>
         <div class="vs-badge">VS</div>
         <figure class="vs-side r">
-          <img id="vsOArt" alt="" />
+          <div class="vs-portrait">
+            <img id="vsOArt" alt="" />
+            <span class="vs-who" id="vsOName">Rival</span>
+          </div>
           <figcaption id="vsOCap"></figcaption>
         </figure>
       </div>
+      <p class="vs-skip">Tap to skip</p>
       <button type="button" class="menu-btn primary" id="btnVsGo">Duel!</button>
     </section>
 
@@ -1625,7 +1954,9 @@
         <p><strong>New cards:</strong> The first copy of a card, from a booster, Grandpa's shop, an ante, or another reward, shows a NEW badge and a glow when it is revealed. The binder keeps NEW on that card until you tap it. A green count on Card Binder is how many of those you have not opened yet. Cards you already owned are treated as seen.</p>
         <p><strong>Daily Puzzle:</strong> One puzzle for today's date. The board, hands, and Life Points are already set. Win that turn with the rules named on the puzzle, Classic or Duelist Kingdom. Hint and Retry sit on the duel screen. The first solve of the day pays 40 Duel Points. Solving on back-to-back days raises a streak. Reset Progress clears the streak.</p>
         <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. A daily deal, picked from today's date, sells one card at a discount. Sell gives Duel Points for a spare copy. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
-        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Settings saves your rules, animation speed, sound, story skip, ante rule, and main-menu theme on this device.</p>
+        <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Each opponent brings their own arena behind the cards. Settings saves your rules, animation speed, sound, story skip, cinematics, ante rule, and main-menu theme on this device.</p>
+        <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. The binder shows which foil versions you own, and each set counts those foils. A foil copy and a normal copy both count as that card in the deck builder. Foils shine in the pack, the binder, the builder, and on the field.</p>
+        <p><strong>Intros:</strong> A VS screen slams in before each duel, with both names, ace art, and the opponent's line. It moves on after about two seconds, or when you tap. Blue-Eyes White Dragon, Dark Magician, Red-Eyes Black Dragon, and a completed Exodia play a short flash. Turn Cinematics off in Settings to skip them.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
     </section>
@@ -1643,6 +1974,7 @@
         <button type="button" class="mini-btn" id="btnPuzzleRetry">Retry</button>
       </div>
       <div class="field">
+        <div class="arena-bg" id="arenaBg" aria-hidden="true"></div>
         <div class="cluster">
           <div class="side opp">
             <div class="zones" id="aiST"></div>
@@ -1725,6 +2057,13 @@
             <span>Jump past the talks on arrival, before and after tournament duels, and after Pegasus.</span>
           </div>
           <button type="button" class="fl-switch" id="storyToggle" aria-pressed="false">Off</button>
+        </div>
+        <div class="set-row">
+          <div class="set-copy">
+            <strong>Cinematics</strong>
+            <span>VS intro and the short summon flashes for Blue-Eyes, Dark Magician, Red-Eyes, and Exodia. Tap skips them. Off, Animations Off, or reduced motion jumps straight in.</span>
+          </div>
+          <button type="button" class="fl-switch on" id="cineToggle" aria-pressed="true">On</button>
         </div>
         <div class="set-block" id="setMenuBlock">
           <div class="set-copy">
@@ -1840,6 +2179,16 @@
   <div id="coin" aria-hidden="true"></div>
 
   <div id="fxLayer" aria-hidden="true"></div>
+  <div id="cine" hidden>
+    <button type="button" class="cine-btn" id="cineBtn">
+      <img id="cineArt" alt="" />
+      <div class="cine-copy">
+        <span id="cineKicker">Summon</span>
+        <strong id="cineTitle"></strong>
+      </div>
+      <span class="cine-tap">Tap to skip</span>
+    </button>
+  </div>
 
   <div class="overlay" id="overlay">
     <div class="sheet" id="cardSheet">
@@ -2330,6 +2679,25 @@
   ];
   const GOD_NAMES = ["Slifer the Sky Dragon", "Obelisk the Tormentor", "The Winged Dragon of Ra"];
   const REWARD_NAMES = EXODIA_NAMES.concat(GOD_NAMES);
+  const FOIL_TIERS = { super: "Super Rare", ultra: "Ultra Rare", secret: "Secret Rare" };
+  const SIGNATURE_SUMMONS = {
+    "Blue-Eyes White Dragon": true,
+    "Dark Magician": true,
+    "Red-Eyes Black Dragon": true,
+  };
+  const DUEL_QUOTES = {
+    yugi: "The heart of the cards is on my side.",
+    kaiba: "My Blue-Eyes White Dragon is the ultimate creature!",
+    joey: "Brooklyn's in the house. Let's duel!",
+    weevil: "The forest belongs to my insects. You'll be swarmed!",
+    rex: "This wasteland is dinosaur country. You're extinct!",
+    mai: "My Harpies rule this mountain. Try to keep up.",
+    keith: "American machines. This Slot Machine does not miss.",
+    panik: "In my castle of darkness, you will not see the end coming.",
+    pegasus: "Welcome to my castle. Let me show you Toon World.",
+    mako: "The sea swallows careless duelists.",
+    bonz: "The dead do not stay buried. Not in my graveyard.",
+  };
   const REWARD_SHORT = {
     "Exodia the Forbidden One": "Exodia",
     "Right Arm of the Forbidden One": "Right Arm",
@@ -2529,7 +2897,7 @@
   let tourneyRulesPick = "dk";
   let collection = { counts: {}, unlocked: false };
   let prize = null;
-  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false, menuTheme: "" };
+  let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, cinematics: true, ante: false, menuTheme: "" };
   let shopMode = "buy";
   let savesReady = false;
   let wallet = { coins: 0, sets: [], cleared: [], rivalId: "" };
@@ -2576,7 +2944,7 @@
     binderSets: $("binderSets"), binderScroll: $("binderScroll"),
     rematchList: $("rematchList"), rematchNote: $("rematchNote"),
     btnHowto: $("btnHowto"), btnHowtoBack: $("btnHowtoBack"), btnSettings: $("btnSettings"),
-    storyToggle: $("storyToggle"), anteToggle: $("anteToggle"),
+    storyToggle: $("storyToggle"), cineToggle: $("cineToggle"), anteToggle: $("anteToggle"),
     storyKicker: $("storyKicker"), storyArt: $("storyArt"), storyInitials: $("storyInitials"),
     storyName: $("storyName"), storyLine: $("storyLine"), storyNext: $("storyNext"),
     btnStorySkip: $("btnStorySkip"),
@@ -2590,6 +2958,7 @@
     aiDeckPile: $("aiDeckPile"), plDeckPile: $("plDeckPile"), fxLayer: $("fxLayer"),
     deckRules: $("deckRules"), btnDeckBack: $("btnDeckBack"),
     vsRules: $("vsRules"), vsMatch: $("vsMatch"), vsPArt: $("vsPArt"), vsOArt: $("vsOArt"),
+    vsPName: $("vsPName"), vsOName: $("vsOName"),
     vsPCap: $("vsPCap"), vsOCap: $("vsOCap"), vsTaunt: $("vsTaunt"), btnVsGo: $("btnVsGo"),
     vsAnte: $("vsAnte"), vsAnteP: $("vsAnteP"), vsAnteO: $("vsAnteO"),
     vsAntePCap: $("vsAntePCap"), vsAnteOCap: $("vsAnteOCap"),
@@ -2774,6 +3143,21 @@
     const fx = mode === "off" ? "0" : mode === "fast" ? "0.45" : "1";
     document.documentElement.setAttribute("data-anim", mode);
     document.documentElement.style.setProperty("--fx", fx);
+    document.documentElement.setAttribute("data-cine", cinematicsOn() ? "on" : "off");
+  }
+
+  function motionReduced() {
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  }
+
+  function cinematicsOn() {
+    if (window.__FAST) return false;
+    return !!(settings && settings.cinematics !== false && settings.anim !== "off" && !motionReduced());
+  }
+
+  function introsOn() {
+    if (window.__FAST) return true;
+    return cinematicsOn();
   }
 
   function persist(key, value) {
@@ -2791,7 +3175,7 @@
   }
 
   function loadSettings() {
-    settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, ante: false, menuTheme: "" };
+    settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, cinematics: true, ante: false, menuTheme: "" };
     try {
       const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
       if (!raw || typeof raw !== "object") return;
@@ -2799,6 +3183,7 @@
       if (raw.anim === "fast" || raw.anim === "off" || raw.anim === "on") settings.anim = raw.anim;
       if (typeof raw.sound === "boolean") settings.sound = raw.sound;
       if (typeof raw.skipStory === "boolean") settings.skipStory = raw.skipStory;
+      if (typeof raw.cinematics === "boolean") settings.cinematics = raw.cinematics;
       if (raw.ante === true) settings.ante = true;
       if (raw.menuTheme === "castle" || raw.menuTheme === "city") settings.menuTheme = raw.menuTheme;
       if (typeof raw.volume === "number" && isFinite(raw.volume)) {
@@ -2838,6 +3223,12 @@
       el.storyToggle.classList.toggle("on", !!settings.skipStory);
       el.storyToggle.textContent = settings.skipStory ? "On" : "Off";
       el.storyToggle.setAttribute("aria-pressed", settings.skipStory ? "true" : "false");
+    }
+    if (el.cineToggle) {
+      const on = settings.cinematics !== false;
+      el.cineToggle.classList.toggle("on", on);
+      el.cineToggle.textContent = on ? "On" : "Off";
+      el.cineToggle.setAttribute("aria-pressed", on ? "true" : "false");
     }
     if (el.anteToggle) {
       el.anteToggle.classList.toggle("on", !!settings.ante);
@@ -3138,6 +3529,7 @@
         p.spells.forEach((st) => { if (st && st.faceup) seenFaceupST.add(st.uid); });
       });
     }
+    armSignatureSeen();
     seenReady = true;
   }
 
@@ -3274,13 +3666,107 @@
   }
 
   function strip(card) {
-    return { uid: card.uid, name: card.name, ref: card.ref };
+    const out = { uid: card.uid, name: card.name, ref: card.ref };
+    if (card && card.foil) out.foil = card.foil;
+    return out;
   }
 
   function inst(name) {
     const base = cardDB[name];
     if (!base) throw new Error("Missing card: " + name);
     return { uid: "c" + (uidN++), name: base.name, ref: base };
+  }
+
+  function monFrom(card, extra) {
+    const m = {
+      uid: card.uid, name: card.name, ref: card.ref,
+      position: "atk", faceup: true, tempControl: null,
+    };
+    if (card && card.foil) m.foil = card.foil;
+    if (extra) Object.keys(extra).forEach((key) => { m[key] = extra[key]; });
+    return m;
+  }
+
+  let cineQueue = [];
+  let cineActive = null;
+  let cineTimer = 0;
+
+  function clearCinematic() {
+    clearTimeout(cineTimer);
+    cineTimer = 0;
+    cineQueue = [];
+    cineActive = null;
+    const node = $("cine");
+    if (node) {
+      node.hidden = true;
+      node.classList.remove("go");
+    }
+  }
+
+  function finishCinematic() {
+    clearTimeout(cineTimer);
+    cineTimer = 0;
+    const spec = cineActive;
+    cineActive = null;
+    const node = $("cine");
+    if (node) {
+      node.hidden = true;
+      node.classList.remove("go");
+    }
+    if (spec && spec.onDone) spec.onDone();
+    pumpCinematic();
+  }
+
+  function skipCinematics() {
+    clearTimeout(cineTimer);
+    cineTimer = 0;
+    const pending = [];
+    if (cineActive) pending.push(cineActive);
+    while (cineQueue.length) pending.push(cineQueue.shift());
+    cineActive = null;
+    const node = $("cine");
+    if (node) {
+      node.hidden = true;
+      node.classList.remove("go");
+    }
+    pending.forEach((spec) => { if (spec && spec.onDone) spec.onDone(); });
+  }
+
+  function pumpCinematic() {
+    if (cineActive || !cineQueue.length) return;
+    const spec = cineQueue.shift();
+    if (!spec) return;
+    if (!cinematicsOn()) {
+      if (spec.onDone) spec.onDone();
+      pumpCinematic();
+      return;
+    }
+    const card = spec.name && cardDB[spec.name];
+    const node = $("cine");
+    const art = $("cineArt");
+    const kicker = $("cineKicker");
+    const title = $("cineTitle");
+    if (!node || !art || !card) {
+      if (spec.onDone) spec.onDone();
+      pumpCinematic();
+      return;
+    }
+    cineActive = spec;
+    art.src = card.imageFull || card.image || "";
+    art.alt = spec.title || card.name;
+    if (kicker) kicker.textContent = spec.kicker || "Summon";
+    if (title) title.textContent = spec.title || card.name;
+    node.hidden = false;
+    node.classList.remove("go");
+    void node.offsetWidth;
+    node.classList.add("go");
+    const ms = settings.anim === "fast" ? 700 : 1500;
+    cineTimer = setTimeout(finishCinematic, ms);
+  }
+
+  function playCinematic(spec) {
+    cineQueue.push(spec || {});
+    pumpCinematic();
   }
 
   function shuffle(arr) {
@@ -3360,6 +3846,7 @@
 
   function abandon() {
     matchGen++;
+    clearCinematic();
     clearTimeout(vsTimer);
     cancelChoice();
     closeSheet();
@@ -3391,11 +3878,29 @@
   }
 
   function checkExodia(p) {
-    if (!state || state.winner || !p) return false;
+    if (!state || state.winner || state.exodiaHold || !p) return false;
     const have = {};
     p.hand.forEach((c) => { have[c.name] = true; });
     if (!EXODIA_NAMES.every((n) => have[n])) return false;
-    endGame(p === state.player ? "player" : "ai", whoName(p) + " holds all five pieces of Exodia.");
+    const winner = p === state.player ? "player" : "ai";
+    const reason = whoName(p) + " holds all five pieces of Exodia.";
+    if (!cinematicsOn()) {
+      endGame(winner, reason);
+      return true;
+    }
+    state.exodiaHold = true;
+    state.busy = true;
+    playCinematic({
+      name: "Exodia the Forbidden One",
+      kicker: "Exodia",
+      title: "Obliterate!",
+      onDone: () => {
+        if (!state || state.winner) return;
+        state.exodiaHold = false;
+        state.busy = false;
+        endGame(winner, reason);
+      },
+    });
     return true;
   }
 
@@ -3715,10 +4220,7 @@
       owner.gy.push(strip(poly));
       return false;
     }
-    owner.monsters[slot] = {
-      uid: fusion.uid, name: fusion.name, ref: fusion.ref,
-      position: "atk", faceup: true, tempControl: null, justFusion: true,
-    };
+    owner.monsters[slot] = monFrom(fusion, { justFusion: true });
     owner.summonedThisTurn.add(fusion.uid);
     owner.gy.push(strip(poly));
     log(whoName(owner) + " Fusion Summons " + fusion.name + "!");
@@ -3740,10 +4242,7 @@
     const slot = firstEmpty(p.monsters);
     if (slot < 0) return null;
     p.hand.splice(handIdx, 1);
-    p.monsters[slot] = {
-      uid: card.uid, name: card.name, ref: card.ref,
-      position: pos, faceup: !!faceup, tempControl: null,
-    };
+    p.monsters[slot] = monFrom(card, { position: pos, faceup: !!faceup });
     if (!faceup) p.monsters[slot].setTurn = state.turnCount;
     p.normalSummoned = true;
     p.summonedThisTurn.add(card.uid);
@@ -3955,10 +4454,7 @@
         const slot = firstEmpty(owner.monsters);
         if (slot < 0) { owner.gy.push(pick); log("No monster zone."); }
         else {
-          owner.monsters[slot] = {
-            uid: pick.uid, name: pick.name, ref: pick.ref,
-            position: "atk", faceup: true, tempControl: null,
-          };
+          owner.monsters[slot] = monFrom(pick);
           log("Special Summoned " + pick.name + ".");
         }
       }
@@ -4006,10 +4502,7 @@
       if (babyIdx >= 0 && tdIdx >= 0) {
         sendMonsterToGY(owner, babyIdx);
         const td = owner.extra.splice(tdIdx, 1)[0];
-        owner.monsters[babyIdx] = {
-          uid: td.uid, name: td.name, ref: td.ref,
-          position: "atk", faceup: true, tempControl: null, justFusion: true,
-        };
+        owner.monsters[babyIdx] = monFrom(td, { justFusion: true });
         owner.summonedThisTurn.add(td.uid);
         log("Baby Dragon grows into Thousand Dragon!");
       }
@@ -4441,9 +4934,13 @@
 
     if (ctx.where === "binder" && known) {
       const owned = ownedCount(c.name);
-      const extra = owned ? "Owned ×" + owned : "Not in your collection";
+      const foilLine = foilSummary(c.name);
+      const extra = (owned ? "Owned ×" + owned : "Not in your collection") + (foilLine ? " · " + foilLine : "");
       el.sheetStats.textContent = el.sheetStats.textContent ? (el.sheetStats.textContent + " · " + extra) : extra;
       if (owned) markSeen(c.name);
+    }
+    if (known && c.foil && FOIL_TIERS[c.foil] && ctx.where !== "binder") {
+      el.sheetStats.textContent = (el.sheetStats.textContent ? el.sheetStats.textContent + " · " : "") + FOIL_TIERS[c.foil] + " foil";
     }
 
     let desc = known ? (c.ref.desc || "") : "";
@@ -4733,9 +5230,11 @@
       const card = zones[i];
       if (card) {
         z.dataset.name = card.name;
-        const node = document.createElement(card.faceup && card.ref.image ? "img" : "div");
-        if (card.faceup && card.ref.image) {
-          node.className = "card" + (card.position === "def" ? " def" : "");
+        const face = card.faceup && card.ref.image;
+        const node = document.createElement(face ? "img" : "div");
+        const showFoil = !!(face && card.foil && FOIL_TIERS[card.foil]);
+        if (face) {
+          node.className = "card" + (!showFoil && card.position === "def" ? " def" : "");
           node.src = card.ref.image;
           node.alt = card.name;
           node.draggable = false;
@@ -4743,7 +5242,16 @@
         if (state.pending && state.pending.type === "attack" && owner === "player" && kind === "m" && card.uid === state.pending.uid) {
           node.classList.add("atk-glow");
         }
-        z.appendChild(node);
+        if (showFoil) {
+          const wrap = document.createElement("span");
+          wrap.className = "foil-face has-foil foil-" + card.foil + (card.position === "def" ? " def" : "");
+          const shine = document.createElement("i");
+          shine.className = "foil-shine";
+          shine.setAttribute("aria-hidden", "true");
+          wrap.appendChild(node);
+          wrap.appendChild(shine);
+          z.appendChild(wrap);
+        } else z.appendChild(node);
         if (kind === "m" && equipsOf(card).length) z.classList.add("has-eq");
         if (state.pending && state.pending.type === "attack" && owner === "ai" && kind === "m") z.classList.add("threat");
         if (state.pending && state.pending.type === "absorb" && owner === "ai" && kind === "m" && card) z.classList.add("threat");
@@ -4809,9 +5317,45 @@
     });
   }
 
+  function arenaKey() {
+    if (!state) return "generic";
+    const id = state.aiId || "";
+    if (id === "yugi" || id === "kaiba" || id === "joey" || id === "weevil" || id === "rex" ||
+        id === "mai" || id === "keith" || id === "panik" || id === "pegasus" || id === "mako" || id === "bonz") {
+      return id;
+    }
+    return "generic";
+  }
+
+  function armSignatureSeen() {
+    if (!state) return;
+    [state.player, state.ai].forEach((side) => {
+      side.monsters.forEach((m) => { if (m) m.cineSeen = true; });
+    });
+  }
+
+  function noteSignatureSummons() {
+    if (!state || state.winner || state.exodiaHold) return;
+    [state.player, state.ai].forEach((side) => {
+      side.monsters.forEach((m) => {
+        if (!m || !m.faceup || m.cineSeen || !SIGNATURE_SUMMONS[m.name]) return;
+        m.cineSeen = true;
+        if (!cinematicsOn()) return;
+        const who = whoName(side);
+        playCinematic({
+          name: m.name,
+          kicker: who + (who === "You" ? " summon" : " summons"),
+          title: m.name,
+        });
+      });
+    });
+  }
+
   function render() {
     if (!state) return;
     noteFieldSummons();
+    const duelNode = $("duel");
+    if (duelNode) duelNode.dataset.arena = arenaKey();
     const pl = state.player;
     const ai = state.ai;
     el.plName.textContent = state.playerName;
@@ -4848,6 +5392,7 @@
         img.alt = c.name;
         img.draggable = false;
         d.appendChild(img);
+        if (c.foil && FOIL_TIERS[c.foil]) paintFoil(d, c.foil);
       } else d.textContent = c.name;
       if (seenReady && !seenHand.has(c.uid)) d.classList.add("anim-draw");
       d.addEventListener("click", () => {
@@ -4875,6 +5420,7 @@
     el.btnNext.textContent = pending ? "Cancel" : "Next Phase";
     el.btnNext.disabled = state.turn !== "player" || state.busy || !!state.winner || !!state.prompt || !!state.ending;
     syncPuzzleBar();
+    noteSignatureSummons();
   }
 
   function layoutHand() {
@@ -5774,6 +6320,7 @@
       if (still()) endTurn();
     } finally {
       if (state && state.gen === gen) {
+        if (state.exodiaHold) return;
         state.busy = false;
         state.spot = null;
         if (!state.winner && state.turn === "player") render();
@@ -5786,27 +6333,35 @@
     const pCard = cardDB[p.ace];
     const oCard = cardDB[o.ace];
     el.vsMatch.textContent = state.playerName + " vs " + state.aiName;
+    if (el.vsPName) el.vsPName.textContent = state.playerName;
+    if (el.vsOName) el.vsOName.textContent = state.aiName;
     el.vsRules.textContent = (state.rematch ? "Rematch · " : "") +
       (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom") +
       (state.field ? " · " + state.field : "");
     paintAnte();
-    if (state.taunt) {
-      el.vsTaunt.hidden = false;
-      el.vsTaunt.textContent = "\u201C" + state.taunt + "\u201D";
-    } else {
-      el.vsTaunt.hidden = true;
-      el.vsTaunt.textContent = "";
-    }
-    el.vsPArt.src = pCard ? pCard.imageFull : "";
-    el.vsOArt.src = oCard ? oCard.imageFull : "";
-    el.vsPArt.alt = p.ace;
-    el.vsOArt.alt = o.ace;
+    const quote = state.taunt || DUEL_QUOTES[state.aiId] || "The duel begins now.";
+    el.vsTaunt.hidden = false;
+    el.vsTaunt.textContent = "\u201C" + quote + "\u201D";
+    el.vsPArt.src = pCard ? (pCard.imageFull || pCard.image) : "";
+    el.vsOArt.src = oCard ? (oCard.imageFull || oCard.image) : "";
+    el.vsPArt.alt = state.playerName;
+    el.vsOArt.alt = state.aiName;
     el.vsPCap.textContent = p.ace;
     el.vsOCap.textContent = o.ace;
-    showScreen("vs");
+    if (!introsOn()) {
+      enterDuel();
+      return;
+    }
+    const screen = $("vs");
+    if (screen) {
+      screen.classList.remove("slam");
+      showScreen("vs");
+      void screen.offsetWidth;
+      screen.classList.add("slam");
+    } else showScreen("vs");
     clearTimeout(vsTimer);
-    const holdTaunt = state.mode === "tourney" && !window.__FAST;
-    if (!holdTaunt) vsTimer = setTimeout(enterDuel, window.__FAST ? 20 : 1700);
+    const hold = window.__FAST ? 20 : (state.ante ? 2400 : 2000);
+    vsTimer = setTimeout(enterDuel, hold);
   }
 
   function enterDuel() {
@@ -6018,6 +6573,7 @@
   function beginPuzzle(puzzle) {
     if (!puzzle) return;
     matchGen++;
+    clearCinematic();
     clearTimeout(vsTimer);
     cancelChoice();
     closeSheet();
@@ -6057,6 +6613,8 @@
       ending: false,
     };
     resetBoardMemory();
+    stampFoils(state.player);
+    armSignatureSeen();
     showScreen("duel");
     log(puzzle.title + " — " + (rules === "classic" ? "Classic" : "Duelist Kingdom") + ".");
     log("Goal: " + (puzzle.goal || "Win this turn") + ". Ending the turn fails the puzzle.");
@@ -6125,6 +6683,7 @@
       extra: playerDeck.extra.slice(),
     };
     matchGen++;
+    clearCinematic();
     clearTimeout(vsTimer);
     cancelChoice();
     closeSheet();
@@ -6162,6 +6721,7 @@
       busy: false,
       prompt: false,
     };
+    stampFoils(state.player);
     if (state.mode === "tourney" && settings.ante) state.ante = pickMatchAnte(aiDeck);
     resetBoardMemory();
     if (!drawCards(state.player, 5)) return;
@@ -6718,8 +7278,10 @@
       name.className = "cname";
       name.textContent = c.name;
       const own = document.createElement("span");
+      const topFoil = owned ? bestFoil(c.name) : "";
       own.className = "own" + (owned ? "" : " none");
-      own.textContent = "Own " + owned + (qty ? " · deck " + qty : "");
+      own.textContent = "Own " + owned + (qty ? " · deck " + qty : "") + (topFoil ? " · " + (topFoil === "secret" ? "Sc" : topFoil === "ultra" ? "U" : "S") + " foil" : "");
+      if (topFoil) paintFoil(b, topFoil);
       b.appendChild(img);
       b.appendChild(name);
       b.appendChild(own);
@@ -6767,9 +7329,11 @@
     const lim = copyLimit(name);
     const owned = ownedCount(name);
     const full = c.isFusion ? draft.extra.length >= 15 : draft.main.length >= 60;
+    const foilLine = foilSummary(name);
+    paintFoil(el.buildArt && el.buildArt.parentElement, bestFoil(name));
     el.buildCount.textContent = lim === 0
-      ? "Forbidden — 0 allowed while the list is on. You own " + owned + "."
-      : "In deck " + have + " / " + lim + " · You own " + owned + (c.isFusion ? " · Extra" : " · Main");
+      ? "Forbidden — 0 allowed while the list is on. You own " + owned + (foilLine ? ". " + foilLine + "." : ".")
+      : "In deck " + have + " / " + lim + " · You own " + owned + (c.isFusion ? " · Extra" : " · Main") + (foilLine ? " · " + foilLine : "");
     el.buildAdd.disabled = have >= lim || have >= owned || owned <= 0 || full;
     el.buildAdd.textContent = c.isFusion ? "Add to Extra" : "Add to Main";
     el.buildRemove.disabled = have <= 0;
@@ -7254,10 +7818,7 @@
       return false;
     }
     sendMonsterToGY(owner, petitIdx);
-    owner.monsters[petitIdx] = {
-      uid: card.uid, name: card.name, ref: card.ref,
-      position: "atk", faceup: true, tempControl: null,
-    };
+    owner.monsters[petitIdx] = monFrom(card);
     owner.summonedThisTurn.add(card.uid);
     log("Petit Moth evolves into " + resultName + "!");
     return true;
@@ -7346,10 +7907,7 @@
     const slot = firstEmpty(owner.monsters);
     if (slot < 0 || hi < 0) return false;
     const summoned = owner.hand.splice(hi, 1)[0];
-    owner.monsters[slot] = {
-      uid: summoned.uid, name: summoned.name, ref: summoned.ref,
-      position: "atk", faceup: true, tempControl: null,
-    };
+    owner.monsters[slot] = monFrom(summoned);
     owner.summonedThisTurn.add(summoned.uid);
     log(whoName(owner) + " Toon Summons " + summoned.name + "!");
     return true;
@@ -7376,10 +7934,7 @@
     owner.gy.push(strip(spell));
     if (!card) return false;
     const slot = firstEmpty(owner.monsters);
-    owner.monsters[slot] = {
-      uid: card.uid, name: card.name, ref: card.ref,
-      position: "atk", faceup: true, tempControl: null,
-    };
+    owner.monsters[slot] = monFrom(card);
     owner.summonedThisTurn.add(card.uid);
     log(whoName(owner) + " Special Summons " + card.name + " with Elegant Egotist!");
     return true;
@@ -7445,10 +8000,7 @@
       owner.gy.push(strip(spell));
       return false;
     }
-    owner.monsters[slot] = {
-      uid: rel.uid, name: rel.name, ref: rel.ref,
-      position: "atk", faceup: true, tempControl: null,
-    };
+    owner.monsters[slot] = monFrom(rel);
     owner.summonedThisTurn.add(rel.uid);
     owner.gy.push(strip(spell));
     log(whoName(owner) + " Ritual Summons Relinquished!");
@@ -7723,7 +8275,7 @@
   }
 
   function loadCollection() {
-    collection = { counts: {}, unlocked: false, starter: false, seen: {} };
+    collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {} };
     let migrated = false;
     try {
       const raw = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "null");
@@ -7738,6 +8290,7 @@
           });
         }
         collection.counts = counts;
+        if (raw.foils && typeof raw.foils === "object") collection.foils = raw.foils;
         if (raw.seen && typeof raw.seen === "object") {
           Object.keys(raw.seen).forEach((name) => {
             if (raw.seen[name]) collection.seen[name] = true;
@@ -7748,10 +8301,203 @@
         }
       }
     } catch (e) {
-      collection = { counts: {}, unlocked: false, starter: false, seen: {} };
+      collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {} };
     }
+    if (sanitizeFoils()) migrated = true;
     ensureStarter();
     if (migrated) saveCollection();
+  }
+
+  function foilTier(value) {
+    return FOIL_TIERS[value] ? value : "";
+  }
+
+  function foilBag(name) {
+    const raw = collection.foils && collection.foils[name];
+    return {
+      super: raw && typeof raw.super === "number" ? raw.super : 0,
+      ultra: raw && typeof raw.ultra === "number" ? raw.ultra : 0,
+      secret: raw && typeof raw.secret === "number" ? raw.secret : 0,
+    };
+  }
+
+  function foilTotal(name) {
+    const bag = foilBag(name);
+    return bag.super + bag.ultra + bag.secret;
+  }
+
+  function bestFoil(name) {
+    const bag = foilBag(name);
+    if (bag.secret > 0) return "secret";
+    if (bag.ultra > 0) return "ultra";
+    if (bag.super > 0) return "super";
+    return "";
+  }
+
+  function foilSummary(name) {
+    const bag = foilBag(name);
+    const bits = [];
+    if (bag.super) bits.push("Super ×" + bag.super);
+    if (bag.ultra) bits.push("Ultra ×" + bag.ultra);
+    if (bag.secret) bits.push("Secret ×" + bag.secret);
+    return bits.length ? ("Foils " + bits.join(", ")) : "";
+  }
+
+  function sanitizeFoils() {
+    const next = {};
+    let dirty = !collection.foils || typeof collection.foils !== "object" || Array.isArray(collection.foils);
+    const src = dirty ? {} : collection.foils;
+    Object.keys(src).forEach((name) => {
+      if (!cardDB[name] || ownedCount(name) <= 0) { dirty = true; return; }
+      const bag = src[name] || {};
+      let sup = Math.max(0, Math.floor(Number(bag.super) || 0));
+      let ultra = Math.max(0, Math.floor(Number(bag.ultra) || 0));
+      let secret = Math.max(0, Math.floor(Number(bag.secret) || 0));
+      if (sup !== bag.super || ultra !== bag.ultra || secret !== bag.secret) dirty = true;
+      let sum = sup + ultra + secret;
+      const cap = ownedCount(name);
+      while (sum > cap && sup) { sup--; sum--; dirty = true; }
+      while (sum > cap && ultra) { ultra--; sum--; dirty = true; }
+      while (sum > cap && secret) { secret--; sum--; dirty = true; }
+      if (sum > 0) next[name] = { super: sup, ultra: ultra, secret: secret };
+      else dirty = true;
+    });
+    if (!dirty) {
+      const keys = Object.keys(src);
+      if (keys.length !== Object.keys(next).length) dirty = true;
+    }
+    collection.foils = next;
+    return dirty && Object.keys(src).length > 0;
+  }
+
+  function addFoil(name, tier) {
+    const key = foilTier(tier);
+    if (!key || ownedCount(name) <= 0) return;
+    if (!collection.foils) collection.foils = {};
+    const bag = foilBag(name);
+    if (bag.super + bag.ultra + bag.secret >= ownedCount(name)) return;
+    bag[key] += 1;
+    collection.foils[name] = bag;
+  }
+
+  function foilToRemove(name) {
+    const owned = ownedCount(name);
+    const reserved = (copiesReserved()[name]) || 0;
+    const foils = foilTotal(name);
+    const normals = Math.max(0, owned - foils);
+    const normalsNeeded = Math.max(0, reserved - foils);
+    if (normals - normalsNeeded > 0) return "";
+    const bag = foilBag(name);
+    if (bag.super > 0) return "super";
+    if (bag.ultra > 0) return "ultra";
+    if (bag.secret > 0) return "secret";
+    return "";
+  }
+
+  function removeCopy(name) {
+    const tier = foilToRemove(name);
+    if (tier && collection.foils && collection.foils[name]) {
+      collection.foils[name][tier] -= 1;
+      if (foilTotal(name) <= 0) delete collection.foils[name];
+    }
+    collection.counts[name] -= 1;
+    if (collection.counts[name] <= 0) {
+      delete collection.counts[name];
+      if (collection.foils) delete collection.foils[name];
+    }
+    return tier;
+  }
+
+  function stampFoils(player) {
+    if (!player || !collection || !collection.foils) return;
+    const budget = {};
+    Object.keys(collection.foils).forEach((name) => {
+      const bag = foilBag(name);
+      if (bag.super || bag.ultra || bag.secret) budget[name] = bag;
+    });
+    const cards = [];
+    ["deck", "extra", "hand", "gy"].forEach((key) => {
+      (player[key] || []).forEach((card) => { if (card) cards.push(card); });
+    });
+    (player.monsters || []).forEach((card) => { if (card) cards.push(card); });
+    (player.spells || []).forEach((card) => { if (card) cards.push(card); });
+    ["secret", "ultra", "super"].forEach((tier) => {
+      cards.forEach((card) => {
+        if (card.foil) return;
+        const bag = budget[card.name];
+        if (!bag || bag[tier] <= 0) return;
+        card.foil = tier;
+        bag[tier] -= 1;
+      });
+    });
+  }
+
+  function paintFoil(node, tier, flash) {
+    if (!node) return;
+    const key = foilTier(tier);
+    node.classList.remove("has-foil", "foil-super", "foil-ultra", "foil-secret", "foil-flash");
+    const shine = node.querySelector(":scope > .foil-shine");
+    const burst = node.querySelector(":scope > .foil-burst");
+    if (!key) {
+      if (shine) shine.remove();
+      if (burst) burst.remove();
+      return;
+    }
+    node.classList.add("has-foil", "foil-" + key);
+    if (!shine) {
+      const mark = document.createElement("i");
+      mark.className = "foil-shine";
+      mark.setAttribute("aria-hidden", "true");
+      node.appendChild(mark);
+    }
+    if (flash) {
+      node.classList.add("foil-flash");
+      if (!burst) {
+        const pop = document.createElement("i");
+        pop.className = "foil-burst";
+        pop.setAttribute("aria-hidden", "true");
+        node.appendChild(pop);
+      }
+    } else if (burst) burst.remove();
+  }
+
+  function foilPips(name) {
+    const bag = foilBag(name);
+    const wrap = document.createElement("span");
+    wrap.className = "foil-pips";
+    ["super", "ultra", "secret"].forEach((tier) => {
+      if (!bag[tier]) return;
+      const pip = document.createElement("i");
+      pip.className = tier;
+      pip.textContent = (tier === "secret" ? "Sc" : tier === "ultra" ? "U" : "S") + (bag[tier] > 1 ? bag[tier] : "");
+      pip.title = FOIL_TIERS[tier] + " foil ×" + bag[tier];
+      wrap.appendChild(pip);
+    });
+    return wrap.childNodes.length ? wrap : null;
+  }
+
+  function rollFoil(hot, holo) {
+    let secret = holo ? 0.012 : 0.0035;
+    let ultra = holo ? 0.04 : 0.012;
+    let sup = holo ? 0.09 : 0.025;
+    if (hot) {
+      secret *= 1.5;
+      ultra *= 1.4;
+      sup *= 1.25;
+    }
+    const r = Math.random();
+    if (r < secret) return "secret";
+    if (r < secret + ultra) return "ultra";
+    if (r < secret + ultra + sup) return "super";
+    return "";
+  }
+
+  function dealFoil(name, key) {
+    const h = hashString("foil:" + key + ":" + name) % 1000;
+    if (h < 8) return "secret";
+    if (h < 36) return "ultra";
+    if (h < 116) return "super";
+    return "";
   }
 
   function grantStarter() {
@@ -7764,6 +8510,7 @@
     });
     collection.counts = counts;
     collection.seen = seen;
+    collection.foils = {};
     collection.starter = true;
   }
 
@@ -7778,8 +8525,7 @@
     if (ownedCount(name) <= 0) return false;
     const need = copiesReserved()[name] || 0;
     if (ownedCount(name) - 1 < need) return false;
-    collection.counts[name] -= 1;
-    if (collection.counts[name] <= 0) delete collection.counts[name];
+    removeCopy(name);
     saveCollection();
     return true;
   }
@@ -7886,13 +8632,16 @@
     if ($("binder").classList.contains("active")) renderBinder();
   }
 
-  function grantCards(names) {
+  function grantCards(entries) {
     const fresh = [];
     const noted = {};
-    (names || []).forEach((name) => {
+    (entries || []).forEach((entry) => {
+      const name = typeof entry === "string" ? entry : entry && entry.name;
+      const foil = entry && typeof entry === "object" ? foilTier(entry.foil) : "";
       if (!name || !cardDB[name]) return;
       const had = ownedCount(name);
-      collection.counts[name] = had + 1;
+      collection.counts[name] = Math.min(99, had + 1);
+      if (foil && collection.counts[name] > had) addFoil(name, foil);
       if (had === 0 && !cardSeen(name) && !noted[name]) {
         fresh.push(name);
         noted[name] = true;
@@ -7965,7 +8714,11 @@
       holoName = pickFrom(hot && buckets.ultra.length ? buckets.ultra : buckets.holo) || pickFrom(buckets.rare) || pickFrom(any);
     }
     cards.push({ name: holoName, rarity: holoRarity });
-    return cards.filter((c) => c && c.name && cardDB[c.name]);
+    const pulled = cards.filter((c) => c && c.name && cardDB[c.name]);
+    pulled.forEach((card, i) => {
+      card.foil = rollFoil(!!hot, i === pulled.length - 1);
+    });
+    return pulled;
   }
 
   function packBonusFor(key) {
@@ -7994,10 +8747,13 @@
     const known = cardDB[card.name];
     el.packName.textContent = prize.revealed ? card.name : "Face down";
     const showNew = !!(prize.revealed && card.isNew);
-    el.packRarity.textContent = prize.revealed ? ((showNew ? "New · " : "") + card.rarity) : "Tap the card";
-    el.packRarity.className = "pack-rarity " + (prize.revealed ? rarityClass(card.rarity) : "common");
+    const foil = prize.revealed ? foilTier(card.foil) : "";
+    const foilText = foil ? (" · " + FOIL_TIERS[foil] + " foil") : "";
+    el.packRarity.textContent = prize.revealed ? ((showNew ? "New · " : "") + card.rarity + foilText) : "Tap the card";
+    el.packRarity.className = "pack-rarity " + (foil || (prize.revealed ? rarityClass(card.rarity) : "common"));
     if (el.packNew) el.packNew.hidden = !showNew;
     el.packCard.classList.toggle("is-new", showNew);
+    paintFoil(el.packCard, foil, !!foil);
     if (prize.revealed && known) {
       el.packArt.hidden = false;
       el.packArt.src = known.imageFull || known.image;
@@ -8420,7 +9176,11 @@
     if (!catalog.length) return null;
     const name = catalog[hashString("deal:" + key) % catalog.length];
     const rarity = printedRarity(name);
-    return { date: key, name: name, rarity: rarity, price: dealPrice(rarity) };
+    const foil = dealFoil(name, key);
+    const base = dealPrice(rarity);
+    const premium = foil === "secret" ? 2.6 : foil === "ultra" ? 1.8 : foil === "super" ? 1.35 : 1;
+    const price = Math.max(base, Math.round((base * premium) / 5) * 5);
+    return { date: key, name: name, rarity: rarity, foil: foil, price: price };
   }
 
   function shopThumb(name) {
@@ -8454,7 +9214,7 @@
       nm.textContent = "Daily deal · " + deal.name;
       const sub = document.createElement("div");
       sub.className = "sub";
-      sub.textContent = deal.rarity + " · own " + ownedCount(deal.name) + " · " + prettyDate(deal.date);
+      sub.textContent = deal.rarity + (deal.foil ? " · " + FOIL_TIERS[deal.foil] + " foil" : "") + " · own " + ownedCount(deal.name) + " · " + prettyDate(deal.date);
       copy.appendChild(nm);
       copy.appendChild(sub);
       const price = document.createElement("div");
@@ -8465,7 +9225,21 @@
       btn.textContent = "Buy";
       btn.disabled = wallet.coins < deal.price;
       btn.addEventListener("click", () => buyDeal(deal));
-      row.appendChild(shopThumb(deal.name));
+      const thumb = shopThumb(deal.name);
+      if (deal.foil) {
+        const frame = document.createElement("span");
+        frame.className = "thumb";
+        frame.style.position = "relative";
+        frame.style.display = "block";
+        frame.style.width = "28px";
+        frame.style.height = "40px";
+        frame.style.flexShrink = "0";
+        thumb.style.width = "100%";
+        thumb.style.height = "100%";
+        frame.appendChild(thumb);
+        paintFoil(frame, deal.foil);
+        row.appendChild(frame);
+      } else row.appendChild(thumb);
       row.appendChild(copy);
       row.appendChild(price);
       row.appendChild(btn);
@@ -8522,7 +9296,8 @@
       nm.textContent = name;
       const sub = document.createElement("div");
       sub.className = "sub";
-      sub.textContent = "Spare " + spare + " · own " + ownedCount(name) + " · " + printedRarity(name);
+      const ownedFoil = foilSummary(name);
+      sub.textContent = "Spare " + spare + " · own " + ownedCount(name) + " · " + printedRarity(name) + (ownedFoil ? " · " + ownedFoil : "");
       copy.appendChild(nm);
       copy.appendChild(sub);
       const priceEl = document.createElement("div");
@@ -8550,8 +9325,8 @@
     if (wallet.coins < current.price) { toast("Not enough Duel Points."); return; }
     wallet.coins -= current.price;
     saveWallet();
-    const card = { name: current.name, rarity: current.rarity };
-    markPrizeNew([card], grantCards([current.name]));
+    const card = { name: current.name, rarity: current.rarity, foil: current.foil || "" };
+    markPrizeNew([card], grantCards([card]));
     prize = {
       cards: [card], index: 0, revealed: false, who: "Grandpa",
       setName: "Daily deal", returnTo: "shop", firstUnlock: false,
@@ -8568,14 +9343,15 @@
     }
     const price = sellPrice(name);
     const left = ownedCount(name) - 1;
-    if (!confirm("Sell 1 " + name + " for " + price + " DP? You will have " + left + " left. Saved decks keep the copies they use.")) return;
+    const tier = foilToRemove(name);
+    const label = tier ? (FOIL_TIERS[tier] + " foil " + name) : name;
+    if (!confirm("Sell 1 " + label + " for " + price + " DP? You will have " + left + " left. Saved decks keep the copies they use.")) return;
     if (ownedCount(name) - 1 < (copiesReserved()[name] || 0)) {
       toast("A saved deck still needs that copy.");
       paintShop();
       return;
     }
-    collection.counts[name] -= 1;
-    if (collection.counts[name] <= 0) delete collection.counts[name];
+    removeCopy(name);
     wallet.coins += price;
     saveCollection();
     saveWallet();
@@ -8592,7 +9368,7 @@
     if (!cards.length) { toast("That pack came up empty."); return; }
     wallet.coins -= pack.price;
     saveWallet();
-    markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
+    markPrizeNew(cards, grantCards(cards));
     prize = {
       cards: cards, index: 0, revealed: false, who: "Grandpa",
       setName: pack.set, returnTo: "shop", firstUnlock: false,
@@ -8821,7 +9597,13 @@
   function groupStat(names) {
     const total = names.length;
     const have = names.filter((name) => ownedCount(name) > 0).length;
-    return { have: have, total: total, pct: total ? Math.round((have * 100) / total) : 0 };
+    const foils = names.reduce((n, name) => n + foilTotal(name), 0);
+    return { have: have, total: total, pct: total ? Math.round((have * 100) / total) : 0, foils: foils };
+  }
+
+  function statLine(stat) {
+    const foils = stat.foils || 0;
+    return stat.have + "/" + stat.total + " · " + stat.pct + "% · " + foils + (foils === 1 ? " foil" : " foils");
   }
 
   function binderUniverse() {
@@ -8836,7 +9618,9 @@
     const isNew = owned > 0 && !cardSeen(name);
     const btn = document.createElement("button");
     btn.type = "button";
+    const topFoil = owned ? bestFoil(name) : "";
     btn.className = "binder-card" + (owned ? "" : " missing") + (isNew ? " is-new" : "");
+    if (topFoil) btn.classList.add("has-foil", "foil-" + topFoil);
     const img = document.createElement("img");
     img.alt = "";
     img.src = card.image;
@@ -8859,6 +9643,14 @@
       tag.textContent = "NEW";
       btn.appendChild(tag);
     }
+    if (topFoil) {
+      const shine = document.createElement("i");
+      shine.className = "foil-shine";
+      shine.setAttribute("aria-hidden", "true");
+      btn.appendChild(shine);
+      const pips = foilPips(name);
+      if (pips) btn.appendChild(pips);
+    }
     btn.appendChild(label);
     btn.addEventListener("click", () => {
       openSheet({
@@ -8873,12 +9665,12 @@
     if (!el.binderScroll || !el.binderSets) return;
     const groups = binderCatalog();
     const overall = groupStat(binderUniverse());
-    el.binderOverall.textContent = overall.have + "/" + overall.total + " · " + overall.pct + "%";
+    el.binderOverall.textContent = overall.pct + "% · " + (overall.foils || 0) + (overall.foils === 1 ? " foil" : " foils");
     const current = groups.find((group) => group.id === binderFilter) || null;
     const currentStat = current ? groupStat(current.names) : null;
     el.binderSub.textContent = currentStat
-      ? current.title + " · " + currentStat.have + "/" + currentStat.total + " · " + currentStat.pct + "%"
-      : "Owned cards show art and a count. Missing cards are dark silhouettes.";
+      ? current.title + " · " + statLine(currentStat)
+      : "Owned cards show art and a count. Foil versions are marked on the card.";
     el.binderSets.innerHTML = "";
     [{ id: "all", label: "All" }].concat(groups).forEach((chip) => {
       const btn = document.createElement("button");
@@ -8903,7 +9695,7 @@
       title.textContent = group.title;
       const stat = groupStat(group.names);
       const pct = document.createElement("span");
-      pct.textContent = stat.have + "/" + stat.total + " · " + stat.pct + "%";
+      pct.textContent = statLine(stat);
       head.appendChild(title);
       head.appendChild(pct);
       const grid = document.createElement("div");
@@ -9085,7 +9877,7 @@
     const rulesNow = tourneyRules();
     const givePack = (who, setName, hot, firstUnlock) => {
       const cards = pullPack(setName, packBonusFor(key), !firstUnlock, !!hot);
-      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
+      markPrizeNew(cards, grantCards(cards));
       prize = {
         cards: cards, index: 0, revealed: false, who: who,
         setName: setName, returnTo: tourney ? "island" : "menu", firstUnlock: !!firstUnlock,
@@ -9134,7 +9926,7 @@
       }
       markCleared("pegasus");
       const cards = pullPack(PACK_OF.pegasus, packBonusFor("pegasus"), !firstUnlock, false);
-      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
+      markPrizeNew(cards, grantCards(cards));
       prize = {
         cards: cards, index: 0, revealed: false, who: "Pegasus",
         setName: PACK_OF.pegasus, returnTo: "menu", firstUnlock: firstUnlock,
@@ -9164,7 +9956,7 @@
       if (tourney.castleOpen) chipLine += " · Castle open";
       const who = state.aiName || key;
       const cards = pullPack(PACK_OF[key] || PACK_OF.weevil, packBonusFor(key), true, false);
-      markPrizeNew(cards, grantCards(cards.map((c) => c.name)));
+      markPrizeNew(cards, grantCards(cards));
       prize = {
         cards: cards, index: 0, revealed: false, who: who,
         setName: PACK_OF[key] || "Legend of Blue Eyes White Dragon",
@@ -9273,6 +10065,19 @@
     paintSettings();
     saveSettings();
   });
+  if (el.cineToggle) el.cineToggle.addEventListener("click", () => {
+    settings.cinematics = settings.cinematics === false;
+    paintSettings();
+    saveSettings();
+  });
+  $("vs").addEventListener("click", () => {
+    if (!$("vs").classList.contains("active")) return;
+    enterDuel();
+  });
+  $("cineBtn").addEventListener("click", (e) => {
+    e.stopPropagation();
+    skipCinematics();
+  });
   el.anteToggle.addEventListener("click", () => {
     settings.ante = !settings.ante;
     paintSettings();
@@ -9336,6 +10141,20 @@
     storySkip();
   });
   document.addEventListener("keydown", (e) => {
+    if ($("cine") && !$("cine").hidden) {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+        skipCinematics();
+        e.preventDefault();
+      }
+      return;
+    }
+    if ($("vs").classList.contains("active")) {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+        enterDuel();
+        e.preventDefault();
+      }
+      return;
+    }
     if (!story || !$("story").classList.contains("active")) return;
     if (e.key === "Escape") { storySkip(); e.preventDefault(); }
     else if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
@@ -9574,9 +10393,11 @@
     puzzleSave: () => Object.assign({}, puzzleSave),
     pullPack: (setName, bonus, allow, hot) => pullPack(setName, bonus || [], !!allow, !!hot),
     openPack: (names) => {
-      const list = (Array.isArray(names) ? names : [names]).filter((name) => cardDB[name]);
-      const cards = list.map((name) => ({ name: name, rarity: "Rare" }));
-      markPrizeNew(cards, grantCards(list));
+      const cards = (Array.isArray(names) ? names : [names]).map((entry) => {
+        if (typeof entry === "string") return { name: entry, rarity: "Rare", foil: "" };
+        return { name: entry && entry.name, rarity: (entry && entry.rarity) || "Rare", foil: (entry && entry.foil) || "" };
+      }).filter((card) => card.name && cardDB[card.name]);
+      markPrizeNew(cards, grantCards(cards));
       prize = {
         cards: cards, index: 0, revealed: true, who: "Grandpa",
         setName: "Legend of Blue Eyes White Dragon", returnTo: "menu", firstUnlock: false,
@@ -9607,7 +10428,7 @@
     menuTheme: () => menuTheme(),
     dailyDeal: () => {
       const deal = dailyDeal();
-      return deal ? { name: deal.name, price: deal.price, rarity: deal.rarity, date: deal.date } : null;
+      return deal ? { name: deal.name, price: deal.price, rarity: deal.rarity, foil: deal.foil || "", date: deal.date } : null;
     },
     spare: (n) => spareCount(n),
     sellPrice: (n) => sellPrice(n),

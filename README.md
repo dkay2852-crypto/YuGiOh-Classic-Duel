@@ -92,7 +92,15 @@ Other effects used by the decks include Dark Hole, Raigeki, Monster Reborn, Pot 
 
 ## Main menu
 
-The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle on a misty island. After that win, it switches to the Battle City night skyline. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the fog, sparkles, lightning, and glow. Card art for the two aces is stored in `art/`.
+The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle on a misty island. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the fog, sparkles, lightning, and glow. Card art for the two aces is stored in `art/`.
+
+A VS intro plays before each free duel and tournament duel. Both names slam in over their ace art, with the opponent's line underneath. It moves on after about two seconds, or when you tap. Settings → Cinematics turns that intro off, and the summon flashes too. Animations Off and reduced motion do the same.
+
+Blue-Eyes White Dragon, Dark Magician, and Red-Eyes Black Dragon play a short art flash when either side summons them. Completing Exodia does too. Tap to skip.
+
+During a duel the mat uses that opponent's arena: Yugi's Duelist Kingdom grounds, KaibaCorp at night, Joey's dusk street, Weevil's forest, Rex's wasteland, Mai's mountain, Keith's fortress, Panik's shadow, and Pegasus's castle. A dim overlay keeps the cards readable. Other opponents use the plain green field.
+
+Packs and Grandpa's daily deal can pull a foil copy: Super Rare (silver sheen), Ultra Rare (gold name and a holo sweep), or Secret Rare (a rainbow shimmer). Secret is the rarest. The binder shows which foil versions you own, and each set's completion line counts those foils. A foil and a normal copy both count as that card when you build a deck. Foils also shine in the pack reveal, the deck builder, your hand, and on the field. Older saves keep their cards; foils start at zero until you pull one.
 
 ## Grandpa's shop
 
