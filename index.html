@@ -535,18 +535,24 @@
     .filter-row select {
       flex: 1; min-width: 0; min-height: 32px; font-size: 13px; padding: 2px 2px;
     }
-    #buildGrid {
-      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+    #buildScroll {
+      flex: 1; min-height: 0; min-width: 0; width: 100%;
+      overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-      align-content: start; padding-bottom: 2px;
+    }
+    #buildGrid {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+      align-content: start; align-items: start; width: 100%; min-width: 0;
+      padding-bottom: 8px;
     }
     .pool-card {
-      position: relative; aspect-ratio: 59 / 86; padding: 0; border-radius: 4px; overflow: hidden;
+      position: relative; display: block; width: 100%; min-width: 0; max-width: 100%; min-height: 0;
+      aspect-ratio: 59 / 86; height: auto; margin: 0; padding: 0; border-radius: 4px; overflow: hidden;
       border: 1px solid rgba(212,160,23,0.35); background: #111; cursor: pointer; color: var(--cream);
     }
     .pool-card img, .pool-card .ph {
-      width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%;
+      object-fit: cover; display: block; pointer-events: none;
     }
     .pool-card .ph {
       display: flex; align-items: flex-end; justify-content: center;
@@ -559,29 +565,27 @@
       background: rgba(0,0,0,0.75); color: var(--cream);
       padding: 2px 3px 3px; max-height: 2.5em; overflow: hidden; pointer-events: none;
     }
-    .pool-card .qty, .pool-card .mark {
-      position: absolute; top: 2px; z-index: 1; pointer-events: none;
+    .pool-card .mark {
+      position: absolute; left: 2px; bottom: 20px; z-index: 5; pointer-events: none;
       font-size: 0.55rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
       background: rgba(0,0,0,0.82);
     }
-    .pool-card .qty { left: 2px; color: var(--gold); font-weight: 700; display: none; }
-    .pool-card .qty.on { display: block; }
-    .pool-card .mark { right: 2px; }
     .pool-card .mark.f { color: #ff8a80; }
     .pool-card .mark.l { color: #ffb74d; }
     .pool-card .mark.s { color: #ffe082; }
     .pool-card .mark.x { color: #d7c4ff; }
-    .pool-card.in { border-color: var(--gold); }
-    .pool-card.over { border-color: #ff5252; box-shadow: inset 0 0 0 1px #ff5252; }
+    .pool-card.in { outline: 2px solid var(--gold); outline-offset: -4px; }
+    .pool-card.over { outline: 2px solid #ff5252; outline-offset: -4px; }
     .pool-empty { grid-column: 1 / -1; color: var(--muted); text-align: center; padding: 16px 8px; font-size: 0.85rem; }
     input, select { user-select: text; -webkit-user-select: text; }
     .build-sheet { align-items: stretch; }
-    .build-sheet .big-wrap { display: flex; justify-content: center; position: relative; }
-    .build-sheet .big-wrap.has-foil { width: 132px; height: 192px; margin: 0 auto; overflow: hidden; border-radius: 6px; }
-    .build-sheet .big-wrap.has-foil .big { width: 100%; height: 100%; }
-    .build-sheet .big {
-      width: 132px; height: 192px; object-fit: cover; border-radius: 6px;
+    .build-sheet .big-wrap {
+      display: block; position: relative; width: 132px; height: 192px; margin: 0 auto;
+      border-radius: 6px; overflow: hidden; flex-shrink: 0;
       border: 1px solid var(--gold-dim); background: #111;
+    }
+    .build-sheet .big {
+      width: 100%; height: 100%; object-fit: cover; border: 0; border-radius: 0; background: #111; display: block;
     }
     .build-sheet h3 { margin: 0; color: var(--gold); font-size: 1rem; text-align: center; line-height: 1.2; }
     .build-sheet .stats, .build-sheet .count-line { font-size: 0.75rem; color: var(--cream); text-align: center; }
@@ -1077,8 +1081,8 @@
     }
     .pack-card {
       width: min(42vw, 168px); aspect-ratio: 59 / 86; max-height: 100%;
-      border: 1px solid var(--gold-dim); border-radius: 8px; padding: 0;
-      background: #111; position: relative; cursor: pointer; color: var(--gold);
+      border: 2px solid var(--gold-dim); border-radius: 8px; padding: 0;
+      background: #111; position: relative; overflow: hidden; cursor: pointer; color: var(--gold);
     }
     .pack-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 7px; display: block; }
     .pack-card .back {
@@ -1153,13 +1157,14 @@
       flex-shrink: 0; max-width: 100%; font-size: 0.58rem; line-height: 1.15; color: var(--cream);
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .pool-card .own {
-      position: absolute; left: 2px; top: 2px; z-index: 4; pointer-events: none;
-      font-size: 0.52rem; line-height: 1.15; padding: 2px 3px; border-radius: 2px;
-      background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
-    }
-    .pool-card .own.none { color: #ff8a80; }
     .pool-card.unowned { opacity: 0.48; }
+    .sheet-art-wrap {
+      position: relative; flex-shrink: 0; width: 96px; height: 140px;
+      border-radius: 4px; overflow: hidden; border: 1px solid var(--gold-dim); background: #111;
+    }
+    .sheet-art-wrap .sheet-art {
+      width: 100%; height: 100%; border: 0; border-radius: 0;
+    }
 
     .overlay, #loading {
       position: fixed; left: 0; right: 0;
@@ -1180,8 +1185,8 @@
     }
     .sheet-top { display: flex; gap: 10px; align-items: flex-start; }
     .sheet-art {
-      width: 96px; height: 140px; border-radius: 4px; object-fit: cover;
-      border: 1px solid var(--gold-dim); background: #111; flex-shrink: 0;
+      width: 100%; height: 100%; border-radius: 4px; object-fit: cover;
+      border: 0; background: #111; display: block;
     }
     .sheet-meta { flex: 1; min-width: 0; }
     .sheet-meta h3 { margin: 0 0 4px; color: var(--gold); font-size: 1rem; line-height: 1.2; }
@@ -1392,8 +1397,12 @@
     .shop-row.locked { opacity: 0.55; }
     .shop-row.deal { border-color: var(--gold); background: linear-gradient(180deg, #3a2a12, #1a1208); }
     .shop-row .thumb {
-      width: 28px; height: 40px; object-fit: cover; border-radius: 3px; flex-shrink: 0;
-      border: 1px solid rgba(212,160,23,0.45); background: #111;
+      width: 48px; height: 68px; object-fit: cover; border-radius: 3px; flex-shrink: 0;
+      border: 2px solid rgba(212,160,23,0.45); background: #111;
+      position: relative; overflow: hidden; display: block;
+    }
+    .shop-row span.thumb img {
+      width: 100%; height: 100%; object-fit: cover; display: block; border: 0; border-radius: 0;
     }
     .shop-row .copy { min-width: 0; flex: 1; text-align: left; }
     .shop-row .nm {
@@ -1439,10 +1448,11 @@
     }
     #binderSets button.on { background: rgba(212,160,23,0.18); color: var(--gold); border-color: var(--gold); }
     #binderScroll, #rematchList {
-      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+      flex: 1; min-height: 0; min-width: 0; width: 100%;
+      overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
-    .binder-sec { margin: 0 0 8px; }
+    .binder-sec { margin: 0 0 8px; min-width: 0; }
     .binder-head {
       position: sticky; top: 0; z-index: 2;
       display: flex; justify-content: space-between; gap: 8px; align-items: baseline;
@@ -1451,46 +1461,136 @@
     }
     .binder-head span { color: var(--cream); font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.62rem; text-align: right; }
     .binder-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; align-content: start;
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px;
+      align-content: start; align-items: start; width: 100%; min-width: 0;
     }
     .binder-card {
-      position: relative; aspect-ratio: 59 / 86; padding: 0; border-radius: 4px; overflow: hidden;
+      position: relative; display: block; width: 100%; min-width: 0; max-width: 100%; min-height: 0;
+      aspect-ratio: 59 / 86; height: auto; margin: 0; padding: 0; border-radius: 4px; overflow: hidden;
       border: 1px solid rgba(212,160,23,0.35); background: #0a0e16; cursor: pointer; color: var(--cream);
     }
-    .binder-card img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+    .binder-card img {
+      position: absolute; inset: 0; width: 100%; height: 100%; max-width: 100%;
+      object-fit: cover; display: block; pointer-events: none;
+    }
     .binder-card.missing img { filter: grayscale(1) brightness(0.16) contrast(1.35); opacity: 0.95; }
-    .binder-card .cname {
-      position: absolute; left: 0; right: 0; bottom: 0;
-      font-size: 0.54rem; line-height: 1.15; text-align: left;
+    .binder-card .cname, .pool-card .cname {
+      position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+      font-size: 0.56rem; line-height: 1.15; text-align: left;
       background: rgba(0,0,0,0.78); color: var(--cream);
       padding: 2px 3px 3px; max-height: 2.4em; overflow: hidden; pointer-events: none;
     }
     .binder-card.missing .cname { color: #7d8796; }
-    .binder-card .count {
-      position: absolute; left: 2px; top: 2px; z-index: 4; pointer-events: none;
+    .binder-card .count, .pool-card .count {
+      position: absolute; left: 2px; bottom: 2px; top: auto; z-index: 6; pointer-events: none;
       font-size: 0.62rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
-      background: rgba(0,0,0,0.82); color: #b7e1c0; font-weight: 700;
+      background: rgba(0,0,0,0.88); color: #d8ffe4; font-weight: 800;
     }
-    .binder-card.is-new {
+    .binder-card:has(.count) .cname, .pool-card:has(.count) .cname { padding-left: 24px; }
+    .binder-card.is-new:not(.tier-sr):not(.tier-ur):not(.tier-scr) {
       border-color: #b6ffd0;
       box-shadow: 0 0 0 1px #7dffb3, 0 0 8px rgba(90, 255, 170, 0.55);
     }
-    .binder-card .new-tag {
-      position: absolute; right: 2px; top: 2px; z-index: 4; pointer-events: none;
+    .binder-card .new-tag, .pool-card .new-tag {
+      position: absolute; left: 2px; top: 2px; z-index: 5; pointer-events: none;
       font-size: 0.52rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
       background: #146b38; color: #e9fff4; font-weight: 700; letter-spacing: 0.04em;
     }
-    .foil-pips {
-      position: absolute; right: 2px; bottom: 16px; z-index: 4; pointer-events: none;
-      display: flex; gap: 2px;
+    .deck-qty {
+      position: absolute; left: 2px; bottom: 20px; z-index: 5; pointer-events: none;
+      font-size: 0.56rem; line-height: 1; padding: 2px 3px; border-radius: 2px;
+      background: rgba(0,0,0,0.82); color: var(--gold); font-weight: 700;
     }
-    .foil-pips i {
-      font-style: normal; font-size: 0.48rem; font-weight: 700; line-height: 1;
-      padding: 1px 2px; border-radius: 2px; background: rgba(0, 0, 0, 0.8);
+    .pool-card .mark { bottom: 20px; }
+    .pool-card .mark.shift, .binder-card .deck-qty.shift { bottom: 34px; }
+    .rarity-stack {
+      position: absolute; top: 2px; right: 2px; z-index: 5; pointer-events: none;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px; max-width: calc(100% - 4px);
     }
-    .foil-pips .super { color: #e8eef8; }
-    .foil-pips .ultra { color: #ffd56a; }
-    .foil-pips .secret { color: #ffb0e4; }
+    .rarity-badge {
+      position: absolute; top: 2px; right: 2px; z-index: 5; pointer-events: none;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-weight: 800; font-style: normal; font-size: 0.62rem; letter-spacing: 0.04em;
+      line-height: 1.15; padding: 1px 3px; border-radius: 2px; white-space: nowrap;
+    }
+    .rarity-stack .rarity-badge { position: static; }
+    .rarity-badge.sr {
+      color: #1c2128;
+      background: linear-gradient(180deg, #f8fafc, #d5dee8 55%, #9aa6b5);
+      box-shadow: inset 0 0 0 1px #fff, 0 0 0 1px #2c3542;
+    }
+    .rarity-badge.ur {
+      color: #2a1c00;
+      background: linear-gradient(180deg, #fff3c4, #f0c040 52%, #c48a10);
+      box-shadow: inset 0 0 0 1px #fff6d0;
+    }
+    .rarity-badge.scr {
+      color: #160818;
+      background: linear-gradient(105deg, #ff6d8a 0%, #ffd35c 26%, #7dffc4 52%, #7eb6ff 74%, #e08bff 100%);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.9);
+    }
+    .tier-sr { border-color: #f4f7fb !important; box-shadow: 0 0 0 2px #5c6b7e, 0 0 8px rgba(220, 230, 245, 0.65); }
+    .tier-ur { border-color: #f0c040 !important; box-shadow: 0 0 0 1px #a87810, 0 0 8px rgba(240, 192, 64, 0.5); }
+    .tier-scr {
+      border: 2px solid transparent !important;
+      background-image: linear-gradient(#111, #111), linear-gradient(120deg, #ff6b8a, #ffd24a, #5dffe0, #6eb0ff, #d56bff) !important;
+      background-origin: border-box !important;
+      background-clip: padding-box, border-box !important;
+    }
+    .foil-legend {
+      flex-shrink: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 8px 12px; margin: 0; min-width: 0;
+      color: var(--muted); font-size: 0.64rem; line-height: 1.2;
+    }
+    .foil-legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .foil-legend .rarity-badge, .version-list .rarity-badge { position: static; font-size: 0.62rem; }
+    .find-bar { flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; min-width: 0; width: 100%; }
+    .find-row { display: flex; gap: 4px; min-width: 0; align-items: center; }
+    .find-row input, .find-row #binderSearch, .find-row #buildSearch {
+      flex: 1 1 auto; min-width: 0; width: auto; max-width: 100%;
+    }
+    .find-row .mini-btn { flex: 0 0 auto; white-space: nowrap; min-height: 34px; padding: 4px 8px; font-size: 0.72rem; font-weight: 700; }
+    .find-row .mini-btn.on { border-color: var(--gold); color: var(--gold); background: rgba(212,160,23,0.16); }
+    .find-panel {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px; min-width: 0;
+      max-height: 38dvh; overflow: auto; -webkit-overflow-scrolling: touch;
+    }
+    .find-panel[hidden] { display: none !important; }
+    .find-panel select, .find-panel input {
+      width: 100%; min-width: 0; min-height: 32px; font: inherit; font-size: 16px;
+      color: var(--cream); background: #0c1626; border: 1px solid var(--zone-line);
+      border-radius: 4px; padding: 2px 4px;
+    }
+    .find-chips { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+    .find-chips:empty { display: none; }
+    .find-chips button, .find-panel .clear-all {
+      min-height: 28px; padding: 2px 8px; font: inherit; font-size: 0.66rem; font-weight: 700;
+      border-radius: 999px; border: 1px solid var(--gold-dim);
+      background: rgba(212,160,23,0.12); color: var(--cream); cursor: pointer;
+      max-width: 100%;
+    }
+    .find-chips .clear-all, .find-panel .clear-all { background: transparent; color: var(--gold); }
+    .binder-empty {
+      color: var(--muted); text-align: center; padding: 16px 8px; font-size: 0.85rem;
+    }
+    .version-list {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .version-list li {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      font-size: 0.75rem; color: var(--cream);
+      border: 1px solid rgba(212,160,23,0.25); border-radius: 4px; padding: 4px 8px;
+    }
+    .version-list .ver-name { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+    .version-list b { font-variant-numeric: tabular-nums; color: var(--gold); }
+    .zone .rarity-badge, .hand .hc .rarity-badge { font-size: 8px; padding: 0 2px; letter-spacing: 0.02em; top: 1px; right: 1px; }
+    .pack-card .rarity-badge { top: 8px; right: 6px; font-size: 0.92rem; padding: 3px 7px; border-radius: 3px; }
+    .shop-row .rarity-badge { font-size: 11px; padding: 1px 3px; letter-spacing: 0.02em; top: 2px; right: 2px; }
+    .hand .hc.tier-sr, .hand .hc.tier-ur, .hand .hc.tier-scr { border-width: 2px; }
+    @media (max-width: 359px) {
+      .binder-grid, #buildGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
     .has-foil { position: relative; }
     .foil-shine, .foil-burst {
       position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
@@ -1538,6 +1638,7 @@
     }
     .foil-face {
       position: relative; display: block; width: 100%; height: 100%;
+      overflow: hidden; border-radius: 2px;
     }
     .foil-face.def { transform: rotate(90deg) scale(0.68); }
     .foil-face .card { width: 100%; height: 100%; }
@@ -1904,6 +2005,60 @@
       </div>
       <p id="binderSub">Every classic card. Owned copies show their art.</p>
       <div id="binderSets"></div>
+      <div class="find-bar" id="binderFind">
+        <div class="find-row">
+          <input id="binderSearch" type="search" placeholder="Search name" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search cards" />
+          <button type="button" class="mini-btn" id="binderFilterBtn" aria-expanded="false" aria-controls="binderFilterPanel">Filters</button>
+        </div>
+        <div class="find-panel" id="binderFilterPanel" hidden>
+          <select id="binderKind" data-field="kind" aria-label="Card type">
+            <option value="">Type</option>
+            <option value="monster">Monster</option>
+            <option value="spell">Spell</option>
+            <option value="trap">Trap</option>
+          </select>
+          <select id="binderAttr" data-field="attr" aria-label="Attribute"><option value="">Attribute</option></select>
+          <select id="binderType" data-field="type" aria-label="Monster type"><option value="">Monster type</option></select>
+          <select id="binderLevel" data-field="level" aria-label="Level"><option value="">Level</option></select>
+          <input id="binderAtkMin" data-field="atkMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="ATK min" aria-label="Minimum ATK" />
+          <input id="binderAtkMax" data-field="atkMax" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="ATK max" aria-label="Maximum ATK" />
+          <input id="binderDefMin" data-field="defMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="DEF min" aria-label="Minimum DEF" />
+          <input id="binderDefMax" data-field="defMax" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="DEF max" aria-label="Maximum DEF" />
+          <select id="binderFoil" data-field="foil" aria-label="Rarity or foil">
+            <option value="">Rarity / foil</option>
+            <option value="none">No foil</option>
+            <option value="super">Super Rare foil</option>
+            <option value="ultra">Ultra Rare foil</option>
+            <option value="secret">Secret Rare foil</option>
+            <option value="any">Any foil</option>
+            <option value="p-common">Printed Common</option>
+            <option value="p-rare">Printed Rare</option>
+            <option value="p-super">Printed Super Rare</option>
+            <option value="p-ultra">Printed Ultra Rare</option>
+            <option value="p-secret">Printed Secret Rare</option>
+          </select>
+          <select id="binderOwned" data-field="owned" aria-label="Owned or new">
+            <option value="">Owned / new</option>
+            <option value="owned">Owned</option>
+            <option value="new">New</option>
+            <option value="missing">Not owned</option>
+          </select>
+          <select id="binderSort" data-field="sort" aria-label="Sort">
+            <option value="name">Sort: Name</option>
+            <option value="atk">Sort: ATK</option>
+            <option value="def">Sort: DEF</option>
+            <option value="level">Sort: Level</option>
+            <option value="newest">Sort: Newest</option>
+          </select>
+          <button type="button" class="clear-all" id="binderClear">Clear all</button>
+        </div>
+        <div class="find-chips" id="binderChips"></div>
+      </div>
+      <p class="foil-legend" aria-label="Foil rarities">
+        <span><i class="rarity-badge sr">SR</i> Super</span>
+        <span><i class="rarity-badge ur">UR</i> Ultra</span>
+        <span><i class="rarity-badge scr">SCR</i> Secret</span>
+      </p>
       <div id="binderScroll"></div>
     </section>
 
@@ -1937,10 +2092,10 @@
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
         <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods, and the main menu can switch to Battle City.</p>
-        <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set. Owned cards show their art and how many you have. Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Tap a card to read it.</p>
+        <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set, in a grid. Owned cards show their art. Extra copies show a count (x2, x3). Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Search and Filters narrow the grid by name, type, attribute, monster type, level, ATK, DEF, rarity, foil, and owned or new. Sort by name, ATK, DEF, level, or newest. Tap a card to see each version you own. From the deck builder, that same card can be added or removed.</p>
         <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips stay put, except when the path is clear and you still need chips for Pegasus. Those island rematches pay the same chips as the first win, and a loss costs 1.</p>
         <p><strong>Ante:</strong> Settings has an Ante rule, off unless you turn it on. Before a tournament duel, you and the opponent each put up one card. You put up a spare card from your collection. The last copy a saved deck needs stays, and preset Yugi, Kaiba, and Joey decks are never edited. The winner takes the loser's card. Both cards show before the duel, and the result shows after.</p>
-        <p><strong>Custom decks:</strong> The builder lists only cards you own, and it will not add more copies than you have (max 3). Search by name, and filter by Monster, Spell, Trap, Level, Attribute, and Type. Auto-Build fills a legal 40-card deck from the strongest cards you own. A new collection starts with a 40-card pile of commons, so one legal deck is possible right away. Preset Yugi, Kaiba, and Joey decks stay playable and do not add their cards to the collection. Owned counts show on each card. Binder in the builder opens the full pool. A main deck is 40–60 cards. Fusion Monsters go in the Extra Deck (max 15). Save up to 8 decks on this device. Rename, copy, or delete them, and pick which one to use before a free duel, a tournament, a rematch, or the next duel in a run. An older saved deck still loads. The Forbidden/Limited switch is off unless you turn it on.</p>
+        <p><strong>Custom decks:</strong> The builder lists cards you own in a grid, and it will not add more copies than you have (max 3). A count shows when you own more than one. Search by name, then open Filters for Monster, Spell, Trap, attribute, monster type, level, ATK and DEF ranges, rarity and foil, owned or new, and sort. Owned, Main, and Extra switch which pile you are looking at. Auto-Build fills a legal 40-card deck from the strongest cards you own. A new collection starts with a 40-card pile of commons, so one legal deck is possible right away. Preset Yugi, Kaiba, and Joey decks stay playable and do not add their cards to the collection. Binder in the builder opens the full pool. A main deck is 40–60 cards. Fusion Monsters go in the Extra Deck (max 15). Save up to 8 decks on this device. Rename, copy, or delete them, and pick which one to use before a free duel, a tournament, a rematch, or the next duel in a run. An older saved deck still loads. The Forbidden/Limited switch is off unless you turn it on.</p>
         <p><strong>Goal:</strong> Drop their Life Points to 0, or deck them out.</p>
         <p><strong>Phases:</strong> Draw → Main 1 → Battle → Main 2 → End. Next Phase advances. You do not draw on your first turn.</p>
         <p><strong>Classic:</strong> 8000 LP. Level 5–6 needs 1 tribute; 7+ needs 2. Egyptian Gods need 3. No attacks on the very first turn. Polymerization can use monsters from your hand or field.</p>
@@ -1955,7 +2110,7 @@
         <p><strong>Daily Puzzle:</strong> One puzzle for today's date. The board, hands, and Life Points are already set. Win that turn with the rules named on the puzzle, Classic or Duelist Kingdom. Hint and Retry sit on the duel screen. The first solve of the day pays 40 Duel Points. Solving on back-to-back days raises a streak. Reset Progress clears the streak.</p>
         <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. A daily deal, picked from today's date, sells one card at a discount. Sell gives Duel Points for a spare copy. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
         <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Each opponent brings their own arena behind the cards. Settings saves your rules, animation speed, sound, story skip, cinematics, ante rule, and main-menu theme on this device.</p>
-        <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. The binder shows which foil versions you own, and each set counts those foils. A foil copy and a normal copy both count as that card in the deck builder. Foils shine in the pack, the binder, the builder, and on the field.</p>
+        <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. A foil card shows SR in silver, UR in gold, or SCR on a rainbow, with a matching border, plus the shine. Commons have no badge. The binder legend uses the same marks. Tap a card to see how many normal, SR, UR, and SCR copies you own. A foil copy and a normal copy both count as that card in the deck builder. The same badge shows on the pack, in the binder, in the builder, in your hand, on the field, and in the shop.</p>
         <p><strong>Intros:</strong> A VS screen slams in before each duel, with both names, ace art, and the opponent's line. It moves on after about two seconds, or when you tap. Blue-Eyes White Dragon, Dark Magician, Red-Eyes Black Dragon, and a completed Exodia play a short flash. Turn Cinematics off in Settings to skip them.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
@@ -2120,24 +2275,61 @@
         <button type="button" class="fl-switch" id="flToggleBuild" aria-pressed="false">F/L Off</button>
       </div>
       <p class="build-status" id="buildStatus" hidden></p>
-      <input id="buildSearch" type="search" placeholder="Search name" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search cards" />
-      <div class="seg" id="buildKind">
-        <button type="button" data-kind="all" class="on">Any</button>
-        <button type="button" data-kind="monster">Monster</button>
-        <button type="button" data-kind="spell">Spell</button>
-        <button type="button" data-kind="trap">Trap</button>
-      </div>
-      <div class="filter-row">
-        <select id="buildAttr" aria-label="Attribute"><option value="">Attribute</option></select>
-        <select id="buildType" aria-label="Type"><option value="">Type</option></select>
-        <select id="buildLevel" aria-label="Level"><option value="">Level</option></select>
-      </div>
       <div class="seg" id="buildView">
         <button type="button" data-view="owned" class="on">Owned</button>
         <button type="button" data-view="main">Main</button>
         <button type="button" data-view="extra">Extra</button>
       </div>
-      <div id="buildGrid"></div>
+      <div class="find-bar" id="buildFind">
+        <div class="find-row">
+          <input id="buildSearch" type="search" placeholder="Search name" autocomplete="off" autocapitalize="off" enterkeyhint="search" aria-label="Search cards" />
+          <button type="button" class="mini-btn" id="buildFilterBtn" aria-expanded="false" aria-controls="buildFilterPanel">Filters</button>
+        </div>
+        <div class="find-panel" id="buildFilterPanel" hidden>
+          <select id="buildKind" data-field="kind" aria-label="Card type">
+            <option value="">Type</option>
+            <option value="monster">Monster</option>
+            <option value="spell">Spell</option>
+            <option value="trap">Trap</option>
+          </select>
+          <select id="buildAttr" data-field="attr" aria-label="Attribute"><option value="">Attribute</option></select>
+          <select id="buildType" data-field="type" aria-label="Monster type"><option value="">Monster type</option></select>
+          <select id="buildLevel" data-field="level" aria-label="Level"><option value="">Level</option></select>
+          <input id="buildAtkMin" data-field="atkMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="ATK min" aria-label="Minimum ATK" />
+          <input id="buildAtkMax" data-field="atkMax" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="ATK max" aria-label="Maximum ATK" />
+          <input id="buildDefMin" data-field="defMin" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="DEF min" aria-label="Minimum DEF" />
+          <input id="buildDefMax" data-field="defMax" type="number" inputmode="numeric" min="0" max="99999" step="1" placeholder="DEF max" aria-label="Maximum DEF" />
+          <select id="buildFoil" data-field="foil" aria-label="Rarity or foil">
+            <option value="">Rarity / foil</option>
+            <option value="none">No foil</option>
+            <option value="super">Super Rare foil</option>
+            <option value="ultra">Ultra Rare foil</option>
+            <option value="secret">Secret Rare foil</option>
+            <option value="any">Any foil</option>
+            <option value="p-common">Printed Common</option>
+            <option value="p-rare">Printed Rare</option>
+            <option value="p-super">Printed Super Rare</option>
+            <option value="p-ultra">Printed Ultra Rare</option>
+            <option value="p-secret">Printed Secret Rare</option>
+          </select>
+          <select id="buildOwned" data-field="owned" aria-label="Owned or new">
+            <option value="">Owned / new</option>
+            <option value="owned">Owned</option>
+            <option value="new">New</option>
+            <option value="missing">Not owned</option>
+          </select>
+          <select id="buildSort" data-field="sort" aria-label="Sort">
+            <option value="name">Sort: Name</option>
+            <option value="atk">Sort: ATK</option>
+            <option value="def">Sort: DEF</option>
+            <option value="level">Sort: Level</option>
+            <option value="newest">Sort: Newest</option>
+          </select>
+          <button type="button" class="clear-all" id="buildClear">Clear all</button>
+        </div>
+        <div class="find-chips" id="buildChips"></div>
+      </div>
+      <div id="buildScroll"><div id="buildGrid"></div></div>
     </section>
 
     <section id="end" class="screen" hidden>
@@ -2193,13 +2385,14 @@
   <div class="overlay" id="overlay">
     <div class="sheet" id="cardSheet">
       <div class="sheet-top">
-        <img class="sheet-art" id="sheetArt" alt="" />
+        <div class="sheet-art-wrap" id="sheetArtWrap"><img class="sheet-art" id="sheetArt" alt="" /></div>
         <div class="sheet-meta">
           <h3 id="sheetName"></h3>
           <div class="stats" id="sheetStats"></div>
           <div class="desc" id="sheetDesc"></div>
         </div>
       </div>
+      <ul class="version-list" id="sheetVersions" hidden></ul>
       <div class="actions" id="sheetActions"></div>
     </div>
   </div>
@@ -2217,6 +2410,7 @@
       <div class="big-wrap"><img class="big" id="buildArt" alt="" /></div>
       <h3 id="buildCardName"></h3>
       <div class="stats" id="buildStats"></div>
+      <ul class="version-list" id="buildVersions"></ul>
       <div class="ban-note" id="buildBan"></div>
       <div class="desc" id="buildDesc"></div>
       <div class="count-line" id="buildCount"></div>
@@ -2680,6 +2874,12 @@
   const GOD_NAMES = ["Slifer the Sky Dragon", "Obelisk the Tormentor", "The Winged Dragon of Ra"];
   const REWARD_NAMES = EXODIA_NAMES.concat(GOD_NAMES);
   const FOIL_TIERS = { super: "Super Rare", ultra: "Ultra Rare", secret: "Secret Rare" };
+  const FOIL_BADGE = { super: "SR", ultra: "UR", secret: "SCR" };
+  const CARD_FILTER_BLANK = {
+    q: "", kind: "", attr: "", type: "", level: "",
+    atkMin: "", atkMax: "", defMin: "", defMax: "",
+    foil: "", owned: "", sort: "name", open: false,
+  };
   const SIGNATURE_SUMMONS = {
     "Blue-Eyes White Dragon": true,
     "Dark Magician": true,
@@ -2888,7 +3088,8 @@
   let flEnforce = false;
   let savedDecks = [];
   let draft = null;
-  let buildFilter = { q: "", kind: "all", attr: "", type: "", level: "", view: "pool" };
+  let buildFilter = freshCardFilter({ view: "owned" });
+  let binderQuery = freshCardFilter();
   let buildTimer = 0;
   let sheetName = "";
   let deckPickMode = "free";
@@ -2979,8 +3180,8 @@
     plGYBtn: $("plGYBtn"), aiGYBtn: $("aiGYBtn"),
     hand: $("hand"), handWrap: $("handWrap"),
     btnNext: $("btnNext"), btnMenu: $("btnMenu"), logLine: $("logLine"),
-    overlay: $("overlay"), sheetArt: $("sheetArt"), sheetName: $("sheetName"),
-    sheetStats: $("sheetStats"), sheetDesc: $("sheetDesc"), sheetActions: $("sheetActions"),
+    overlay: $("overlay"), sheetArt: $("sheetArt"), sheetArtWrap: $("sheetArtWrap"), sheetName: $("sheetName"),
+    sheetStats: $("sheetStats"), sheetDesc: $("sheetDesc"), sheetVersions: $("sheetVersions"), sheetActions: $("sheetActions"),
     extraOverlay: $("extraOverlay"), extraTitle: $("extraTitle"), extraList: $("extraList"),
     choiceOverlay: $("choiceOverlay"), choiceTitle: $("choiceTitle"), choiceBtns: $("choiceBtns"),
     toast: $("toast"), coin: $("coin"),
@@ -2992,10 +3193,10 @@
     customList: $("customList"), btnCustomBack: $("btnCustomBack"), btnNewDeck: $("btnNewDeck"),
     btnBuildBack: $("btnBuildBack"), btnBuildSave: $("btnBuildSave"),
     buildName: $("buildName"), buildMain: $("buildMain"), buildExtra: $("buildExtra"),
-    buildStatus: $("buildStatus"), buildSearch: $("buildSearch"), buildGrid: $("buildGrid"),
+    buildStatus: $("buildStatus"), buildSearch: $("buildSearch"), buildGrid: $("buildGrid"), buildScroll: $("buildScroll"),
     buildAttr: $("buildAttr"), buildType: $("buildType"), buildLevel: $("buildLevel"),
     buildOverlay: $("buildOverlay"), buildArt: $("buildArt"), buildCardName: $("buildCardName"),
-    buildStats: $("buildStats"), buildBan: $("buildBan"), buildDesc: $("buildDesc"),
+    buildStats: $("buildStats"), buildVersions: $("buildVersions"), buildBan: $("buildBan"), buildDesc: $("buildDesc"),
     buildCount: $("buildCount"), buildAdd: $("buildAdd"), buildRemove: $("buildRemove"), buildClose: $("buildClose"),
   };
 
@@ -4939,8 +5140,19 @@
       el.sheetStats.textContent = el.sheetStats.textContent ? (el.sheetStats.textContent + " · " + extra) : extra;
       if (owned) markSeen(c.name);
     }
-    if (known && c.foil && FOIL_TIERS[c.foil] && ctx.where !== "binder") {
-      el.sheetStats.textContent = (el.sheetStats.textContent ? el.sheetStats.textContent + " · " : "") + FOIL_TIERS[c.foil] + " foil";
+    const shownFoil = known ? (foilTier(c.foil) || (ctx.where === "binder" ? bestFoil(c.name) : "")) : "";
+    if (shownFoil && ctx.where !== "binder") {
+      el.sheetStats.textContent = (el.sheetStats.textContent ? el.sheetStats.textContent + " · " : "") + FOIL_TIERS[shownFoil] + " foil";
+    }
+    paintFoil(el.sheetArtWrap, shownFoil);
+    if (el.sheetVersions) {
+      if (ctx.where === "binder" && known) {
+        el.sheetVersions.hidden = false;
+        fillVersionList(el.sheetVersions, c.name);
+      } else {
+        el.sheetVersions.hidden = true;
+        el.sheetVersions.innerHTML = "";
+      }
     }
 
     let desc = known ? (c.ref.desc || "") : "";
@@ -5244,12 +5456,9 @@
         }
         if (showFoil) {
           const wrap = document.createElement("span");
-          wrap.className = "foil-face has-foil foil-" + card.foil + (card.position === "def" ? " def" : "");
-          const shine = document.createElement("i");
-          shine.className = "foil-shine";
-          shine.setAttribute("aria-hidden", "true");
+          wrap.className = "foil-face" + (card.position === "def" ? " def" : "");
           wrap.appendChild(node);
-          wrap.appendChild(shine);
+          paintFoil(wrap, card.foil);
           z.appendChild(wrap);
         } else z.appendChild(node);
         if (kind === "m" && equipsOf(card).length) z.classList.add("has-eq");
@@ -7165,14 +7374,11 @@
       extra: deck.extra.slice(),
     };
     draft.savedJSON = draftSnapshot();
-    buildFilter = { q: "", kind: "all", attr: "", type: "", level: "", view: "owned" };
+    replaceFilter(buildFilter, { view: "owned" });
     el.buildSearch.value = "";
     el.buildSearch.placeholder = "Search cards you own";
     el.buildName.value = draft.name;
-    el.buildAttr.value = "";
-    el.buildType.value = "";
-    el.buildLevel.value = "";
-    document.querySelectorAll("#buildKind button").forEach((b) => b.classList.toggle("on", b.dataset.kind === "all"));
+    paintFilterBar("build", buildFilter);
     document.querySelectorAll("#buildView button").forEach((b) => b.classList.toggle("on", b.dataset.view === "owned"));
     showScreen("builder");
     syncFL();
@@ -7205,19 +7411,253 @@
       if (ownedCount(name) <= 0) return;
       if (c.isMonster || c.isSpell || c.isTrap) list.push(c);
     });
-    list.sort((a, b) => a.name.localeCompare(b.name));
     return list;
   }
 
-  function passesFilter(c) {
-    if (buildFilter.kind === "monster" && !c.isMonster) return false;
-    if (buildFilter.kind === "spell" && !c.isSpell) return false;
-    if (buildFilter.kind === "trap" && !c.isTrap) return false;
-    if (buildFilter.attr && c.attribute !== buildFilter.attr) return false;
-    if (buildFilter.type && c.race !== buildFilter.type) return false;
-    if (buildFilter.level && String(c.level || 0) !== buildFilter.level) return false;
-    if (buildFilter.q && c.name.toLowerCase().indexOf(buildFilter.q) < 0) return false;
+  function catalogCards() {
+    const list = [];
+    Object.keys(cardDB).forEach((name) => {
+      const c = cardDB[name];
+      if (!c || /Token|Skill/i.test(c.type)) return;
+      if (c.isMonster || c.isSpell || c.isTrap) list.push(c);
+    });
+    return list;
+  }
+
+  function freshCardFilter(extra) {
+    const next = {};
+    Object.keys(CARD_FILTER_BLANK).forEach((key) => { next[key] = CARD_FILTER_BLANK[key]; });
+    return Object.assign(next, extra || {});
+  }
+
+  function replaceFilter(state, extra) {
+    const next = freshCardFilter(extra);
+    Object.keys(state).forEach((key) => { if (!(key in next)) delete state[key]; });
+    Object.keys(next).forEach((key) => { state[key] = next[key]; });
+  }
+
+  function readFilterNum(value) {
+    const text = String(value == null ? "" : value).trim();
+    if (!text) return "";
+    const n = Number(text);
+    if (!isFinite(n)) return "";
+    return String(Math.max(0, Math.min(99999, Math.floor(n))));
+  }
+
+  function cardMatchesQuery(c, q) {
+    if (!c || !q) return false;
+    if (q.q && c.name.toLowerCase().indexOf(q.q) < 0) return false;
+    if (q.kind === "monster" && !c.isMonster) return false;
+    if (q.kind === "spell" && !c.isSpell) return false;
+    if (q.kind === "trap" && !c.isTrap) return false;
+    if (q.attr && c.attribute !== q.attr) return false;
+    if (q.type && c.race !== q.type) return false;
+    if (q.level && String(c.level || 0) !== q.level) return false;
+    const atkOn = q.atkMin !== "" || q.atkMax !== "";
+    const defOn = q.defMin !== "" || q.defMax !== "";
+    if (atkOn || defOn) {
+      if (!c.isMonster) return false;
+      if (q.atkMin !== "" && (c.atk == null || c.atk < Number(q.atkMin))) return false;
+      if (q.atkMax !== "" && (c.atk == null || c.atk > Number(q.atkMax))) return false;
+      if (q.defMin !== "" && (c.def == null || c.def < Number(q.defMin))) return false;
+      if (q.defMax !== "" && (c.def == null || c.def > Number(q.defMax))) return false;
+    }
+    const owned = ownedCount(c.name);
+    const isNew = owned > 0 && !cardSeen(c.name);
+    if (q.owned === "owned" && owned <= 0) return false;
+    if (q.owned === "new" && !isNew) return false;
+    if (q.owned === "missing" && owned > 0) return false;
+    const bag = foilBag(c.name);
+    if (q.foil === "none" && (bag.super || bag.ultra || bag.secret)) return false;
+    if (q.foil === "any" && !(bag.super || bag.ultra || bag.secret)) return false;
+    if (q.foil === "super" && !bag.super) return false;
+    if (q.foil === "ultra" && !bag.ultra) return false;
+    if (q.foil === "secret" && !bag.secret) return false;
+    if (q.foil && q.foil.indexOf("p-") === 0) {
+      const printed = printedRarity(c.name);
+      const want = { "p-common": "Common", "p-rare": "Rare", "p-super": "Super Rare", "p-ultra": "Ultra Rare", "p-secret": "Secret Rare" }[q.foil];
+      if (want && printed !== want) return false;
+    }
     return true;
+  }
+
+  function newestRankMap() {
+    const map = {};
+    const keys = Object.keys((collection && collection.counts) || {});
+    keys.forEach((name, i) => {
+      const bump = ownedCount(name) > 0 && !cardSeen(name) ? keys.length + 1 : 0;
+      map[name] = i + bump;
+    });
+    return map;
+  }
+
+  function compareBySort(a, b, sort, newest) {
+    if (sort === "atk") {
+      const diff = (b.atk == null ? -1 : b.atk) - (a.atk == null ? -1 : a.atk);
+      if (diff) return diff;
+    } else if (sort === "def") {
+      const diff = (b.def == null ? -1 : b.def) - (a.def == null ? -1 : a.def);
+      if (diff) return diff;
+    } else if (sort === "level") {
+      const diff = (b.level || 0) - (a.level || 0);
+      if (diff) return diff;
+    } else if (sort === "newest") {
+      const diff = (newest[b.name] || -1) - (newest[a.name] || -1);
+      if (diff) return diff;
+    }
+    return a.name.localeCompare(b.name);
+  }
+
+  function filterChipList(q) {
+    const chips = [];
+    if (!q) return chips;
+    if (q.q) chips.push({ key: "q", text: "Name: " + q.q });
+    if (q.kind === "monster") chips.push({ key: "kind", text: "Monster" });
+    else if (q.kind === "spell") chips.push({ key: "kind", text: "Spell" });
+    else if (q.kind === "trap") chips.push({ key: "kind", text: "Trap" });
+    if (q.attr) chips.push({ key: "attr", text: q.attr });
+    if (q.type) chips.push({ key: "type", text: q.type });
+    if (q.level) chips.push({ key: "level", text: "Lv " + q.level });
+    if (q.atkMin !== "" || q.atkMax !== "") {
+      chips.push({ key: "atk", text: "ATK " + (q.atkMin === "" ? "0" : q.atkMin) + "–" + (q.atkMax === "" ? "any" : q.atkMax) });
+    }
+    if (q.defMin !== "" || q.defMax !== "") {
+      chips.push({ key: "def", text: "DEF " + (q.defMin === "" ? "0" : q.defMin) + "–" + (q.defMax === "" ? "any" : q.defMax) });
+    }
+    const foilLabel = {
+      none: "No foil", any: "Any foil", super: "SR foil", ultra: "UR foil", secret: "SCR foil",
+      "p-common": "Common", "p-rare": "Rare", "p-super": "Printed SR", "p-ultra": "Printed UR", "p-secret": "Printed Secret",
+    };
+    if (q.foil) chips.push({ key: "foil", text: foilLabel[q.foil] || q.foil });
+    if (q.owned === "owned") chips.push({ key: "owned", text: "Owned" });
+    else if (q.owned === "new") chips.push({ key: "owned", text: "New" });
+    else if (q.owned === "missing") chips.push({ key: "owned", text: "Not owned" });
+    if (q.sort && q.sort !== "name") {
+      const sortLabel = { atk: "ATK", def: "DEF", level: "Level", newest: "Newest" };
+      chips.push({ key: "sort", text: "Sort: " + (sortLabel[q.sort] || q.sort) });
+    }
+    return chips;
+  }
+
+  function pullFilterFields(prefix, state) {
+    const panel = $(prefix + "FilterPanel");
+    if (!panel || !state) return;
+    panel.querySelectorAll("[data-field]").forEach((node) => {
+      const key = node.dataset.field;
+      if (!key || !(key in state)) return;
+      const raw = node.value;
+      state[key] = (key === "atkMin" || key === "atkMax" || key === "defMin" || key === "defMax") ? readFilterNum(raw) : raw;
+    });
+  }
+
+  function paintFilterBar(prefix, state) {
+    if (!state) return;
+    const search = $(prefix + "Search");
+    const btn = $(prefix + "FilterBtn");
+    const panel = $(prefix + "FilterPanel");
+    const chips = $(prefix + "Chips");
+    if (search && document.activeElement !== search) search.value = state.q || "";
+    if (panel) {
+      panel.hidden = !state.open;
+      panel.querySelectorAll("[data-field]").forEach((node) => {
+        const key = node.dataset.field;
+        if (!key || !(key in state)) return;
+        const next = state[key] == null ? "" : String(state[key]);
+        if (document.activeElement !== node && node.value !== next) node.value = next;
+      });
+    }
+    const list = filterChipList(state);
+    if (btn) {
+      btn.setAttribute("aria-expanded", state.open ? "true" : "false");
+      btn.classList.toggle("on", !!state.open);
+      btn.textContent = (state.open ? "Hide" : "Filters") + (list.length ? " (" + list.length + ")" : "");
+    }
+    if (!chips) return;
+    chips.innerHTML = "";
+    list.forEach((chip) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = chip.text + " ×";
+      b.addEventListener("click", () => clearFilterKey(prefix, state, chip.key));
+      chips.appendChild(b);
+    });
+    if (list.length) {
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "clear-all";
+      clear.textContent = "Clear all";
+      clear.addEventListener("click", () => clearFilterKey(prefix, state, "all"));
+      chips.appendChild(clear);
+    }
+  }
+
+  function clearFilterKey(prefix, state, key) {
+    if (key === "all") {
+      const view = state.view;
+      const open = state.open;
+      const next = freshCardFilter({ view: view, open: open });
+      Object.keys(next).forEach((k) => { state[k] = next[k]; });
+    } else if (key === "atk") {
+      state.atkMin = "";
+      state.atkMax = "";
+    } else if (key === "def") {
+      state.defMin = "";
+      state.defMax = "";
+    } else if (key === "sort") state.sort = "name";
+    else if (key) state[key] = "";
+    const search = $(prefix + "Search");
+    if (search && (key === "q" || key === "all")) search.value = "";
+    if (prefix === "binder") {
+      if (el.binderScroll) el.binderScroll.scrollTop = 0;
+      renderBinder();
+    } else {
+      if (el.buildScroll) el.buildScroll.scrollTop = 0;
+      if (draft && $("builder").classList.contains("active")) renderBuilderGrid();
+      else paintFilterBar("build", state);
+    }
+  }
+
+  function bindFilterBar(prefix, state, onChange) {
+    const search = $(prefix + "Search");
+    const btn = $(prefix + "FilterBtn");
+    const panel = $(prefix + "FilterPanel");
+    const clear = $(prefix + "Clear");
+    let timer = 0;
+    if (search) {
+      search.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          state.q = search.value.trim().toLowerCase();
+          onChange();
+        }, 60);
+      });
+    }
+    if (btn && panel) {
+      btn.addEventListener("click", () => {
+        state.open = !state.open;
+        paintFilterBar(prefix, state);
+      });
+    }
+    if (panel) {
+      const apply = () => {
+        pullFilterFields(prefix, state);
+        onChange();
+      };
+      panel.addEventListener("change", apply);
+      panel.addEventListener("input", (e) => {
+        if (!e.target || e.target.tagName !== "INPUT") return;
+        clearTimeout(timer);
+        timer = setTimeout(apply, 80);
+      });
+    }
+    if (clear) {
+      clear.addEventListener("click", () => clearFilterKey(prefix, state, "all"));
+    }
+    paintFilterBar(prefix, state);
+  }
+
+  function passesFilter(c) {
+    return cardMatchesQuery(c, buildFilter);
   }
 
   function cardsInDraft(list) {
@@ -7233,22 +7673,28 @@
 
   function renderBuilderGrid() {
     if (!draft) return;
+    paintFilterBar("build", buildFilter);
     const counts = countNames(draft.main.concat(draft.extra));
     let cards = buildFilter.view === "main"
       ? cardsInDraft(draft.main)
       : buildFilter.view === "extra"
         ? cardsInDraft(draft.extra)
-        : deckCards();
+        : (buildFilter.owned === "missing" ? catalogCards() : deckCards());
     cards = cards.filter(passesFilter);
+    const newest = newestRankMap();
+    cards.sort((a, b) => compareBySort(a, b, buildFilter.sort, newest));
     const grid = el.buildGrid;
-    const scroll = grid.scrollTop;
+    const scroller = el.buildScroll || grid;
+    const scroll = scroller.scrollTop;
     grid.innerHTML = "";
     if (!cards.length) {
       const empty = document.createElement("div");
       empty.className = "pool-empty";
-      empty.textContent = buildFilter.view === "owned"
-        ? "No owned cards match. Open the binder to see what you are missing."
-        : "Nothing in this deck matches.";
+      empty.textContent = buildFilter.owned === "missing"
+        ? "No missing cards match."
+        : (buildFilter.view === "owned"
+          ? "No cards match. Clear a filter, or open the binder."
+          : "Nothing in this deck matches.");
       grid.appendChild(empty);
       return;
     }
@@ -7277,14 +7723,8 @@
       const name = document.createElement("span");
       name.className = "cname";
       name.textContent = c.name;
-      const own = document.createElement("span");
-      const topFoil = owned ? bestFoil(c.name) : "";
-      own.className = "own" + (owned ? "" : " none");
-      own.textContent = "Own " + owned + (qty ? " · deck " + qty : "") + (topFoil ? " · " + (topFoil === "secret" ? "Sc" : topFoil === "ultra" ? "U" : "S") + " foil" : "");
-      if (topFoil) paintFoil(b, topFoil);
       b.appendChild(img);
       b.appendChild(name);
-      b.appendChild(own);
       const mark = banMark(c);
       if (mark) {
         const m = document.createElement("span");
@@ -7297,11 +7737,12 @@
         m.textContent = "EX";
         b.appendChild(m);
       }
+      paintCopyBadges(b, c.name, qty);
       b.addEventListener("click", () => openBuildSheet(c.name));
       frag.appendChild(b);
     });
     grid.appendChild(frag);
-    grid.scrollTop = scroll;
+    scroller.scrollTop = scroll;
   }
 
   function closeBuildSheet() {
@@ -7311,33 +7752,41 @@
 
   function openBuildSheet(name) {
     const c = cardDB[name];
-    if (!c || !draft) return;
+    if (!c) return;
     sheetName = name;
     el.buildArt.src = c.imageFull || c.image;
     el.buildArt.alt = c.name;
     el.buildCardName.textContent = c.name;
+    const printed = printedRarity(name);
     if (c.isMonster) {
       el.buildStats.textContent =
-        [c.attribute, c.race, "Lv" + c.level, "ATK " + (c.atk == null ? "?" : c.atk), "DEF " + (c.def == null ? "?" : c.def), c.isFusion ? "Extra Deck" : "Main Deck"]
+        [c.attribute, c.race, "Lv" + c.level, "ATK " + (c.atk == null ? "?" : c.atk), "DEF " + (c.def == null ? "?" : c.def), printed, c.isFusion ? "Extra Deck" : "Main Deck"]
           .filter(Boolean).join(" · ");
     } else {
-      el.buildStats.textContent = [c.type, c.race, "Main Deck"].filter(Boolean).join(" · ");
+      el.buildStats.textContent = [c.type, c.race, printed, "Main Deck"].filter(Boolean).join(" · ");
     }
     el.buildBan.textContent = banSentence(c);
     el.buildDesc.textContent = c.desc || "";
-    const have = (countNames(draft.main.concat(draft.extra)))[name] || 0;
+    fillVersionList(el.buildVersions, name);
+    const have = draft ? ((countNames(draft.main.concat(draft.extra)))[name] || 0) : 0;
     const lim = copyLimit(name);
     const owned = ownedCount(name);
-    const full = c.isFusion ? draft.extra.length >= 15 : draft.main.length >= 60;
-    const foilLine = foilSummary(name);
-    paintFoil(el.buildArt && el.buildArt.parentElement, bestFoil(name));
-    el.buildCount.textContent = lim === 0
-      ? "Forbidden — 0 allowed while the list is on. You own " + owned + (foilLine ? ". " + foilLine + "." : ".")
-      : "In deck " + have + " / " + lim + " · You own " + owned + (c.isFusion ? " · Extra" : " · Main") + (foilLine ? " · " + foilLine : "");
-    el.buildAdd.disabled = have >= lim || have >= owned || owned <= 0 || full;
+    const full = !!(draft && (c.isFusion ? draft.extra.length >= 15 : draft.main.length >= 60));
+    paintFoil(el.buildArt && el.buildArt.parentElement, owned ? bestFoil(name) : "");
+    if (!draft) {
+      el.buildCount.textContent = owned
+        ? "You own " + owned + ". Open the deck builder to add or remove copies."
+        : "Not in your collection. Open the deck builder after you own a copy.";
+    } else if (lim === 0) {
+      el.buildCount.textContent = "Forbidden — 0 allowed while the list is on. You own " + owned + ".";
+    } else {
+      el.buildCount.textContent = "In deck " + have + " / " + lim + " · You own " + owned + (c.isFusion ? " · Extra" : " · Main");
+    }
+    el.buildAdd.disabled = !draft || have >= lim || have >= owned || owned <= 0 || full;
     el.buildAdd.textContent = c.isFusion ? "Add to Extra" : "Add to Main";
-    el.buildRemove.disabled = have <= 0;
+    el.buildRemove.disabled = !draft || have <= 0;
     el.buildOverlay.classList.add("open");
+    if (owned) markSeen(name);
   }
 
   function addDraftCard(name) {
@@ -7372,23 +7821,21 @@
   }
 
   function afterDraftChange(name) {
+    if (!draft) return;
     draft.name = el.buildName.value;
     paintDraft();
     let node = null;
     el.buildGrid.querySelectorAll(".pool-card").forEach((n) => { if (n.dataset.name === name) node = n; });
-    if (buildFilter.view === "owned" && node) {
+    if (buildFilter.view === "owned" && buildFilter.owned !== "missing" && node && cardDB[name]) {
       const qty = (countNames(draft.main.concat(draft.extra)))[name] || 0;
       const lim = copyLimit(name);
       const owned = ownedCount(name);
       node.classList.toggle("in", qty > 0);
       node.classList.toggle("over", qty > lim || qty > owned);
       node.classList.toggle("unowned", owned <= 0);
-      const own = node.querySelector(".own");
-      if (own) {
-        own.textContent = "Own " + owned + (qty ? " · deck " + qty : "");
-        own.classList.toggle("none", owned <= 0);
-      }
-    } else renderBuilderGrid();
+      paintCopyBadges(node, name, qty);
+    } else if ($("builder").classList.contains("active")) renderBuilderGrid();
+    if ($("binder").classList.contains("active")) renderBinder();
     if (sheetName) openBuildSheet(sheetName);
   }
 
@@ -7550,27 +7997,26 @@
       o.textContent = label;
       sel.appendChild(o);
     };
-    ["DARK", "LIGHT", "EARTH", "WATER", "FIRE", "WIND", "DIVINE"].forEach((a) => { if (attrs[a]) addOpt(el.buildAttr, a, a); });
-    const mGroup = document.createElement("optgroup");
-    mGroup.label = "Monster";
-    Object.keys(monsterRaces).sort().forEach((r) => {
-      const o = document.createElement("option");
-      o.value = r;
-      o.textContent = r;
-      mGroup.appendChild(o);
-    });
-    const sGroup = document.createElement("optgroup");
-    sGroup.label = "Spell / Trap";
-    Object.keys(cardRaces).sort().forEach((r) => {
-      const o = document.createElement("option");
-      o.value = r;
-      o.textContent = r;
-      sGroup.appendChild(o);
-    });
-    el.buildType.appendChild(mGroup);
-    el.buildType.appendChild(sGroup);
-    for (let lv = 1; lv <= 12; lv++) addOpt(el.buildLevel, String(lv), "Lv " + lv);
-    el.buildSearch.placeholder = "Search cards you own";
+    const fillOne = (prefix) => {
+      const attr = $(prefix + "Attr");
+      const type = $(prefix + "Type");
+      const level = $(prefix + "Level");
+      if (!attr || attr.dataset.ready) return;
+      ["DARK", "LIGHT", "EARTH", "WATER", "FIRE", "WIND", "DIVINE"].forEach((a) => { if (attrs[a]) addOpt(attr, a, a); });
+      const mGroup = document.createElement("optgroup");
+      mGroup.label = "Monster";
+      Object.keys(monsterRaces).sort().forEach((r) => addOpt(mGroup, r, r));
+      const sGroup = document.createElement("optgroup");
+      sGroup.label = "Spell / Trap";
+      Object.keys(cardRaces).sort().forEach((r) => addOpt(sGroup, r, r));
+      type.appendChild(mGroup);
+      type.appendChild(sGroup);
+      for (let lv = 1; lv <= 12; lv++) addOpt(level, String(lv), "Lv " + lv);
+      attr.dataset.ready = "1";
+    };
+    fillOne("build");
+    fillOne("binder");
+    if (el.buildSearch) el.buildSearch.placeholder = "Search name";
   }
 
   function canNormalSummon(card) {
@@ -8432,24 +8878,40 @@
     });
   }
 
+  function foilBadgeClass(tier) {
+    if (tier === "ultra") return "ur";
+    if (tier === "secret") return "scr";
+    return "sr";
+  }
+
   function paintFoil(node, tier, flash) {
     if (!node) return;
     const key = foilTier(tier);
-    node.classList.remove("has-foil", "foil-super", "foil-ultra", "foil-secret", "foil-flash");
+    node.classList.remove("has-foil", "foil-super", "foil-ultra", "foil-secret", "foil-flash", "tier-sr", "tier-ur", "tier-scr");
     const shine = node.querySelector(":scope > .foil-shine");
     const burst = node.querySelector(":scope > .foil-burst");
+    const stack = node.querySelector(":scope > .rarity-stack");
+    const badge = node.querySelector(":scope > .rarity-badge");
+    if (stack) stack.remove();
     if (!key) {
       if (shine) shine.remove();
       if (burst) burst.remove();
+      if (badge) badge.remove();
       return;
     }
-    node.classList.add("has-foil", "foil-" + key);
+    node.classList.add("has-foil", "foil-" + key, "tier-" + foilBadgeClass(key));
     if (!shine) {
       const mark = document.createElement("i");
       mark.className = "foil-shine";
       mark.setAttribute("aria-hidden", "true");
       node.appendChild(mark);
     }
+    const chip = badge || document.createElement("span");
+    chip.className = "rarity-badge " + foilBadgeClass(key);
+    chip.textContent = FOIL_BADGE[key];
+    chip.title = FOIL_TIERS[key];
+    chip.setAttribute("aria-label", FOIL_TIERS[key]);
+    if (!badge) node.appendChild(chip);
     if (flash) {
       node.classList.add("foil-flash");
       if (!burst) {
@@ -8461,19 +8923,97 @@
     } else if (burst) burst.remove();
   }
 
-  function foilPips(name) {
+  function paintOwnedFoils(node, name) {
     const bag = foilBag(name);
+    const tiers = ["secret", "ultra", "super"].filter((tier) => bag[tier] > 0);
+    paintFoil(node, tiers[0] || "");
+    if (tiers.length <= 1) return;
+    const single = node.querySelector(":scope > .rarity-badge");
+    if (single) single.remove();
     const wrap = document.createElement("span");
-    wrap.className = "foil-pips";
-    ["super", "ultra", "secret"].forEach((tier) => {
-      if (!bag[tier]) return;
-      const pip = document.createElement("i");
-      pip.className = tier;
-      pip.textContent = (tier === "secret" ? "Sc" : tier === "ultra" ? "U" : "S") + (bag[tier] > 1 ? bag[tier] : "");
-      pip.title = FOIL_TIERS[tier] + " foil ×" + bag[tier];
-      wrap.appendChild(pip);
+    wrap.className = "rarity-stack";
+    tiers.forEach((tier) => {
+      const chip = document.createElement("span");
+      chip.className = "rarity-badge " + foilBadgeClass(tier);
+      chip.textContent = FOIL_BADGE[tier];
+      chip.title = FOIL_TIERS[tier] + " ×" + bag[tier];
+      chip.setAttribute("aria-label", FOIL_TIERS[tier]);
+      wrap.appendChild(chip);
     });
-    return wrap.childNodes.length ? wrap : null;
+    node.appendChild(wrap);
+  }
+
+  function paintCopyBadges(node, name, qty) {
+    const owned = ownedCount(name);
+    const isNew = owned > 0 && !cardSeen(name);
+    node.classList.toggle("is-new", isNew);
+    let tag = node.querySelector(":scope > .new-tag");
+    if (isNew) {
+      if (!tag) {
+        tag = document.createElement("span");
+        tag.className = "new-tag";
+        tag.textContent = "NEW";
+        node.appendChild(tag);
+      }
+    } else if (tag) tag.remove();
+    let count = node.querySelector(":scope > .count");
+    if (owned > 1) {
+      if (!count) {
+        count = document.createElement("span");
+        count.className = "count";
+        node.appendChild(count);
+      }
+      count.textContent = "x" + owned;
+    } else if (count) count.remove();
+    let deck = node.querySelector(":scope > .deck-qty");
+    if (qty > 0) {
+      if (!deck) {
+        deck = document.createElement("span");
+        deck.className = "deck-qty";
+        node.appendChild(deck);
+      }
+      deck.textContent = "Deck " + qty;
+    } else if (deck) deck.remove();
+    if (owned > 0) paintOwnedFoils(node, name);
+    else paintFoil(node, "");
+    const mark = node.querySelector(":scope > .mark");
+    const deckNow = node.querySelector(":scope > .deck-qty");
+    if (mark) mark.classList.toggle("shift", !!deckNow);
+    if (deckNow) deckNow.classList.toggle("shift", !!mark);
+  }
+
+  function fillVersionList(node, name) {
+    if (!node) return;
+    node.innerHTML = "";
+    const owned = ownedCount(name);
+    if (owned <= 0) {
+      const li = document.createElement("li");
+      li.textContent = "Not in your collection";
+      node.appendChild(li);
+      return;
+    }
+    const bag = foilBag(name);
+    const rows = [{ tier: "", label: "Normal", count: Math.max(0, owned - bag.super - bag.ultra - bag.secret) }];
+    if (bag.super) rows.push({ tier: "super", label: "Super Rare", count: bag.super });
+    if (bag.ultra) rows.push({ tier: "ultra", label: "Ultra Rare", count: bag.ultra });
+    if (bag.secret) rows.push({ tier: "secret", label: "Secret Rare", count: bag.secret });
+    rows.forEach((row) => {
+      const li = document.createElement("li");
+      const left = document.createElement("span");
+      left.className = "ver-name";
+      if (row.tier) {
+        const badge = document.createElement("i");
+        badge.className = "rarity-badge " + foilBadgeClass(row.tier);
+        badge.textContent = FOIL_BADGE[row.tier];
+        left.appendChild(badge);
+        left.appendChild(document.createTextNode(row.label));
+      } else left.textContent = row.label;
+      const n = document.createElement("b");
+      n.textContent = "x" + row.count;
+      li.appendChild(left);
+      li.appendChild(n);
+      node.appendChild(li);
+    });
   }
 
   function rollFoil(hot, holo) {
@@ -9183,13 +9723,21 @@
     return { date: key, name: name, rarity: rarity, foil: foil, price: price };
   }
 
-  function shopThumb(name) {
-    const img = document.createElement("img");
-    img.className = "thumb";
-    img.alt = "";
+  function shopThumb(name, tier) {
     const card = cardDB[name];
+    const foil = foilTier(tier);
+    const img = document.createElement("img");
+    img.alt = "";
     if (card) img.src = card.image;
-    return img;
+    if (!foil) {
+      img.className = "thumb";
+      return img;
+    }
+    const frame = document.createElement("span");
+    frame.className = "thumb";
+    frame.appendChild(img);
+    paintFoil(frame, foil);
+    return frame;
   }
 
   function paintShop() {
@@ -9225,21 +9773,7 @@
       btn.textContent = "Buy";
       btn.disabled = wallet.coins < deal.price;
       btn.addEventListener("click", () => buyDeal(deal));
-      const thumb = shopThumb(deal.name);
-      if (deal.foil) {
-        const frame = document.createElement("span");
-        frame.className = "thumb";
-        frame.style.position = "relative";
-        frame.style.display = "block";
-        frame.style.width = "28px";
-        frame.style.height = "40px";
-        frame.style.flexShrink = "0";
-        thumb.style.width = "100%";
-        thumb.style.height = "100%";
-        frame.appendChild(thumb);
-        paintFoil(frame, deal.foil);
-        row.appendChild(frame);
-      } else row.appendChild(thumb);
+      row.appendChild(shopThumb(deal.name, deal.foil));
       row.appendChild(copy);
       row.appendChild(price);
       row.appendChild(btn);
@@ -9307,7 +9841,7 @@
       btn.type = "button";
       btn.textContent = "Sell";
       btn.addEventListener("click", () => sellOne(name));
-      row.appendChild(shopThumb(name));
+      row.appendChild(shopThumb(name, bestFoil(name)));
       row.appendChild(copy);
       row.appendChild(priceEl);
       row.appendChild(btn);
@@ -9614,13 +10148,12 @@
 
   function binderCardButton(name) {
     const card = cardDB[name];
+    if (!card) return document.createElement("span");
     const owned = ownedCount(name);
-    const isNew = owned > 0 && !cardSeen(name);
     const btn = document.createElement("button");
     btn.type = "button";
-    const topFoil = owned ? bestFoil(name) : "";
-    btn.className = "binder-card" + (owned ? "" : " missing") + (isNew ? " is-new" : "");
-    if (topFoil) btn.classList.add("has-foil", "foil-" + topFoil);
+    btn.className = "binder-card" + (owned ? "" : " missing");
+    btn.dataset.name = name;
     const img = document.createElement("img");
     img.alt = "";
     img.src = card.image;
@@ -9631,46 +10164,24 @@
     label.className = "cname";
     label.textContent = name;
     btn.appendChild(img);
-    if (owned) {
-      const count = document.createElement("span");
-      count.className = "count";
-      count.textContent = "×" + owned;
-      btn.appendChild(count);
-    }
-    if (isNew) {
-      const tag = document.createElement("span");
-      tag.className = "new-tag";
-      tag.textContent = "NEW";
-      btn.appendChild(tag);
-    }
-    if (topFoil) {
-      const shine = document.createElement("i");
-      shine.className = "foil-shine";
-      shine.setAttribute("aria-hidden", "true");
-      btn.appendChild(shine);
-      const pips = foilPips(name);
-      if (pips) btn.appendChild(pips);
-    }
     btn.appendChild(label);
-    btn.addEventListener("click", () => {
-      openSheet({
-        owner: "player", where: "binder", faceup: true, inspect: true,
-        card: { uid: "binder", name: card.name, ref: card },
-      });
-    });
+    paintCopyBadges(btn, name, 0);
+    btn.addEventListener("click", () => openBuildSheet(name));
     return btn;
   }
 
   function renderBinder() {
     if (!el.binderScroll || !el.binderSets) return;
+    paintFilterBar("binder", binderQuery);
     const groups = binderCatalog();
     const overall = groupStat(binderUniverse());
     el.binderOverall.textContent = overall.pct + "% · " + (overall.foils || 0) + (overall.foils === 1 ? " foil" : " foils");
     const current = groups.find((group) => group.id === binderFilter) || null;
     const currentStat = current ? groupStat(current.names) : null;
+    const filtering = filterChipList(binderQuery).length > 0;
     el.binderSub.textContent = currentStat
       ? current.title + " · " + statLine(currentStat)
-      : "Owned cards show art and a count. Foil versions are marked on the card.";
+      : "Owned cards show art. Extra copies show a count. Foils use SR, UR, and SCR.";
     el.binderSets.innerHTML = "";
     [{ id: "all", label: "All" }].concat(groups).forEach((chip) => {
       const btn = document.createElement("button");
@@ -9684,9 +10195,16 @@
       });
       el.binderSets.appendChild(btn);
     });
+    const scroll = el.binderScroll.scrollTop;
     el.binderScroll.innerHTML = "";
     const shown = binderFilter === "all" ? groups : groups.filter((group) => group.id === binderFilter);
+    const newest = newestRankMap();
+    let matches = 0;
     shown.forEach((group) => {
+      const names = group.names.filter((name) => cardDB[name] && cardMatchesQuery(cardDB[name], binderQuery));
+      names.sort((a, b) => compareBySort(cardDB[a], cardDB[b], binderQuery.sort, newest));
+      if (!names.length) return;
+      matches += names.length;
       const sec = document.createElement("section");
       sec.className = "binder-sec";
       const head = document.createElement("div");
@@ -9695,20 +10213,31 @@
       title.textContent = group.title;
       const stat = groupStat(group.names);
       const pct = document.createElement("span");
-      pct.textContent = statLine(stat);
+      pct.textContent = filtering ? (names.length + (names.length === 1 ? " match" : " matches")) : statLine(stat);
       head.appendChild(title);
       head.appendChild(pct);
       const grid = document.createElement("div");
       grid.className = "binder-grid";
-      group.names.forEach((name) => grid.appendChild(binderCardButton(name)));
+      names.forEach((name) => grid.appendChild(binderCardButton(name)));
       sec.appendChild(head);
       sec.appendChild(grid);
       el.binderScroll.appendChild(sec);
     });
+    if (!matches) {
+      const empty = document.createElement("p");
+      empty.className = "binder-empty";
+      empty.textContent = "No cards match. Clear a filter to see the set again.";
+      el.binderScroll.appendChild(empty);
+    }
+    el.binderScroll.scrollTop = scroll;
   }
 
   function showBinder(from) {
     binderFrom = from || "menu";
+    replaceFilter(binderQuery);
+    const search = $("binderSearch");
+    if (search) search.value = "";
+    paintFilterBar("binder", binderQuery);
     renderBinder();
     showScreen("binder");
   }
@@ -10187,32 +10716,14 @@
   el.btnBuildSave.addEventListener("click", saveDraft);
   el.btnAutoBuild.addEventListener("click", () => autoBuild());
   el.buildName.addEventListener("input", () => { if (draft) draft.name = el.buildName.value; });
-  el.buildSearch.addEventListener("input", () => {
-    clearTimeout(buildTimer);
-    buildTimer = setTimeout(() => {
-      if (!draft || !$("builder").classList.contains("active")) return;
-      buildFilter.q = el.buildSearch.value.trim().toLowerCase();
-      renderBuilderGrid();
-    }, 60);
-  });
-  $("buildKind").addEventListener("click", (e) => {
-    const b = e.target.closest("button");
-    if (!b || !b.dataset.kind) return;
-    buildFilter.kind = b.dataset.kind;
-    $("buildKind").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
-    renderBuilderGrid();
-  });
   $("buildView").addEventListener("click", (e) => {
     const b = e.target.closest("button");
     if (!b || !b.dataset.view) return;
     buildFilter.view = b.dataset.view;
     $("buildView").querySelectorAll("button").forEach((x) => x.classList.toggle("on", x === b));
-    el.buildGrid.scrollTop = 0;
+    if (el.buildScroll) el.buildScroll.scrollTop = 0;
     renderBuilderGrid();
   });
-  el.buildAttr.addEventListener("change", () => { buildFilter.attr = el.buildAttr.value; renderBuilderGrid(); });
-  el.buildType.addEventListener("change", () => { buildFilter.type = el.buildType.value; renderBuilderGrid(); });
-  el.buildLevel.addEventListener("change", () => { buildFilter.level = el.buildLevel.value; renderBuilderGrid(); });
   el.buildAdd.addEventListener("click", () => { if (sheetName) addDraftCard(sheetName); });
   el.buildRemove.addEventListener("click", () => { if (sheetName) removeDraftCard(sheetName); });
   el.buildClose.addEventListener("click", closeBuildSheet);
@@ -10306,6 +10817,16 @@
   syncUnlocksFromTourney();
   syncClearedFromTourney();
   fillBuilderSelects();
+  bindFilterBar("binder", binderQuery, () => {
+    if (el.binderScroll) el.binderScroll.scrollTop = 0;
+    if ($("binder").classList.contains("active")) renderBinder();
+    else paintFilterBar("binder", binderQuery);
+  });
+  bindFilterBar("build", buildFilter, () => {
+    if (el.buildScroll) el.buildScroll.scrollTop = 0;
+    if (draft && $("builder").classList.contains("active")) renderBuilderGrid();
+    else paintFilterBar("build", buildFilter);
+  });
   syncFL();
   refreshContinue();
   Object.keys(DECKS).forEach((id) => {
@@ -10346,7 +10867,7 @@
     if (!known) return;
     openSheet({
       owner: "player", where: "pack", faceup: true, inspect: true,
-      card: { uid: "pack", name: known.name, ref: known },
+      card: { uid: "pack", name: known.name, ref: known, foil: card.foil || "" },
     });
   });
   window.addEventListener("pagehide", flushSaves);
