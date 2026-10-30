@@ -360,7 +360,7 @@
       border-color: #9ecbff; color: #e7f2ff;
     }
     #btnBinder, #btnBuildBinder { position: relative; }
-    .sr {
+    .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
       overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
     }
@@ -1174,6 +1174,10 @@
     #overlay { z-index: 60; }
     #choiceOverlay { z-index: 70; }
     #confirmOverlay { z-index: 80; }
+    #foilBonusOverlay { z-index: 85; }
+    #foilBonusLead { margin: 0; color: var(--cream); font-size: 0.86rem; line-height: 1.35; }
+    #foilBonusList { max-height: min(42dvh, 280px); overflow: auto; -webkit-overflow-scrolling: touch; }
+    #foilBonusList:empty { display: none; }
     .overlay { background: rgba(4,8,16,0.72); align-items: flex-end; justify-content: center; }
     .overlay.open { display: flex; }
     .sheet {
@@ -1396,18 +1400,30 @@
     }
     .shop-row.locked { opacity: 0.55; }
     .shop-row.deal { border-color: var(--gold); background: linear-gradient(180deg, #3a2a12, #1a1208); }
-    .shop-row .thumb {
-      width: 48px; height: 68px; object-fit: cover; border-radius: 3px; flex-shrink: 0;
-      border: 2px solid rgba(212,160,23,0.45); background: #111;
-      position: relative; overflow: hidden; display: block;
+    .shop-card {
+      position: relative; flex: 0 0 auto; width: 64px; height: 90px; margin: 0; padding: 0;
+      border-radius: 4px; border: 2px solid rgba(212,160,23,0.55); background: #111;
+      overflow: hidden; display: block; color: inherit;
     }
-    .shop-row span.thumb img {
-      width: 100%; height: 100%; object-fit: cover; display: block; border: 0; border-radius: 0;
+    .shop-card img {
+      width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none;
     }
+    .shop-card .rarity-badge {
+      z-index: 6; top: 3px; right: 3px; font-size: 13px; padding: 2px 4px; border-radius: 3px;
+    }
+    .shop-card.tier-sr { box-shadow: inset 0 0 0 2px #e7eef6; }
+    .shop-card.tier-ur { box-shadow: inset 0 0 0 2px #f0c040; }
     .shop-row .copy { min-width: 0; flex: 1; text-align: left; }
     .shop-row .nm {
+      display: flex; align-items: center; gap: 4px; min-width: 0;
       color: var(--gold); font-weight: 700; font-size: 0.78rem; line-height: 1.15;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .shop-row .nm-text {
+      min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .rarity-badge.inline {
+      position: static; display: inline-block; flex: 0 0 auto; z-index: auto;
+      margin: 0; font-size: 0.68rem; padding: 1px 4px; vertical-align: middle;
     }
     .shop-row .sub {
       color: var(--muted); font-size: 0.64rem; line-height: 1.15;
@@ -1417,13 +1433,13 @@
       flex-shrink: 0; color: #ffe7a3; font-weight: 700; font-size: 0.75rem;
       font-variant-numeric: tabular-nums;
     }
-    .shop-row button {
+    .shop-row button:not(.shop-card) {
       flex-shrink: 0; min-width: 64px; min-height: 40px; padding: 4px 8px;
       font: inherit; font-size: 0.78rem; font-weight: 700; cursor: pointer;
       border-radius: 4px; border: 1px solid #f0c040;
       background: linear-gradient(180deg, #b88912, #7a5608); color: #1a1200;
     }
-    .shop-row button:disabled { opacity: 0.45; cursor: default; }
+    .shop-row button:not(.shop-card):disabled { opacity: 0.45; cursor: default; }
     #btnShopBack { flex-shrink: 0; align-self: center; }
 
     /* —— Binder and rematch (the grid or list scrolls; the screen does not) —— */
@@ -1586,7 +1602,15 @@
     .version-list b { font-variant-numeric: tabular-nums; color: var(--gold); }
     .zone .rarity-badge, .hand .hc .rarity-badge { font-size: 8px; padding: 0 2px; letter-spacing: 0.02em; top: 1px; right: 1px; }
     .pack-card .rarity-badge { top: 8px; right: 6px; font-size: 0.92rem; padding: 3px 7px; border-radius: 3px; }
-    .shop-row .rarity-badge { font-size: 11px; padding: 1px 3px; letter-spacing: 0.02em; top: 2px; right: 2px; }
+    .shop-card > .rarity-badge {
+      position: absolute; top: 4px; right: 4px; z-index: 6;
+      font-size: 14px; line-height: 1.15; padding: 2px 5px; letter-spacing: 0.03em;
+    }
+    .shop-row .rarity-badge.inline {
+      position: static; font-size: 12px; line-height: 1.2; padding: 2px 5px;
+    }
+    .shop-card.tier-sr { border: 3px solid #e4edf6 !important; box-shadow: inset 0 0 0 1px #5c6b7e; }
+    .shop-card.tier-ur { border: 3px solid #f0c040 !important; box-shadow: inset 0 0 0 1px #a87810; }
     .hand .hc.tier-sr, .hand .hc.tier-ur, .hand .hc.tier-scr { border-width: 2px; }
     @media (max-width: 359px) {
       .binder-grid, #buildGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1829,8 +1853,8 @@
         <div class="sparkles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
       <div class="menu-hud">
-        <div class="hud-pill" id="menuDpPill" title="Duel Points"><span class="hud-gem" aria-hidden="true"></span><span id="menuDp">0</span><span class="sr"> Duel Points</span></div>
-        <div class="hud-pill" id="menuChipsPill" title="Star Chips"><span class="hud-star" aria-hidden="true">★</span><span id="menuChips">0</span><span class="sr"> Star Chips</span></div>
+        <div class="hud-pill" id="menuDpPill" title="Duel Points"><span class="hud-gem" aria-hidden="true"></span><span id="menuDp">0</span><span class="sr-only"> Duel Points</span></div>
+        <div class="hud-pill" id="menuChipsPill" title="Star Chips"><span class="hud-star" aria-hidden="true">★</span><span id="menuChips">0</span><span class="sr-only"> Star Chips</span></div>
       </div>
       <div class="menu-brand">
         <div class="puzzle" aria-hidden="true">
@@ -2108,9 +2132,9 @@
         <p><strong>Story:</strong> A short scene plays when you arrive, before and after each tournament duel, and after you beat Pegasus. Tap to advance, or Skip. Settings can skip every scene. Win and loss have different lines.</p>
         <p><strong>New cards:</strong> The first copy of a card, from a booster, Grandpa's shop, an ante, or another reward, shows a NEW badge and a glow when it is revealed. The binder keeps NEW on that card until you tap it. A green count on Card Binder is how many of those you have not opened yet. Cards you already owned are treated as seen.</p>
         <p><strong>Daily Puzzle:</strong> One puzzle for today's date. The board, hands, and Life Points are already set. Win that turn with the rules named on the puzzle, Classic or Duelist Kingdom. Hint and Retry sit on the duel screen. The first solve of the day pays 40 Duel Points. Solving on back-to-back days raises a streak. Reset Progress clears the streak.</p>
-        <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. A daily deal, picked from today's date, sells one card at a discount. Sell gives Duel Points for a spare copy. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
+        <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. A daily deal, picked from today's date, sells one card at a discount. A foil deal shows SR, UR, or SCR on the card, with the same colored border as the rest of the game. Tap the card picture to read it. Sell lists each spare separately: a normal copy, then Super, Ultra, and Secret. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
         <p><strong>During a duel:</strong> Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Each opponent brings their own arena behind the cards. Settings saves your rules, animation speed, sound, story skip, cinematics, ante rule, and main-menu theme on this device.</p>
-        <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. A foil card shows SR in silver, UR in gold, or SCR on a rainbow, with a matching border, plus the shine. Commons have no badge. The binder legend uses the same marks. Tap a card to see how many normal, SR, UR, and SCR copies you own. A foil copy and a normal copy both count as that card in the deck builder. The same badge shows on the pack, in the binder, in the builder, in your hand, on the field, and in the shop.</p>
+        <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. A foil card shows SR in silver, UR in gold, or SCR on a rainbow, with a matching border, plus the shine. Commons have no badge. The binder legend uses the same marks. Tap a card to see how many normal, SR, UR, and SCR copies you own. A foil copy and a normal copy both count as that card in the deck builder. The same badge shows on the pack, in the binder, in the builder, in your hand, on the field, and in the shop. The first time an older save opens, each extra copy you already owned — not the first copy, and not cards that only live in a preset deck — gets one roll at the normal pack foil odds. Counts stay the same. That check runs once.</p>
         <p><strong>Intros:</strong> A VS screen slams in before each duel, with both names, ace art, and the opponent's line. It moves on after about two seconds, or when you tap. Blue-Eyes White Dragon, Dark Magician, Red-Eyes Black Dragon, and a completed Exodia play a short flash. Turn Cinematics off in Settings to skip them.</p>
       </div>
       <button type="button" class="menu-btn" id="btnHowtoBack">Back</button>
@@ -2426,6 +2450,17 @@
     <div class="sheet">
       <h3 id="choiceTitle"></h3>
       <div class="choice-btns" id="choiceBtns"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="foilBonusOverlay">
+    <div class="sheet">
+      <h3 id="foilBonusTitle">A shine on your extras</h3>
+      <p id="foilBonusLead"></p>
+      <ul class="version-list" id="foilBonusList"></ul>
+      <div class="actions">
+        <button type="button" id="foilBonusClose">Close</button>
+      </div>
     </div>
   </div>
 
@@ -3097,6 +3132,7 @@
   let tourney = null;
   let tourneyRulesPick = "dk";
   let collection = { counts: {}, unlocked: false };
+  let pendingFoilBonus = null;
   let prize = null;
   let settings = { rules: "classic", anim: "on", sound: true, volume: 0.7, skipStory: false, cinematics: true, ante: false, menuTheme: "" };
   let shopMode = "buy";
@@ -5133,12 +5169,12 @@
       el.sheetStats.textContent = line;
     } else el.sheetStats.textContent = "Face-down";
 
-    if (ctx.where === "binder" && known) {
+    if ((ctx.where === "binder" || ctx.where === "shop") && known) {
       const owned = ownedCount(c.name);
       const foilLine = foilSummary(c.name);
       const extra = (owned ? "Owned ×" + owned : "Not in your collection") + (foilLine ? " · " + foilLine : "");
       el.sheetStats.textContent = el.sheetStats.textContent ? (el.sheetStats.textContent + " · " + extra) : extra;
-      if (owned) markSeen(c.name);
+      if (ctx.where === "binder" && owned) markSeen(c.name);
     }
     const shownFoil = known ? (foilTier(c.foil) || (ctx.where === "binder" ? bestFoil(c.name) : "")) : "";
     if (shownFoil && ctx.where !== "binder") {
@@ -5146,7 +5182,7 @@
     }
     paintFoil(el.sheetArtWrap, shownFoil);
     if (el.sheetVersions) {
-      if (ctx.where === "binder" && known) {
+      if ((ctx.where === "binder" || ctx.where === "shop") && known) {
         el.sheetVersions.hidden = false;
         fillVersionList(el.sheetVersions, c.name);
       } else {
@@ -8721,13 +8757,16 @@
   }
 
   function loadCollection() {
-    collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {} };
+    collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {}, foilBonus: false };
     let migrated = false;
+    let hadSave = false;
     try {
       const raw = JSON.parse(localStorage.getItem(COLLECTION_KEY) || "null");
       if (raw && typeof raw === "object") {
+        hadSave = true;
         collection.unlocked = !!raw.unlocked;
         collection.starter = !!raw.starter;
+        collection.foilBonus = !!raw.foilBonus;
         const counts = {};
         if (raw.counts && typeof raw.counts === "object") {
           Object.keys(raw.counts).forEach((name) => {
@@ -8747,10 +8786,21 @@
         }
       }
     } catch (e) {
-      collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {} };
+      collection = { counts: {}, unlocked: false, starter: false, seen: {}, foils: {}, foilBonus: false };
     }
     if (sanitizeFoils()) migrated = true;
+    const bonusNames = hadSave && !collection.foilBonus
+      ? Object.keys(collection.counts).filter((name) => ownedCount(name) > 0 && cardDB[name])
+      : null;
     ensureStarter();
+    if (bonusNames && bonusNames.length) {
+      pendingFoilBonus = grantDuplicateFoils(bonusNames);
+      collection.foilBonus = true;
+      migrated = true;
+    } else if (!collection.foilBonus) {
+      collection.foilBonus = true;
+      migrated = true;
+    }
     if (migrated) saveCollection();
   }
 
@@ -8818,12 +8868,79 @@
 
   function addFoil(name, tier) {
     const key = foilTier(tier);
-    if (!key || ownedCount(name) <= 0) return;
+    if (!key || ownedCount(name) <= 0) return false;
     if (!collection.foils) collection.foils = {};
     const bag = foilBag(name);
-    if (bag.super + bag.ultra + bag.secret >= ownedCount(name)) return;
+    if (bag.super + bag.ultra + bag.secret >= ownedCount(name)) return false;
     bag[key] += 1;
     collection.foils[name] = bag;
+    return true;
+  }
+
+  function duplicateFoilRolls(name) {
+    const owned = ownedCount(name);
+    if (owned <= 1 || !cardDB[name]) return 0;
+    const slots = owned - 1;
+    return slots - Math.min(foilTotal(name), slots);
+  }
+
+  function grantDuplicateFoils(names) {
+    const granted = [];
+    (names || []).forEach((name) => {
+      if (!cardDB[name]) return;
+      const rolls = duplicateFoilRolls(name);
+      for (let i = 0; i < rolls; i++) {
+        const tier = rollFoil(false, false);
+        if (!tier) continue;
+        if (!addFoil(name, tier)) break;
+        granted.push({ name: name, tier: tier });
+      }
+    });
+    return granted;
+  }
+
+  function showFoilBonus(granted) {
+    const overlay = $("foilBonusOverlay");
+    const lead = $("foilBonusLead");
+    const list = $("foilBonusList");
+    if (!overlay || !lead || !list) return;
+    const grouped = {};
+    (granted || []).forEach((row) => {
+      if (!row || !FOIL_TIERS[row.tier] || !row.name) return;
+      const key = row.tier + "\n" + row.name;
+      if (!grouped[key]) grouped[key] = { name: row.name, tier: row.tier, count: 0 };
+      grouped[key].count += 1;
+    });
+    const rows = Object.keys(grouped).map((key) => grouped[key]);
+    rows.sort((a, b) => a.name.localeCompare(b.name) || a.tier.localeCompare(b.tier));
+    list.innerHTML = "";
+    if (!rows.length) {
+      lead.textContent = "Your extra copies were checked. None of them picked up a foil this time. Your card counts are unchanged.";
+    } else {
+      lead.textContent = "Some extra copies you already owned picked up a foil. Your card counts are the same.";
+      rows.forEach((row) => {
+        const li = document.createElement("li");
+        const left = document.createElement("span");
+        left.className = "ver-name";
+        const badge = document.createElement("i");
+        badge.className = "rarity-badge " + foilBadgeClass(row.tier);
+        badge.textContent = FOIL_BADGE[row.tier];
+        left.appendChild(badge);
+        left.appendChild(document.createTextNode(row.name));
+        const n = document.createElement("b");
+        n.textContent = "x" + row.count;
+        li.appendChild(left);
+        li.appendChild(n);
+        list.appendChild(li);
+      });
+    }
+    overlay.classList.add("open");
+  }
+
+  function closeFoilBonus() {
+    const overlay = $("foilBonusOverlay");
+    if (overlay) overlay.classList.remove("open");
+    pendingFoilBonus = null;
   }
 
   function foilToRemove(name) {
@@ -9052,6 +9169,7 @@
     collection.seen = seen;
     collection.foils = {};
     collection.starter = true;
+    collection.foilBonus = true;
   }
 
   function ensureStarter() {
@@ -9723,21 +9841,47 @@
     return { date: key, name: name, rarity: rarity, foil: foil, price: price };
   }
 
-  function shopThumb(name, tier) {
+  function openShopPreview(name, tier) {
+    const card = cardDB[name];
+    if (!card) return;
+    openSheet({
+      owner: "player", where: "shop", faceup: true, inspect: true,
+      card: { uid: "shop", name: card.name, ref: card, foil: foilTier(tier) },
+    });
+  }
+
+  function shopCard(name, tier) {
     const card = cardDB[name];
     const foil = foilTier(tier);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "shop-card";
+    btn.setAttribute("aria-label", "Preview " + (foil ? FOIL_TIERS[foil] + " " : "") + name);
     const img = document.createElement("img");
     img.alt = "";
     if (card) img.src = card.image;
-    if (!foil) {
-      img.className = "thumb";
-      return img;
+    btn.appendChild(img);
+    paintFoil(btn, foil);
+    btn.addEventListener("click", () => openShopPreview(name, foil));
+    return btn;
+  }
+
+  function shopName(label, tier) {
+    const nm = document.createElement("div");
+    nm.className = "nm";
+    const foil = foilTier(tier);
+    if (foil) {
+      const pill = document.createElement("span");
+      pill.className = "rarity-badge inline " + foilBadgeClass(foil);
+      pill.textContent = FOIL_BADGE[foil];
+      pill.title = FOIL_TIERS[foil];
+      nm.appendChild(pill);
     }
-    const frame = document.createElement("span");
-    frame.className = "thumb";
-    frame.appendChild(img);
-    paintFoil(frame, foil);
-    return frame;
+    const text = document.createElement("span");
+    text.className = "nm-text";
+    text.textContent = label;
+    nm.appendChild(text);
+    return nm;
   }
 
   function paintShop() {
@@ -9757,9 +9901,7 @@
       row.className = "shop-row deal";
       const copy = document.createElement("div");
       copy.className = "copy";
-      const nm = document.createElement("div");
-      nm.className = "nm";
-      nm.textContent = "Daily deal · " + deal.name;
+      const nm = shopName("Daily deal · " + deal.name, deal.foil);
       const sub = document.createElement("div");
       sub.className = "sub";
       sub.textContent = deal.rarity + (deal.foil ? " · " + FOIL_TIERS[deal.foil] + " foil" : "") + " · own " + ownedCount(deal.name) + " · " + prettyDate(deal.date);
@@ -9773,7 +9915,7 @@
       btn.textContent = "Buy";
       btn.disabled = wallet.coins < deal.price;
       btn.addEventListener("click", () => buyDeal(deal));
-      row.appendChild(shopThumb(deal.name, deal.foil));
+      row.appendChild(shopCard(deal.name, deal.foil));
       row.appendChild(copy);
       row.appendChild(price);
       row.appendChild(btn);
@@ -9808,6 +9950,17 @@
     });
   }
 
+  function sellVersions(name) {
+    const bag = foilBag(name);
+    const normals = Math.max(0, ownedCount(name) - bag.super - bag.ultra - bag.secret);
+    const rows = [];
+    if (normals) rows.push({ tier: "", count: normals });
+    if (bag.super) rows.push({ tier: "super", count: bag.super });
+    if (bag.ultra) rows.push({ tier: "ultra", count: bag.ultra });
+    if (bag.secret) rows.push({ tier: "secret", count: bag.secret });
+    return rows;
+  }
+
   function paintSellList() {
     const names = Object.keys(collection.counts || {}).filter((name) => spareCount(name) > 0 && cardDB[name]);
     names.sort((a, b) => spareCount(b) - spareCount(a) || a.localeCompare(b));
@@ -9819,33 +9972,33 @@
       return;
     }
     names.forEach((name) => {
-      const spare = spareCount(name);
-      const price = sellPrice(name);
-      const row = document.createElement("div");
-      row.className = "shop-row";
-      const copy = document.createElement("div");
-      copy.className = "copy";
-      const nm = document.createElement("div");
-      nm.className = "nm";
-      nm.textContent = name;
-      const sub = document.createElement("div");
-      sub.className = "sub";
-      const ownedFoil = foilSummary(name);
-      sub.textContent = "Spare " + spare + " · own " + ownedCount(name) + " · " + printedRarity(name) + (ownedFoil ? " · " + ownedFoil : "");
-      copy.appendChild(nm);
-      copy.appendChild(sub);
-      const priceEl = document.createElement("div");
-      priceEl.className = "price";
-      priceEl.textContent = price + " DP";
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.textContent = "Sell";
-      btn.addEventListener("click", () => sellOne(name));
-      row.appendChild(shopThumb(name, bestFoil(name)));
-      row.appendChild(copy);
-      row.appendChild(priceEl);
-      row.appendChild(btn);
-      el.shopList.appendChild(row);
+      sellVersions(name).forEach((version) => {
+        const price = sellPrice(name);
+        const row = document.createElement("div");
+        row.className = "shop-row";
+        const copy = document.createElement("div");
+        copy.className = "copy";
+        const nm = shopName(name, version.tier);
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        const kind = version.tier ? FOIL_TIERS[version.tier] : "Normal";
+        sub.textContent = kind + " · " + version.count + (version.count === 1 ? " copy" : " copies");
+        copy.appendChild(nm);
+        copy.appendChild(sub);
+        const priceEl = document.createElement("div");
+        priceEl.className = "price";
+        priceEl.textContent = price + " DP";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Sell";
+        btn.disabled = spareCount(name) <= 0;
+        btn.addEventListener("click", () => sellOne(name, version.tier));
+        row.appendChild(shopCard(name, version.tier));
+        row.appendChild(copy);
+        row.appendChild(priceEl);
+        row.appendChild(btn);
+        el.shopList.appendChild(row);
+      });
     });
   }
 
@@ -9868,24 +10021,42 @@
     openPrize();
   }
 
-  function sellOne(name) {
+  function removeSpecificCopy(name, tier) {
+    if (ownedCount(name) <= 0) return false;
+    if (ownedCount(name) - 1 < (copiesReserved()[name] || 0)) return false;
+    const key = foilTier(tier);
+    if (key) {
+      const bag = foilBag(name);
+      if (!bag[key] || !collection.foils || !collection.foils[name]) return false;
+      collection.foils[name][key] -= 1;
+      if (foilTotal(name) <= 0) delete collection.foils[name];
+    } else if (ownedCount(name) - foilTotal(name) <= 0) return false;
+    collection.counts[name] -= 1;
+    if (collection.counts[name] <= 0) {
+      delete collection.counts[name];
+      if (collection.foils) delete collection.foils[name];
+    }
+    return true;
+  }
+
+  function sellOne(name, tier) {
     const spare = spareCount(name);
-    if (spare <= 0 || !cardDB[name]) {
+    const key = foilTier(tier);
+    const haveTier = key ? foilBag(name)[key] : Math.max(0, ownedCount(name) - foilTotal(name));
+    if (spare <= 0 || !cardDB[name] || haveTier <= 0) {
       toast("A saved deck still needs that copy.");
       paintShop();
       return;
     }
     const price = sellPrice(name);
     const left = ownedCount(name) - 1;
-    const tier = foilToRemove(name);
-    const label = tier ? (FOIL_TIERS[tier] + " foil " + name) : name;
+    const label = key ? (FOIL_TIERS[key] + " foil " + name) : name;
     if (!confirm("Sell 1 " + label + " for " + price + " DP? You will have " + left + " left. Saved decks keep the copies they use.")) return;
-    if (ownedCount(name) - 1 < (copiesReserved()[name] || 0)) {
+    if (!removeSpecificCopy(name, key)) {
       toast("A saved deck still needs that copy.");
       paintShop();
       return;
     }
-    removeCopy(name);
     wallet.coins += price;
     saveCollection();
     saveWallet();
@@ -10632,6 +10803,10 @@
   });
   el.volume.addEventListener("change", () => { unlockAudio(); if (settings.sound) sfx("draw"); });
   el.btnReset.addEventListener("click", () => el.confirmOverlay.classList.add("open"));
+  const foilBonusClose = $("foilBonusClose");
+  const foilBonusOverlay = $("foilBonusOverlay");
+  if (foilBonusClose) foilBonusClose.addEventListener("click", closeFoilBonus);
+  if (foilBonusOverlay) foilBonusOverlay.addEventListener("click", (e) => { if (e.target === foilBonusOverlay) closeFoilBonus(); });
   el.confirmYes.addEventListener("click", resetProgress);
   el.confirmNo.addEventListener("click", closeConfirm);
   el.confirmOverlay.addEventListener("click", (e) => { if (e.target === el.confirmOverlay) closeConfirm(); });
@@ -10875,6 +11050,7 @@
     if (document.visibilityState === "hidden") flushSaves();
   });
   showScreen("menu");
+  if (pendingFoilBonus) showFoilBonus(pendingFoilBonus);
   refreshCards();
   refreshBanlist();
 
