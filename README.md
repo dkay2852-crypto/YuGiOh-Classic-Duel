@@ -15,7 +15,7 @@ Pick **Classic** or **Duelist Kingdom** on the main menu before Free Duel. A new
 - **Classic:** 8000 LP. Level 5–6 needs 1 tribute; Level 7+ needs 2. Egyptian Gods need 3. The very first turn cannot attack. Polymerization can use monsters from your hand or the field. A tournament arena still shows its field, without the bonus.
 - **Duelist Kingdom:** 2000 LP, no tributes. The field gives matching Types +30% ATK and DEF. The first player may attack. Polymerization uses monsters on the field only.
 
-Turns go Draw → Main 1 → Battle → Main 2 → End. The first player does not draw. A trap cannot be activated the turn it was Set.
+Turns go Draw → Main 1 → Battle → Main 2 → End. The first player does not draw. A trap cannot be activated the turn it was Set. In your Main Phase, Change Position switches a face-up monster between Attack and Defense, or Flip Summons a face-down Defense monster to Attack. Once per monster each turn, not the turn it was summoned or Set, and not after it attacked. Gravity Bind, while face-up, stops Level 4 or higher monsters from declaring an attack.
 
 ## Decks
 
@@ -92,7 +92,11 @@ Other effects used by the decks include Dark Hole, Raigeki, Monster Reborn, Pot 
 
 ## Main menu
 
-The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle on a misty island. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the fog, sparkles, lightning, and glow. Card art for the two aces is stored in `art/`.
+The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Both menus use that same layout, so the picture stays visible behind the buttons. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the glow. Card art for the duel intros is stored in `art/`.
+
+**Profile** on the main menu is your duelist: a portrait, a name, and the record (wins, losses, win rate, tournaments cleared, cards and set completion, foils, best puzzle streak). Titles unlock from that record — Duelist Kingdom Champion and Pegasus Slayer from beating Pegasus, Foil Collector, Puzzle Master, Deck Master, Rematch King, and others. A toast names a title when it unlocks. The one you equip shows on the profile and on the VS screen. An older save counts duelists you already beat, a cleared tournament, foils you own, a saved deck, and the puzzle streak. The name and portrait stay if you reset progress. Stored in `classicDuel_profile_v1`.
+
+Settings has Mute, a music slider, and a sound-effects slider. The menu, a normal duel, and a Pegasus duel each loop an original piece made in the browser. Nothing plays until the first tap, so iPhone can start the audio.
 
 A VS intro plays before each free duel and tournament duel. Both names slam in over their ace art, with the opponent's line underneath. It moves on after about two seconds, or when you tap. Settings → Cinematics turns that intro off, and the summon flashes too. Animations Off and reduced motion do the same.
 
@@ -104,7 +108,7 @@ Packs and Grandpa's daily deal can pull a foil copy: Super Rare (silver sheen), 
 
 ## Grandpa's shop
 
-Packs are unchanged. A **daily deal** sells one classic card at a discount. The card is chosen from the local date, so the same day offers the same card. **Sell** pays Duel Points for a spare copy. A copy that any saved deck still uses cannot be sold, and the shop asks before a card leaves.
+Each pack has **Buy 1**, **Buy 5**, and **Buy 10**. The buttons stay off when you do not have the Duel Points. Buying more than one pack opens a single grid of every card, with NEW and foil badges. Reveal all flips the grid. Skip leaves the cards in the collection and goes back. A **daily deal** sells one classic card at a discount. The card is chosen from the local date, so the same day offers the same card. **Sell** pays Duel Points for a spare copy. A copy that any saved deck still uses cannot be sold, and the shop asks before a card leaves.
 
 ## Deploy
 
