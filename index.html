@@ -238,15 +238,15 @@
       padding: 2px 8px;
     }
     .menu-actions {
-      flex: 0 0 auto; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end;
-      gap: 3px; width: 94%; margin: auto auto 0;
-      padding-top: 10px;
+      flex: 0 1 auto; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end;
+      gap: 1px; width: 94%; margin: auto auto 0;
+      padding-top: 6px; overflow: auto; -webkit-overflow-scrolling: touch;
       background: linear-gradient(180deg, rgba(6, 8, 24, 0) 0%, rgba(6, 8, 24, 0.22) 22%, rgba(6, 8, 24, 0.42) 100%);
     }
     .menu-brand .puzzle { width: 26px; height: 22px; }
     .brand { font-size: clamp(1.2rem, 5.8vw, 1.5rem); }
     #menu .menu-btn {
-      width: 100%; min-height: 30px; flex: 0 0 auto; max-height: 34px;
+      width: 100%; min-height: 26px; flex: 0 0 auto; max-height: 26px;
       padding: 0 8px 0 6px; gap: 8px;
       display: flex; align-items: center;
       border-radius: 7px; border: 1px solid rgba(232, 196, 110, 0.78);
@@ -277,6 +277,8 @@
     .m-go { flex: 0 0 auto; color: #f0c040; font-size: 1.05rem; line-height: 1; }
     #btnTourney .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M4 16h16v2H4v-2zm.6-1.2 2.7-6.2 3.2 3.6L12 5l1.5 7.2 3.2-3.6 2.7 6.2H4.6z'/></svg>"); }
     #btnPuzzle .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23c9a6ff' d='M8 3a2 2 0 0 1 2 2h2a2 2 0 1 1 2 2v2h2a2 2 0 1 1 0 4h-2v2a2 2 0 1 1-2 2h-2a2 2 0 1 1-4 0H6v-2H4a2 2 0 1 1 0-4h2V7a2 2 0 0 1 2-2z'/></svg>"); }
+    #btnChallenges .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M7 3h10v2h3v3a5 5 0 0 1-3.2 4.7A5 5 0 0 1 14 17H10a5 5 0 0 1-2.8-4.3A5 5 0 0 1 4 8V5h3V3zm1 4v1a3 3 0 0 0 2.2 2.9 5 5 0 0 1 3.6 0A3 3 0 0 0 16 8V7H8zm2 12h4v2H10v-2z'/></svg>"); }
+    #btnTrade .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23d7b4ff' d='M7 7h11l-2.2-2.2 1.4-1.4L22 8l-4.8 4.6-1.4-1.4L18 9H7V7zm10 10H6l2.2 2.2-1.4 1.4L2 16l4.8-4.6 1.4 1.4L6 15h11v2z'/></svg>"); }
     #btnStart .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M7 3h8l2 2v14l-2 2H7l-2-2V5l2-2zm1 3v12h6V6H8zm9 1 3 2v8l-3 2V4z'/></svg>"); }
     #btnContinue .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='m12 3 2.4 5.6L20 11l-5.6 2.4L12 19l-2.4-5.6L4 11l5.6-2.4L12 3z'/></svg>"); }
     #btnRematch .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M12 5V2L7 6l5 4V7a5 5 0 0 1 4.2 7.7l1.5 1.3A7 7 0 0 0 12 5zm0 14v3l5-4-5-4v3a5 5 0 0 1-4.2-7.7L6.3 8A7 7 0 0 0 12 19z'/></svg>"); }
@@ -1035,6 +1037,110 @@
     #end p { margin: 0; color: var(--muted); max-width: 320px; }
     #endChips, #endPoints { margin: 0; color: var(--gold); font-size: 1.02rem; font-weight: 700; }
     #endChips[hidden], #endPoints[hidden] { display: none !important; }
+
+    .shadow-row {
+      flex-shrink: 0; width: min(340px, 100%); align-self: center;
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 8px;
+      border: 1px solid rgba(160, 100, 255, 0.55);
+      background: linear-gradient(180deg, rgba(40, 16, 72, 0.92), rgba(16, 8, 32, 0.92));
+    }
+    .shadow-row[hidden] { display: none !important; }
+    .shadow-row .set-copy strong { color: #e6d4ff; font-size: 0.86rem; }
+    .shadow-row .set-copy span { color: #cbb6e8; font-size: 0.66rem; line-height: 1.25; }
+    .shadow-line {
+      flex-shrink: 0; width: 100%; min-height: 36px; padding: 6px 10px;
+      border-radius: 8px; border: 1px solid rgba(160, 100, 255, 0.55);
+      background: rgba(28, 10, 48, 0.88); color: #e6d4ff;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.04em; text-align: left;
+    }
+    .shadow-line.on {
+      border-color: #d7b4ff; color: #fff;
+      box-shadow: inset 0 0 0 1px rgba(215, 180, 255, 0.45), 0 0 12px rgba(120, 40, 200, 0.35);
+    }
+    #challengeLead { flex-shrink: 0; max-width: 100%; text-align: center; align-self: center; }
+    #btnChallengesBack, #btnTradeBack { flex-shrink: 0; align-self: center; }
+    #shadowWarnBody, #tradeSheetLead {
+      margin: 0; color: var(--cream); font-size: 0.82rem; line-height: 1.35; text-align: left;
+    }
+    #shadowWarn h3, #tradeOverlay h3 { margin: 0; color: #e6d4ff; font-size: 1.05rem; text-align: center; }
+    #challenges, #trade { padding: 8px 10px 4px; gap: 6px; }
+    #challenges .menu-btn, #trade .menu-btn { min-height: 40px; padding: 6px 12px; }
+    #challenges .deck-head, #trade .deck-head { width: 100%; }
+    #challenges .deck-head h2, #trade .deck-head h2 { font-size: 1.15rem; }
+    #challengeList, #tradeList {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px;
+      overflow: auto; -webkit-overflow-scrolling: touch;
+    }
+    .goal-row {
+      flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px;
+      padding: 8px; border-radius: 8px;
+      border: 1px solid var(--gold-dim);
+      background: linear-gradient(180deg, #1a2f4d, #101e33);
+    }
+    .goal-row.done { border-color: #8dface; }
+    .goal-row.claimed { opacity: 0.72; }
+    .goal-row h3 { margin: 0; color: var(--gold); font-size: 0.92rem; line-height: 1.15; }
+    .goal-row p { margin: 0; color: var(--cream); font-size: 0.75rem; line-height: 1.3; }
+    .bar-track {
+      height: 8px; border-radius: 99px; overflow: hidden;
+      background: rgba(6, 12, 24, 0.95);
+      border: 1px solid rgba(240, 192, 64, 0.7);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+    }
+    .bar-fill {
+      height: 100%; width: 0; border-radius: 99px;
+      background: linear-gradient(90deg, #6a3cb5, #f0c040);
+    }
+    .goal-foot { display: flex; align-items: center; gap: 8px; }
+    .goal-foot span { flex: 1; min-width: 0; color: var(--muted); font-size: 0.68rem; line-height: 1.25; }
+    .goal-foot button {
+      flex: 0 0 auto; min-height: 36px; padding: 6px 10px; font: inherit; font-size: 0.78rem; font-weight: 700;
+      border-radius: 4px; border: 1px solid #f0c040;
+      background: linear-gradient(180deg, #b88912, #7a5608); color: #1a1200;
+    }
+    .goal-foot button:disabled { opacity: 0.45; }
+    .trade-offer img, .trade-pick img {
+      width: 36px; height: 52px; object-fit: cover; border-radius: 3px; flex-shrink: 0; background: #111;
+    }
+    #tradeSheetList { display: flex; flex-direction: column; gap: 6px; overflow: auto; max-height: 46dvh; }
+    .trade-pick {
+      width: 100%; min-height: 44px; display: flex; align-items: center; gap: 8px;
+      padding: 4px 6px; border-radius: 6px; border: 1px solid var(--gold-dim);
+      background: #122038; color: var(--cream); text-align: left;
+    }
+    .trade-pick.fair { border-color: #8dface; }
+    .trade-pick.unfair { opacity: 0.72; }
+    .trade-pick .nm { color: var(--gold); font-size: 0.82rem; font-weight: 700; }
+    .trade-pick .sub { color: var(--muted); font-size: 0.66rem; line-height: 1.25; }
+    #duel.shadow-on .field {
+      border-color: #b388ff;
+      box-shadow: inset 0 0 42px rgba(70, 0, 130, 0.78);
+    }
+    #duel.shadow-on .arena-bg {
+      filter: grayscale(0.15) saturate(1.35) brightness(0.5) hue-rotate(262deg) !important;
+    }
+    #duel.shadow-on .phase-pill { color: #f4e8ff; text-shadow: 0 0 8px #7a3ad4; }
+    #duel.shadow-on .lp {
+      border-color: rgba(190, 140, 255, 0.7);
+      background: rgba(18, 0, 32, 0.62);
+    }
+    #duel.shadow-on .field-tag { color: #e2c8ff; }
+    #vs.shadow-on {
+      background:
+        radial-gradient(ellipse at 50% 40%, rgba(130, 50, 210, 0.42), transparent 52%),
+        linear-gradient(180deg, #220840, #070110);
+    }
+    #vs.shadow-on .vs-match { color: #eddfff; }
+    #vs.shadow-on .vs-portrait {
+      border-color: #c9a6ff;
+      box-shadow: 0 0 18px rgba(130, 50, 210, 0.72), inset 0 0 0 1px rgba(230, 210, 255, 0.35);
+    }
+    #end.shadow-on {
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(120, 40, 190, 0.35), transparent 55%),
+        linear-gradient(180deg, #1a0830, #070110);
+    }
 
     #decks .rules-row, #decks .rules-hint { flex-shrink: 0; align-self: center; }
     #tourneyRules[hidden], #tourneyRulesHint[hidden] { display: none !important; }
@@ -1933,9 +2039,11 @@
       <div class="menu-actions">
         <button type="button" class="menu-btn tourney" id="btnTourney"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Tournament</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn puzzle" id="btnPuzzle"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Daily Puzzle</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnChallenges"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Challenges<span class="menu-badge" id="challengeBadge" hidden>0</span></span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn primary" id="btnStart"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Free Duel</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn" id="btnContinue" hidden><span class="m-ico" aria-hidden="true"></span><span class="m-label" id="continueLabel">Continue</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn" id="btnRematch"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Rematch</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn" id="btnTrade"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Trade</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn" id="btnBinder"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Card Binder<span class="menu-badge" id="binderBadge" hidden>0</span></span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn shop" id="btnShop"><span class="m-ico" aria-hidden="true"></span><span class="m-label" id="shopLabel">Card Shop</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn" id="btnProfile"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Profile</span><span class="m-go" aria-hidden="true">›</span></button>
@@ -1954,6 +2062,13 @@
         <button type="button" id="tourneyDK" class="on">Duelist Kingdom</button>
       </div>
       <p class="rules-hint" id="tourneyRulesHint" hidden>2000 LP · no tributes · arena field bonus</p>
+      <div class="shadow-row" id="deckShadowRow" hidden>
+        <div class="set-copy">
+          <strong>Shadow Game</strong>
+          <span>Harder AI. A win pays more. A loss costs a spare card, or 80 DP.</span>
+        </div>
+        <button type="button" class="fl-switch" id="deckShadowBtn" aria-pressed="false">Off</button>
+      </div>
       <div class="deck-grid">
         <button type="button" class="deck-opt yugi" data-deck="yugi">
           <img alt="" src="https://images.ygoprodeck.com/images/cards_small/46986414.jpg" />
@@ -1992,6 +2107,7 @@
         </div>
       </div>
       <p class="island-note" id="islandNote"></p>
+      <button type="button" class="shadow-line" id="islandShadow" aria-pressed="false">Shadow Game · Off</button>
       <div class="map-board" id="mapBoard"></div>
       <div class="footer-row">
         <button type="button" class="menu-btn" id="btnIslandDeck">Deck</button>
@@ -2009,7 +2125,7 @@
           <img id="vsAnteP" alt="" hidden />
           <figcaption id="vsAntePCap">Your ante</figcaption>
         </figure>
-        <div class="vs-ante-mid">ANTE</div>
+        <div class="vs-ante-mid" id="vsAnteMid">ANTE</div>
         <figure>
           <img id="vsAnteO" alt="" hidden />
           <figcaption id="vsAnteOCap">Their ante</figcaption>
@@ -2143,8 +2259,28 @@
         <h2>Rematch</h2>
         <p id="rematchNote">Harder deck and sharper play. More Duel Points. Star Chips stay put.</p>
       </div>
+      <button type="button" class="shadow-line" id="rematchShadow" aria-pressed="false">Shadow Game · Off</button>
       <div id="rematchList"></div>
       <button type="button" class="menu-btn" id="btnRematchBack">Back</button>
+    </section>
+
+    <section id="challenges" class="screen" hidden>
+      <div class="deck-head">
+        <h2>Challenges</h2>
+        <p id="challengeWeek">This week</p>
+      </div>
+      <p class="rules-hint" id="challengeLead">Goals rotate each calendar week. Each reward pays once.</p>
+      <div id="challengeList"></div>
+      <button type="button" class="menu-btn" id="btnChallengesBack">Back</button>
+    </section>
+
+    <section id="trade" class="screen" hidden>
+      <div class="deck-head">
+        <h2 id="tradeTitle">Trade</h2>
+        <p id="tradeNote">Beat a duelist, then trade a spare card for one of theirs.</p>
+      </div>
+      <div id="tradeList"></div>
+      <button type="button" class="menu-btn" id="btnTradeBack">Back</button>
     </section>
 
     <section id="puzzle" class="screen" hidden>
@@ -2187,7 +2323,10 @@
         <p><strong>Card Shop:</strong> Grandpa sells booster packs for Duel Points, from the main menu or the shop stop on the island. Buy 1, Buy 5, or Buy 10. Five and ten open together: a grid of every card, with NEW and foil badges, and Reveal all or Skip. A daily deal, picked from today's date, sells one card at a discount. A foil deal shows SR, UR, or SCR on the card, with the same colored border as the rest of the game. Tap the card picture to read it. Sell lists each spare separately: a normal copy, then Super, Ultra, and Secret. It will not sell a copy a saved deck still needs, and it asks before the card leaves. Wins pay more against harder duelists. Staying at half your Life Points or higher pays a bonus. A loss pays a little. A set unlocks when you beat its duelist. Duel Points are saved on this device. Reset Progress clears them.</p>
         <p><strong>During a duel:</strong> Tap a monster in your Main Phase and choose Change Position. Once each turn, a face-up monster can switch between Attack and Defense, and a face-down Defense monster can Flip Summon into Attack. Not the turn it was summoned or Set, and not after it attacked. Tap Log for every action. Hold a card to read its full text, ATK, DEF, and type. Each opponent brings their own arena behind the cards.</p>
         <p><strong>Traps:</strong> Set a trap, then activate it on a later turn. Gravity Bind, while face-up, stops Level 4 or higher monsters from attacking. The Attack button shows the reason when a card blocks the swing. Trap Hole, Mirror Force, and the other traps in the card list resolve at their own timing.</p>
-        <p><strong>Profile:</strong> The main menu opens your duelist: name, portrait, win record, collection, foils, and puzzle streak. Titles unlock from duels you have already won where the save remembers them. Equip one. It shows on your profile and on the VS screen. A toast appears the moment a new title unlocks.</p>
+        <p><strong>Weekly Challenges:</strong> Challenges on the main menu shows 3 to 5 goals for the calendar week. The set is the same all week on this device, then a new set arrives with the next week. Bars fill as you play. Each goal pays Duel Points, and some pay a pack, once that week. Finish every goal to build a streak. Reset Progress clears it.</p>
+        <p><strong>Trade:</strong> After you beat a duelist, Trade lets you offer one spare card from your collection for one of theirs. Preset Yugi, Kaiba, and Joey decks are never edited, and a copy a saved deck still needs stays. They accept a trade when the rarity and ATK are close. Each duelist shows a few offers, and those offers change the next day. A card you did not own is marked NEW in the binder.</p>
+        <p><strong>Shadow Game:</strong> Turn it on when you start a free duel, a rematch, or a duel on the island. A warning explains the stake before the duel begins. The opponent plays harder, and the field turns dark purple. A win pays more Duel Points. If you put up a spare card, you also take theirs. A loss forfeits that spare card. With no spare card, a loss costs 80 Duel Points instead.</p>
+        <p><strong>Profile:</strong> The main menu opens your duelist: name, portrait, win record, collection, foils, and puzzle streak. Titles unlock from duels you have already won where the save remembers them, including Shadow Game Winner, Trader, and a weekly challenge streak. Equip one. It shows on your profile and on the VS screen. A toast appears the moment a new title unlocks.</p>
         <p><strong>Foils:</strong> Booster packs and Grandpa's daily deal can pull a Super Rare, Ultra Rare, or Secret Rare foil. Secret is the rarest. A foil card shows SR in silver, UR in gold, or SCR on a rainbow, with a matching border, plus the shine. Commons have no badge. The binder legend uses the same marks. Tap a card to see how many normal, SR, UR, and SCR copies you own. A foil copy and a normal copy both count as that card in the deck builder. The same badge shows on the pack, in the binder, in the builder, in your hand, on the field, and in the shop. The first time an older save opens, each extra copy you already owned — not the first copy, and not cards that only live in a preset deck — gets one roll at the normal pack foil odds. Counts stay the same. That check runs once.</p>
         <p><strong>Intros:</strong> A VS screen slams in before each duel, with both names, ace art, and the opponent's line. It moves on after about two seconds, or when you tap. Blue-Eyes White Dragon, Dark Magician, Red-Eyes Black Dragon, and a completed Exodia play a short flash. Turn Cinematics off in Settings to skip them.</p>
       </div>
@@ -2550,10 +2689,32 @@
     </div>
   </div>
 
+  <div class="overlay" id="shadowWarn">
+    <div class="sheet">
+      <h3>Shadow Game</h3>
+      <p id="shadowWarnBody">The opponent plays harder, and the field turns dark purple. A win pays double Duel Points. If you have a spare card, both sides put one up and the winner takes it. A loss forfeits your card. Preset decks are never edited, and a saved deck keeps the copies it needs. With no spare card, a loss costs 80 Duel Points instead.</p>
+      <div class="actions">
+        <button type="button" id="shadowYes">Start Shadow Game</button>
+        <button type="button" class="ghost" id="shadowNo">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="tradeOverlay">
+    <div class="sheet">
+      <h3 id="tradeSheetTitle">Offer a card</h3>
+      <p id="tradeSheetLead"></p>
+      <div id="tradeSheetList"></div>
+      <div class="actions">
+        <button type="button" class="ghost" id="tradeSheetClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="confirmOverlay">
     <div class="sheet">
       <h3 id="confirmTitle">Reset progress?</h3>
-      <p id="confirmBody">This erases the tournament, Duel Points, the puzzle streak, titles, duel record, saved decks, and your collection. Your duelist name and portrait stay. A starter pile of commons comes back. Settings stay.</p>
+      <p id="confirmBody">This erases the tournament, Duel Points, the puzzle streak, weekly challenges, trades, titles, duel record, saved decks, and your collection. Your duelist name and portrait stay. A starter pile of commons comes back. Settings stay.</p>
       <div class="actions">
         <button type="button" id="confirmYes">Reset</button>
         <button type="button" class="ghost" id="confirmNo">Cancel</button>
@@ -2712,7 +2873,11 @@
   const SETTINGS_KEY = "classicDuel_settings_v1";
   const WALLET_KEY = "classicDuel_wallet_v1";
   const PUZZLE_KEY = "classicDuel_puzzle_v1";
+  const CHALLENGE_KEY = "classicDuel_challenges_v1";
+  const TRADE_KEY = "classicDuel_trade_v1";
   const PUZZLE_DP = 40;
+  const SHADOW_PAY = 2;
+  const SHADOW_LOSS_DP = 80;
   const DP_LOSS = 20;
   const REMATCH_PAY = 1.75;
   /* Two copies of each. 20 names × 2 = one legal 40-card deck of commons. */
@@ -3228,6 +3393,12 @@
   let binderFrom = "menu";
   let binderFilter = "all";
   let pendingRematch = null;
+  let challengeSave = null;
+  let tradeSave = null;
+  let shadowWanted = false;
+  let pendingShadow = null;
+  let tradeFocus = "";
+  let tradeOffer = null;
   let story = null;
   let shopFrom = "menu";
   let shopGreet = GRANDPA_LINES[0];
@@ -3396,7 +3567,7 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile", "challenges", "trade"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -3406,6 +3577,8 @@
     if (name === "menu" || name === "island" || name === "shop") paintWallet();
     if (name === "menu") paintMenu();
     if (name === "menu" || name === "builder" || name === "binder") paintNewBadge();
+    paintShadowChrome();
+    paintShadowToggles();
     syncPuzzleBar();
     syncMusic();
   }
@@ -3612,6 +3785,7 @@
     if (el.menuDp) el.menuDp.textContent = groupNum(wallet && wallet.coins);
     const chips = tourney && typeof tourney.chips === "number" ? tourney.chips : 0;
     if (el.menuChips) el.menuChips.textContent = groupNum(chips);
+    paintChallengeBadge();
   }
 
   function setMenuTheme(mode) {
@@ -4101,6 +4275,8 @@
     persist(PUZZLE_KEY, puzzleSave);
     if (profile) persist(PROFILE_KEY, profile);
     if (tourney) persist(TOURNEY_KEY, tourney);
+    if (challengeSave) persist(CHALLENGE_KEY, challengeSave);
+    if (tradeSave) persist(TRADE_KEY, tradeSave);
   }
 
   function cardLine(c, stats) {
@@ -4431,16 +4607,17 @@
       return;
     }
     const points = awardMatchPoints(you);
+    const shadowLine = resolveShadow(you);
     endPrimary = "again";
     el.btnAgain.hidden = false;
     el.btnAgain.textContent = "Duel Again";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
     el.endChips.hidden = true;
-    el.endPoints.hidden = false;
+    el.endPoints.hidden = !points.gain;
     el.endPoints.textContent = pointsText(points);
-    el.endAnte.hidden = true;
-    el.endAnte.textContent = "";
+    el.endAnte.hidden = !shadowLine;
+    el.endAnte.textContent = shadowLine || "";
     el.endTitle.textContent = you ? "Victory!" : "Defeat";
     el.endMsg.textContent = msg;
     showScreen("end");
@@ -4565,6 +4742,7 @@
       log(m.name + " is unaffected.");
       return;
     }
+    if (p === state.player && state.mode !== "puzzle") state.monstersLost = (state.monstersLost || 0) + 1;
     fxShatter(p, "m", idx);
     sendMonsterToGY(p, idx);
     log(m.name + " is destroyed.");
@@ -6209,7 +6387,7 @@
       else if (st.name === "Spellbinding Circle") use = state.player.monsters.some((m) => m && m.faceup && !isGod(m));
       else if (st.name === "Dragon Capture Jar") use = state.player.monsters.some((m) => m && m.faceup && m.ref.race === "Dragon");
       else if (st.name === "Mirror Wall") use = state.player.monsters.some((m) => m && m.faceup && m.position === "atk") && ai.lp > 2500;
-      else if (st.name === "Call of the Haunted") use = ai.gy.some((c) => c.ref && c.ref.isMonster && (c.ref.atk || 0) >= 1400) && firstEmpty(ai.monsters) >= 0;
+      else if (st.name === "Call of the Haunted") use = ai.gy.some((c) => c.ref && c.ref.isMonster && (c.ref.atk || 0) >= (shadowMind() ? 1000 : 1400)) && firstEmpty(ai.monsters) >= 0;
       else if (st.name === "Royal Command") use = state.player.monsters.some((m) => m && !m.faceup);
       else if (st.name === "Light of Intervention") use = true;
       else if (st.name === "Messenger of Peace") use = false;
@@ -6232,7 +6410,7 @@
       if (!state || state.winner) return;
       await aiGlance("ai", "st", 0);
     };
-    const foeAtk = state.player.monsters.some((m) => m && m.faceup && getStats(m).atk >= 1500);
+    const foeAtk = state.player.monsters.some((m) => m && m.faceup && getStats(m).atk >= (shadowMind() ? 1100 : 1500));
     const weAtk = ai.monsters.some((m) => m && m.faceup && m.position === "atk" && getStats(m).atk >= 1500);
     await tryName("Messenger of Peace", foeAtk && !weAtk);
     await tryName("The Dark Door", state.player.monsters.filter((m) => m && m.faceup && m.position === "atk").length >= 2);
@@ -6376,6 +6554,7 @@
     owner.summonedThisTurn.add(fusion.uid);
     owner.gy.push(strip(poly));
     log(whoName(owner) + " Fusion Summons " + fusion.name + "!");
+    if (owner === state.player && state.mode !== "puzzle") noteFusionSummon();
     return true;
   }
 
@@ -6406,6 +6585,7 @@
     if (!faceup) p.monsters[slot].setTurn = state.turnCount;
     p.normalSummoned = true;
     p.summonedThisTurn.add(card.uid);
+    if (need > 0 && p === state.player && state.mode !== "puzzle") noteTributeSummon();
     return { slot: slot, monster: p.monsters[slot] };
   }
 
@@ -7654,11 +7834,12 @@
     el.aiGY.textContent = ai.gy.length;
     el.plExtra.textContent = pl.extra.length;
     el.aiExtra.textContent = ai.extra.length;
-    el.fieldTag.textContent = fieldBonusOn()
+    const shadowTag = state.shadow ? "Shadow · " : "";
+    el.fieldTag.textContent = shadowTag + (fieldBonusOn()
       ? "Field: " + state.field + " · +30% " + (FIELD_TYPES[state.field] || []).join(", ")
       : (state.field
         ? "Field: " + state.field
-        : (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom"));
+        : (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom")));
     const who = state.turn === "player" ? "YOUR TURN" : state.aiName.toUpperCase();
     el.phaseLabel.textContent = who + " · " + (PHASE_LABEL[state.phase] || "").toUpperCase();
     renderZones(el.aiST, ai.spells, "ai", "st");
@@ -7745,17 +7926,33 @@
         equipLove: Math.max(style.equipLove, ace.equipLove),
       };
     }
-    if (!state.rematch) return style;
+    if (state.rematch) {
+      style = {
+        diff: Math.min(9, style.diff + 2),
+        style: style.style,
+        bias: style.bias,
+        bluff: Math.max(0.04, style.bluff * 0.45),
+        defend: Math.min(0.97, style.defend + 0.16),
+        aggression: Math.min(0.98, style.aggression + 0.1),
+        trapLove: Math.min(0.98, style.trapLove + 0.14),
+        equipLove: Math.min(0.99, style.equipLove + 0.05),
+      };
+    }
+    if (!state.shadow) return style;
     return {
-      diff: Math.min(9, style.diff + 2),
-      style: style.style,
+      diff: 9,
+      style: style.style === "wall" ? "balanced" : style.style,
       bias: style.bias,
-      bluff: Math.max(0.04, style.bluff * 0.45),
-      defend: Math.min(0.97, style.defend + 0.16),
-      aggression: Math.min(0.98, style.aggression + 0.1),
-      trapLove: Math.min(0.98, style.trapLove + 0.14),
-      equipLove: Math.min(0.99, style.equipLove + 0.05),
+      bluff: 0.04,
+      defend: Math.max(style.defend, 0.5),
+      aggression: 0.97,
+      trapLove: 0.98,
+      equipLove: Math.min(0.99, style.equipLove + 0.08),
     };
+  }
+
+  function shadowMind() {
+    return !!(state && state.shadow && state.mode !== "puzzle");
   }
 
   function pegasusEye() {
@@ -7860,6 +8057,7 @@
   function suspectTrapHole() {
     const sets = setBackrowCount(state.player);
     if (!sets) return false;
+    if (shadowMind()) return true;
     if (pegasusEye()) return true;
     const prof = aiProfile();
     if (prof.aggression >= 0.9 && prof.diff <= 2) return false;
@@ -7880,6 +8078,7 @@
     const atk = getStats(m).atk;
     const myBest = ourBestAtk(state.ai);
     if (atk >= state.ai.lp) return true;
+    if (shadowMind() && atk >= 1000) return true;
     if (atk >= 2000) return true;
     if (atk >= myBest && atk >= 1400) return true;
     if (prof.trapLove >= 0.85 && atk >= 1200) return true;
@@ -7893,6 +8092,7 @@
     const a = getStats(atkM).atk;
     const waiting = atkOwner.monsters.filter((m) => m && m.faceup && m.position === "atk" && !atkOwner.attackedThisTurn.has(m.uid)).length;
     if (occupied(state.ai.monsters).length === 0 && a >= state.ai.lp) return true;
+    if (shadowMind() && (a >= 1300 || waiting >= 2)) return true;
     if (waiting >= 2 && a >= 1300) return true;
     if (a >= 2300) return true;
     const weAnswer = state.ai.monsters.some((mon) => {
@@ -7951,7 +8151,7 @@
     const tributes = ranked.slice(0, need);
     let costliest = 0;
     tributes.forEach((i) => { costliest = Math.max(costliest, tributeValue(ai.monsters[i])); });
-    const margin = need >= 2 ? 600 : 400;
+    const margin = shadowMind() ? (need >= 2 ? 350 : 200) : (need >= 2 ? 600 : 400);
     if (projectedStats(card).atk < costliest + margin) return null;
     return tributes;
   }
@@ -8012,6 +8212,9 @@
     }
     if (pwr.def >= pwr.atk + 250 && (loses || prof.style === "wall")) {
       return { pos: "def", faceup: prof.style === "wall" ? false : true };
+    }
+    if (shadowMind() && !trapScare && pwr.atk >= 1300 && pwr.atk + 100 >= oppAtk) {
+      return { pos: "atk", faceup: true };
     }
     if (loses && pwr.def >= oppAtk && prof.defend >= 0.35) return { pos: "def", faceup: true };
     if (loses && prof.defend >= 0.6) return { pos: "def", faceup: false };
@@ -8096,17 +8299,18 @@
       await cast("Pot of Greed");
     }
     if (!state || state.winner) return;
+    const shadow = shadowMind();
     const back = occupied(pl.spells).length;
-    if (back >= 2 || (back >= 1 && (aiProfile().diff >= 3 || scareMirror()))) await cast("Harpie's Feather Duster");
+    if (back >= 2 || (back >= 1 && (shadow || aiProfile().diff >= 3 || scareMirror()))) await cast("Harpie's Feather Duster");
     if (!state || state.winner) return;
     let them = sidePower(pl);
     const handBestNow = handMonsters(ai).reduce((m, x) => Math.max(m, projectedStats(x.c).atk), 0);
     const reach = Math.max(ourBestAtk(ai), handBestNow);
-    if (them.n >= 1 && (them.best > reach + 100 || (them.n >= 2 && them.power > reach + 300))) await cast("Raigeki");
+    if (them.n >= 1 && (them.best > reach + (shadow ? 0 : 100) || (them.n >= 2 && them.power > reach + (shadow ? 80 : 300)))) await cast("Raigeki");
     if (!state || state.winner) return;
     them = sidePower(pl);
     const us = sidePower(ai);
-    if (them.n >= 1 && them.best > ourBestAtk(ai) && them.power > us.power + 700 && (us.n <= 1 || them.power > us.power * 1.35)) {
+    if (them.n >= 1 && them.best > ourBestAtk(ai) && (shadow || them.power > us.power + 700) && (us.n <= 1 || them.power > us.power * (shadow ? 1.12 : 1.35))) {
       await cast("Dark Hole");
     }
     if (!state || state.winner) return;
@@ -8124,7 +8328,7 @@
         pool.sort((a, b) => projectedStats(b).atk - projectedStats(a).atk);
         const best = projectedStats(pool[0]).atk;
         const handBest = handMonsters(ai).reduce((m, x) => Math.max(m, projectedStats(x.c).atk), 0);
-        if ((best >= 1500 && best + 100 >= handBest) || (best >= 1000 && handBest < 1000)) {
+        if ((best >= (shadow ? 1100 : 1500) && best + 100 >= handBest) || (best >= 1000 && handBest < 1000)) {
           await cast("Monster Reborn");
         }
       }
@@ -8138,7 +8342,7 @@
         if (a > best) best = a;
       });
       const only = occupied(pl.monsters).length === 1;
-      if (best >= 1400 || (only && best >= 1000) || best > ourBestAtk(ai)) await cast("Change of Heart");
+      if (best >= (shadow ? 1000 : 1400) || (only && best >= 1000) || best > ourBestAtk(ai)) await cast("Change of Heart");
     }
   }
 
@@ -8326,7 +8530,8 @@
 
   async function aiSetBackrow(ai) {
     const prof = aiProfile();
-    const maxSets = prof.trapLove >= 0.85 ? 2 : 1;
+    const shadow = shadowMind();
+    const maxSets = shadow ? 3 : (prof.trapLove >= 0.85 ? 2 : 1);
     const order = ["Mirror Force", "Gravity Bind", "Magic Cylinder", "Spellbinding Circle", "Magical Hats", "Trap Hole", "Call of the Haunted"];
     let sets = 0;
     for (let i = 0; i < order.length && sets < maxSets; i++) {
@@ -8340,6 +8545,18 @@
       sets++;
       await aiGlance("ai", "st", slot);
       if (!state || state.winner) return;
+    }
+    if (shadow) {
+      while (sets < maxSets && firstEmpty(ai.spells) >= 0) {
+        const hi = ai.hand.findIndex((c) => c.ref && c.ref.isTrap);
+        if (hi < 0) break;
+        const slot = setSpellTrap(ai, hi);
+        if (slot === false || slot == null) break;
+        log(whoName(ai) + " Sets a card.");
+        sets++;
+        await aiGlance("ai", "st", slot);
+        if (!state || state.winner) return;
+      }
     }
     if (Math.random() >= prof.bluff || firstEmpty(ai.spells) < 0) return;
     const hi = bluffHandIndex(ai);
@@ -8365,6 +8582,7 @@
       if (a >= 2100) return 340;
       if (a >= 1900 && prof.diff >= 4) return 210;
       if (a >= 1600 && prof.aggression >= 0.9 && prof.diff <= 3) return 90;
+      if (shadowMind() && a >= 1500) return 300;
       if (aiSloppy() && a >= 1500 && prof.diff <= 2) return 45;
       return -1;
     }
@@ -8374,6 +8592,7 @@
       return -1;
     }
     if (a > ds.atk) return 1000 + ds.atk + (a - ds.atk) * 0.2;
+    if (a === ds.atk && shadowMind() && ds.atk >= 1200) return 220;
     if (a === ds.atk && ds.atk >= 1700 && prof.aggression >= 0.45) return 140;
     return -1;
   }
@@ -8646,7 +8865,8 @@
       el.vsPTitle.textContent = titleName || "";
     }
     if (el.vsPArt && el.vsPArt.parentElement) el.vsPArt.parentElement.classList.toggle("has-title", !!titleName);
-    el.vsRules.textContent = (state.rematch ? "Rematch · " : "") +
+    el.vsRules.textContent = (state.shadow ? "Shadow Game · " : "") +
+      (state.rematch ? "Rematch · " : "") +
       (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom") +
       (state.field ? " · " + state.field : "");
     paintAnte();
@@ -8689,7 +8909,12 @@
     } else if (state.mode === "tourney" && state.tourneyKey !== "pegasus") {
       log("Win to take " + (state.stake || 0) + " Star Chip" + (state.stake === 1 ? "" : "s") + ".");
     }
-    if (state.ante) {
+    if (state.shadow) {
+      log("Shadow Game. The opponent plays harder.");
+      const stake = state.shadowStake;
+      if (stake && stake.player) log("Shadow stake — you: " + stake.player + ". Opponent: " + (stake.ai || "a card") + ".");
+      else log("No spare card. A loss costs " + SHADOW_LOSS_DP + " Duel Points.");
+    } else if (state.ante) {
       const yours = state.ante.player ? state.ante.player : "no spare card";
       const theirs = state.ante.ai || "a card";
       log("Ante — you: " + yours + ". Opponent: " + theirs + ".");
@@ -9019,6 +9244,10 @@
       rematch: !!opts.rematch,
       chipHunt: !!opts.chipHunt,
       ante: null,
+      shadow: !!opts.shadow,
+      shadowStake: null,
+      monstersLost: 0,
+      ownedOnly: deckUsesOwnedOnly(deck),
       taunt: opts.taunt || "",
       playerName: deck.name,
       aiName: aiDeck.name,
@@ -9039,7 +9268,8 @@
       prompt: false,
     };
     stampFoils(state.player);
-    if (state.mode === "tourney" && settings.ante) state.ante = pickMatchAnte(aiDeck);
+    if (state.shadow) state.shadowStake = pickShadowStake(aiDeck);
+    else if (state.mode === "tourney" && settings.ante) state.ante = pickMatchAnte(aiDeck);
     resetBoardMemory();
     if (!drawCards(state.player, 5)) return;
     if (!state || state.winner || !drawCards(state.ai, 5)) return;
@@ -9064,7 +9294,7 @@
       return;
     }
     if (deckPickMode === "tourney") beginTourneyRun(deck);
-    else beginMatch(deck, pickOpponent(id));
+    else armShadowMatch(deck, pickOpponent(id), { rules: rulesMode, shadow: shadowWanted });
   }
 
   function applyRunDeck(deck) {
@@ -9428,7 +9658,7 @@
       return;
     }
     if (deckPickMode === "tourney") beginTourneyRun(built);
-    else beginMatch(built, pickOpponent("custom"));
+    else armShadowMatch(built, pickOpponent("custom"), { rules: rulesMode, shadow: shadowWanted });
   }
 
   function copySaved(deck) {
@@ -11324,11 +11554,19 @@
 
   function paintAnte() {
     if (!el.vsAnte) return;
-    const ante = state && state.ante;
+    const shadow = state && state.shadow && state.shadowStake;
+    const ante = shadow ? state.shadowStake : (state && state.ante);
+    const mid = $("vsAnteMid");
+    if (mid) mid.textContent = shadow ? "SHADOW" : "ANTE";
     if (!ante) { el.vsAnte.hidden = true; return; }
     el.vsAnte.hidden = false;
-    paintAnteSide(el.vsAnteP, el.vsAntePCap, ante.player, "No spare card");
-    paintAnteSide(el.vsAnteO, el.vsAnteOCap, ante.ai, "Their ante");
+    if (shadow && !ante.player) {
+      paintAnteSide(el.vsAnteP, el.vsAntePCap, "", SHADOW_LOSS_DP + " DP");
+      paintAnteSide(el.vsAnteO, el.vsAnteOCap, "", "No card");
+      return;
+    }
+    paintAnteSide(el.vsAnteP, el.vsAntePCap, ante.player, shadow ? "No spare card" : "No spare card");
+    paintAnteSide(el.vsAnteO, el.vsAnteOCap, ante.ai, shadow ? "Their stake" : "Their ante");
   }
 
   function saveCollection() {
@@ -11505,6 +11743,7 @@
     const last = prize.index >= total - 1;
     const doneLabel = prize.returnTo === "menu" ? "Main Menu"
       : prize.returnTo === "shop" ? "Back to the Shop"
+      : prize.returnTo === "challenges" ? "Challenges"
       : "Back to the Island";
     el.btnPackNext.textContent = !prize.revealed ? "Reveal" : (last ? doneLabel : "Next Card");
   }
@@ -11603,7 +11842,8 @@
     if (el.packActions) el.packActions.hidden = !!prize.bulkShown;
     if (el.btnPackNext) {
       el.btnPackNext.hidden = !prize.bulkShown;
-      el.btnPackNext.textContent = prize.returnTo === "shop" ? "Back to the Shop" : "Done";
+      el.btnPackNext.textContent = prize.returnTo === "shop" ? "Back to the Shop"
+        : prize.returnTo === "challenges" ? "Challenges" : "Done";
     }
   }
 
@@ -11619,6 +11859,7 @@
     const dest = prize.returnTo;
     prize = null;
     if (dest === "shop") showShop();
+    else if (dest === "challenges") showChallenges();
     else if (dest === "island" && tourney) showIsland();
     else { refreshContinue(); showScreen("menu"); }
   }
@@ -11645,6 +11886,7 @@
     const dest = prize.returnTo;
     prize = null;
     if (dest === "shop") showShop();
+    else if (dest === "challenges") showChallenges();
     else if (dest === "island" && tourney) showIsland();
     else { refreshContinue(); showScreen("menu"); }
   }
@@ -11708,6 +11950,7 @@
     return {
       name: "Duelist", avatar: "yugi", title: "",
       wins: 0, losses: 0, tournaments: 0, pegasusWins: 0, rematchWins: 0, cleanWins: 0,
+      shadowWins: 0, trades: 0, challengeStreak: 0,
       bestStreak: 0, announced: {},
     };
   }
@@ -11757,6 +12000,9 @@
     { id: "set", name: "Set Completer", need: "Complete any booster set", test: () => collectionProgress().complete > 0 },
     { id: "heir", name: "Millennium Heir", need: "Unlock Exodia and the Gods", test: () => !!(collection && collection.unlocked) },
     { id: "steady", name: "Steady Hand", need: "Win with half your Life or more", test: () => profile && profile.cleanWins > 0 },
+    { id: "shadow", name: "Shadow Game Winner", need: "Win a Shadow Game", test: () => profile && profile.shadowWins > 0 },
+    { id: "trader", name: "Trader", need: "Complete 3 trades", test: () => profile && profile.trades >= 3 },
+    { id: "weekstreak", name: "Weekly Streak", need: "Finish every weekly challenge, two weeks in a row", test: () => (profile && profile.challengeStreak >= 2) || (challengeSave && challengeSave.bestStreak >= 2) },
   ];
 
   function saveProfile() {
@@ -11775,9 +12021,11 @@
       }
       const start = state.rules === "classic" ? 8000 : 2000;
       if (state.player && state.player.lp * 2 >= start) profile.cleanWins += 1;
+      if (state.shadow) profile.shadowWins += 1;
     } else profile.losses += 1;
     saveProfile();
     refreshTitles(false);
+    if (you) noteDuelChallenges();
   }
 
   function queueTitle(name) {
@@ -11822,7 +12070,7 @@
       if (typeof raw.name === "string" && raw.name.trim()) profile.name = raw.name.trim().slice(0, 16);
       if (AVATARS.some((a) => a.id === raw.avatar)) profile.avatar = raw.avatar;
       if (typeof raw.title === "string") profile.title = raw.title;
-      ["wins", "losses", "tournaments", "pegasusWins", "rematchWins", "cleanWins", "bestStreak"].forEach((key) => {
+      ["wins", "losses", "tournaments", "pegasusWins", "rematchWins", "cleanWins", "bestStreak", "shadowWins", "trades", "challengeStreak"].forEach((key) => {
         if (typeof raw[key] === "number" && isFinite(raw[key]) && raw[key] > 0) profile[key] = Math.floor(raw[key]);
       });
       if (raw.announced && typeof raw.announced === "object") profile.announced = raw.announced;
@@ -11832,6 +12080,8 @@
       profile.pegasusWins = pegasusBeaten() ? 1 : 0;
       profile.bestStreak = puzzleSave.streak || 0;
       profile.announced = {};
+      if (challengeSave) profile.challengeStreak = Math.max(profile.challengeStreak || 0, challengeSave.bestStreak || 0);
+      if (tradeSave) profile.trades = Math.max(profile.trades || 0, tradeSave.total || 0);
       refreshTitles(true);
       saveProfile();
       return;
@@ -11842,6 +12092,8 @@
       profile.pegasusWins = Math.max(profile.pegasusWins, 1);
     }
     profile.wins = Math.max(profile.wins, (wallet.cleared || []).length);
+    if (challengeSave) profile.challengeStreak = Math.max(profile.challengeStreak || 0, challengeSave.bestStreak || 0);
+    if (tradeSave) profile.trades = Math.max(profile.trades || 0, tradeSave.total || 0);
     refreshTitles(false);
   }
 
@@ -11869,6 +12121,9 @@
       ["Sets", prog.complete + " / " + prog.sets],
       ["Foils", String(prog.foils)],
       ["Puzzle streak", String(Math.max(profile.bestStreak || 0, shownStreak()))],
+      ["Shadow wins", String(profile.shadowWins || 0)],
+      ["Trades", String(profile.trades || 0)],
+      ["Challenge streak", String(challengeSave ? (challengeSave.streak || 0) : (profile.challengeStreak || 0))],
     ];
     if (el.profileStats) {
       el.profileStats.innerHTML = "";
@@ -11994,16 +12249,24 @@
   }
 
   function pointsText(points) {
-    if (!points) return "";
-    let line = (points.rematch ? "Rematch · " : "") + "+" + points.gain + " Duel Points";
+    if (!points || !points.gain) return "";
+    const tags = [];
+    if (points.shadow) tags.push("Shadow Game");
+    if (points.rematch) tags.push("Rematch");
+    let line = (tags.length ? tags.join(" · ") + " · " : "") + "+" + points.gain + " Duel Points";
     return points.bonus ? line + " · half your Life or more left" : line;
   }
 
   function awardMatchPoints(you) {
     const key = state && state.mode === "tourney" ? (state.tourneyKey || "weevil") : ((state && state.aiId) || "yugi");
     const rematch = !!(state && state.rematch);
+    const shadow = !!(state && state.shadow);
+    if (shadow && !you) {
+      return { gain: 0, bonus: 0, base: 0, rematch: rematch, shadow: true };
+    }
     const baseWin = DP_WIN[key] || 70;
-    const base = you ? (rematch ? Math.round(baseWin * REMATCH_PAY) : baseWin) : DP_LOSS;
+    let base = you ? (rematch ? Math.round(baseWin * REMATCH_PAY) : baseWin) : DP_LOSS;
+    if (you && shadow) base = Math.round(base * SHADOW_PAY);
     let bonus = 0;
     if (you && state && state.player) {
       const start = state.rules === "classic" ? 8000 : 2000;
@@ -12013,7 +12276,7 @@
     wallet.coins += gain;
     if (you && state && state.mode === "tourney") unlockSetFor(state.tourneyKey);
     saveWallet();
-    return { gain: gain, bonus: bonus, base: base, rematch: rematch };
+    return { gain: gain, bonus: bonus, base: base, rematch: rematch, shadow: shadow };
   }
 
   function markCleared(key) {
@@ -12923,19 +13186,19 @@
     const hunt = !!hunting && !!rematch && key !== "pegasus";
     if (key === "rival") {
       const id = (tourney && tourney.rival) || wallet.rivalId || "kaiba";
-      beginMatch(deck, id, {
+      armShadowMatch(deck, id, {
         rules: rules, field: rivalField(id), mode: "tourney",
         tourneyKey: "rival", stake: hunt ? stakeOf("rival") : (rematch ? 0 : STAKES.rival),
-        taunt: rivalTaunt(id), rematch: !!rematch, chipHunt: hunt,
+        taunt: rivalTaunt(id), rematch: !!rematch, chipHunt: hunt, shadow: shadowWanted,
       });
       return;
     }
     const src = TOURNEY[key];
     if (!src) return;
-    beginMatch(deck, key, {
+    armShadowMatch(deck, key, {
       rules: rules, field: src.field, mode: "tourney",
       tourneyKey: key, stake: hunt ? stakeOf(key) : (rematch ? 0 : (src.stake || 0)),
-      taunt: src.taunt || "", rematch: !!rematch, chipHunt: hunt,
+      taunt: src.taunt || "", rematch: !!rematch, chipHunt: hunt, shadow: shadowWanted,
     });
   }
 
@@ -12982,7 +13245,7 @@
     const sceneWho = (key === "rival" ? rivalWho : key) || "weevil";
     const rematch = !!state.rematch;
     const points = awardMatchPoints(you);
-    const anteLine = resolveAnte(you);
+    const anteLine = [resolveAnte(you), resolveShadow(you)].filter(Boolean).join(" ");
     let title = you ? "Victory!" : "Defeat";
     let chipLine = "";
     let primary = "map";
@@ -13082,7 +13345,7 @@
     el.endMsg.textContent = reason;
     el.endChips.hidden = !chipLine;
     el.endChips.textContent = chipLine;
-    el.endPoints.hidden = false;
+    el.endPoints.hidden = !points.gain;
     el.endPoints.textContent = pointsText(points);
     el.endAnte.hidden = !anteLine;
     el.endAnte.textContent = anteLine || "";
@@ -13111,6 +13374,8 @@
     pendingRematch = null;
     wallet = { coins: 0, sets: [], cleared: [], rivalId: "" };
     puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
+    challengeSave = freshChallenges();
+    tradeSave = freshTrade();
     if (profile) {
       const name = profile.name;
       const avatar = profile.avatar;
@@ -13124,6 +13389,8 @@
     const okW = persist(WALLET_KEY, wallet);
     const okP = persist(PUZZLE_KEY, puzzleSave);
     const okProfile = profile ? persist(PROFILE_KEY, profile) : true;
+    const okChallenge = persist(CHALLENGE_KEY, challengeSave);
+    const okTrade = persist(TRADE_KEY, tradeSave);
     paintNewBadge();
     refreshContinue();
     syncFL();
@@ -13133,7 +13400,7 @@
     if ($("binder").classList.contains("active")) renderBinder();
     if ($("rematch").classList.contains("active")) renderRematch();
     closeConfirm();
-    toast(okT && okC && okD && okW && okP && okProfile ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
+    toast(okT && okC && okD && okW && okP && okProfile && okChallenge && okTrade ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
   }
 
   function setRules(mode) {
@@ -13159,6 +13426,725 @@
       : "2000 LP · no tributes · arena field bonus · fuse from the field";
     el.deckRules.textContent = classic ? "Tournament · Classic" : "Tournament · Duelist Kingdom";
   }
+
+  const CHALLENGE_POOL = [
+    { id: "dk3", goal: 3, dp: 90, name: "Kingdom Rules", text: "Win 3 duels with Duelist Kingdom rules." },
+    { id: "clean", goal: 1, dp: 70, name: "Untouched", text: "Win a duel without losing a monster. A Tribute is not a loss." },
+    { id: "tribute5", goal: 5, dp: 80, name: "Tribute Summoner", text: "Tribute Summon 5 monsters." },
+    { id: "owned", goal: 1, dp: 60, pack: true, name: "Your Cards", text: "Beat a duelist using only cards you own." },
+    { id: "wins2", goal: 2, dp: 50, name: "Two Victories", text: "Win 2 duels." },
+    { id: "shadow1", goal: 1, dp: 120, name: "Face the Shadow", text: "Win a Shadow Game." },
+    { id: "rematch1", goal: 1, dp: 80, name: "Return Match", text: "Win a rematch." },
+    { id: "half", goal: 1, dp: 55, name: "Steady Life", text: "Win a duel with at least half your Life Points left." },
+    { id: "fusion2", goal: 2, dp: 75, name: "Fusion Practice", text: "Fusion Summon 2 monsters." },
+    { id: "tourney2", goal: 2, dp: 70, name: "Island Path", text: "Win 2 tournament duels." },
+  ];
+
+  function challengeById(id) {
+    return CHALLENGE_POOL.find((row) => row.id === id) || null;
+  }
+
+  function seededShuffle(list, seed) {
+    const arr = list.slice();
+    let s = seed >>> 0;
+    for (let i = arr.length - 1; i > 0; i--) {
+      s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+      const j = s % (i + 1);
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function weekKeyFromDate(date) {
+    const src = date instanceof Date ? date : new Date();
+    const d = new Date(src.getFullYear(), src.getMonth(), src.getDate());
+    const day = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - day + 3);
+    const isoYear = d.getFullYear();
+    const jan4 = new Date(isoYear, 0, 4);
+    const jan4Day = (jan4.getDay() + 6) % 7;
+    const firstThursday = new Date(isoYear, 0, 4 - jan4Day + 3);
+    const week = 1 + Math.round((d.getTime() - firstThursday.getTime()) / 604800000);
+    return isoYear + "-W" + (week < 10 ? "0" : "") + week;
+  }
+
+  function isoWeekThursday(key) {
+    const match = /^(\d{4})-W(\d{2})$/.exec(key || "");
+    if (!match) return null;
+    const year = Number(match[1]);
+    const week = Number(match[2]);
+    const jan4 = new Date(year, 0, 4);
+    const jan4Day = (jan4.getDay() + 6) % 7;
+    return new Date(year, 0, 4 - jan4Day + 3 + (week - 1) * 7);
+  }
+
+  function previousWeekKey(key) {
+    const thursday = isoWeekThursday(key);
+    if (!thursday) return "";
+    thursday.setDate(thursday.getDate() - 7);
+    return weekKeyFromDate(thursday);
+  }
+
+  function weekStartLabel(key) {
+    const thursday = isoWeekThursday(key);
+    if (!thursday) return "This week";
+    const monday = new Date(thursday.getFullYear(), thursday.getMonth(), thursday.getDate() - 3);
+    return "Week of " + prettyDate(localDateKey(monday));
+  }
+
+  function challengesForWeek(week) {
+    const seed = hashString("challenges:" + week);
+    const count = 3 + (seed % 3);
+    return seededShuffle(CHALLENGE_POOL.map((row) => row.id), seed).slice(0, count);
+  }
+
+  function idsLookValid(ids) {
+    return Array.isArray(ids) && ids.length >= 3 && ids.length <= 5 && ids.every((id) => !!challengeById(id));
+  }
+
+  function freshChallenges() {
+    const week = weekKeyFromDate(new Date());
+    return {
+      week: week,
+      ids: challengesForWeek(week),
+      progress: {},
+      claimed: {},
+      streak: 0,
+      bestStreak: 0,
+      lastFull: "",
+      lifetime: 0,
+    };
+  }
+
+  function saveChallenges() {
+    if (!challengeSave) return;
+    if (!persist(CHALLENGE_KEY, challengeSave)) toast("Couldn't save weekly challenges.");
+  }
+
+  function noteFullWeek() {
+    if (!challengeSave || !idsLookValid(challengeSave.ids)) return;
+    if (!challengeSave.ids.every((id) => challengeSave.claimed[id])) return;
+    if (challengeSave.lastFull === challengeSave.week) return;
+    const prev = previousWeekKey(challengeSave.week);
+    challengeSave.streak = challengeSave.lastFull === prev ? (challengeSave.streak || 0) + 1 : 1;
+    challengeSave.lastFull = challengeSave.week;
+    if (challengeSave.streak > (challengeSave.bestStreak || 0)) challengeSave.bestStreak = challengeSave.streak;
+    if (profile) {
+      profile.challengeStreak = Math.max(profile.challengeStreak || 0, challengeSave.bestStreak || 0);
+      saveProfile();
+      refreshTitles(false);
+    }
+  }
+
+  function rolloverChallenges() {
+    if (!challengeSave) challengeSave = freshChallenges();
+    const now = weekKeyFromDate(new Date());
+    if (challengeSave.week === now && idsLookValid(challengeSave.ids)) return;
+    const leaving = challengeSave.week;
+    const finished = idsLookValid(challengeSave.ids) && challengeSave.ids.every((id) => challengeSave.claimed[id]);
+    if (finished && leaving && challengeSave.lastFull !== leaving) {
+      const prev = previousWeekKey(leaving);
+      challengeSave.streak = challengeSave.lastFull === prev ? (challengeSave.streak || 0) + 1 : 1;
+      challengeSave.lastFull = leaving;
+      if (challengeSave.streak > (challengeSave.bestStreak || 0)) challengeSave.bestStreak = challengeSave.streak;
+    }
+    if (leaving && leaving !== now && challengeSave.lastFull !== previousWeekKey(now)) challengeSave.streak = 0;
+    challengeSave.week = now;
+    challengeSave.ids = challengesForWeek(now);
+    challengeSave.progress = {};
+    challengeSave.claimed = {};
+    if (profile) profile.challengeStreak = Math.max(profile.challengeStreak || 0, challengeSave.bestStreak || 0);
+  }
+
+  function loadChallenges() {
+    challengeSave = freshChallenges();
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem(CHALLENGE_KEY) || "null"); } catch (e) { raw = null; }
+    if (raw && typeof raw === "object") {
+      if (typeof raw.week === "string" && /^\d{4}-W\d{2}$/.test(raw.week)) challengeSave.week = raw.week;
+      if (typeof raw.lastFull === "string" && /^\d{4}-W\d{2}$/.test(raw.lastFull)) challengeSave.lastFull = raw.lastFull;
+      ["streak", "bestStreak", "lifetime"].forEach((key) => {
+        if (typeof raw[key] === "number" && isFinite(raw[key]) && raw[key] > 0) {
+          challengeSave[key] = Math.min(9999, Math.floor(raw[key]));
+        }
+      });
+      challengeSave.ids = idsLookValid(raw.ids) ? raw.ids.slice() : challengesForWeek(challengeSave.week);
+      const progress = {};
+      const claimed = {};
+      challengeSave.ids.forEach((id) => {
+        const def = challengeById(id);
+        const n = raw.progress && raw.progress[id];
+        if (def && typeof n === "number" && n > 0) progress[id] = Math.min(def.goal, Math.floor(n));
+        if (raw.claimed && raw.claimed[id]) claimed[id] = true;
+      });
+      challengeSave.progress = progress;
+      challengeSave.claimed = claimed;
+    }
+    rolloverChallenges();
+    saveChallenges();
+  }
+
+  function ensureChallengeWeek() {
+    rolloverChallenges();
+  }
+
+  function bumpChallenge(id, n) {
+    if (!challengeSave || !n) return;
+    ensureChallengeWeek();
+    if (challengeSave.ids.indexOf(id) < 0 || challengeSave.claimed[id]) return;
+    const def = challengeById(id);
+    if (!def) return;
+    const cur = challengeSave.progress[id] || 0;
+    const next = Math.min(def.goal, cur + n);
+    if (next === cur) return;
+    challengeSave.progress[id] = next;
+    saveChallenges();
+    paintChallengeBadge();
+    if ($("challenges").classList.contains("active")) renderChallenges();
+  }
+
+  function noteTributeSummon() { bumpChallenge("tribute5", 1); }
+  function noteFusionSummon() { bumpChallenge("fusion2", 1); }
+
+  function noteDuelChallenges() {
+    if (!state || state.mode === "puzzle") return;
+    bumpChallenge("wins2", 1);
+    if (state.rules === "dk") bumpChallenge("dk3", 1);
+    if (!(state.monstersLost > 0)) bumpChallenge("clean", 1);
+    if (state.ownedOnly) bumpChallenge("owned", 1);
+    if (state.shadow) bumpChallenge("shadow1", 1);
+    if (state.rematch) bumpChallenge("rematch1", 1);
+    if (state.mode === "tourney") bumpChallenge("tourney2", 1);
+    const start = state.rules === "classic" ? 8000 : 2000;
+    if (state.player && state.player.lp * 2 >= start) bumpChallenge("half", 1);
+  }
+
+  function claimableCount() {
+    if (!challengeSave) return 0;
+    return challengeSave.ids.filter((id) => {
+      const def = challengeById(id);
+      return def && !challengeSave.claimed[id] && (challengeSave.progress[id] || 0) >= def.goal;
+    }).length;
+  }
+
+  function paintChallengeBadge() {
+    const badge = $("challengeBadge");
+    if (!badge) return;
+    const n = claimableCount();
+    badge.hidden = n <= 0;
+    badge.textContent = n > 9 ? "9+" : String(n);
+  }
+
+  function claimChallenge(id) {
+    ensureChallengeWeek();
+    const def = challengeById(id);
+    if (!def || challengeSave.ids.indexOf(id) < 0 || challengeSave.claimed[id]) return;
+    if ((challengeSave.progress[id] || 0) < def.goal) return;
+    challengeSave.claimed[id] = true;
+    challengeSave.lifetime = (challengeSave.lifetime || 0) + 1;
+    wallet.coins += def.dp || 0;
+    saveWallet();
+    paintWallet();
+    noteFullWeek();
+    saveChallenges();
+    refreshTitles(false);
+    paintChallengeBadge();
+    const reward = "+" + (def.dp || 0) + " Duel Points";
+    if (def.pack) {
+      const setName = (wallet.sets && wallet.sets[0]) || "Legend of Blue Eyes White Dragon";
+      const cards = pullPack(setName, [], true, false);
+      if (cards && cards.length) {
+        markPrizeNew(cards, grantCards(cards));
+        prize = {
+          cards: cards, index: 0, revealed: false, who: "Weekly Challenge",
+          setName: setName, returnTo: "challenges", firstUnlock: false,
+        };
+        toast(reward + " · pack");
+        openPrize();
+        return;
+      }
+    }
+    toast(reward);
+    renderChallenges();
+  }
+
+  function renderChallenges() {
+    ensureChallengeWeek();
+    const week = $("challengeWeek");
+    const lead = $("challengeLead");
+    const list = $("challengeList");
+    if (week) {
+      week.textContent = weekStartLabel(challengeSave.week) + " · streak " + (challengeSave.streak || 0);
+    }
+    if (lead) {
+      const n = challengeSave.ids.length;
+      lead.textContent = n + " goals this week. Each reward pays once. Finish them all to keep a streak.";
+    }
+    if (!list) return;
+    list.innerHTML = "";
+    challengeSave.ids.forEach((id) => {
+      const def = challengeById(id);
+      if (!def) return;
+      const have = Math.min(def.goal, challengeSave.progress[id] || 0);
+      const claimed = !!challengeSave.claimed[id];
+      const ready = have >= def.goal && !claimed;
+      const row = document.createElement("article");
+      row.className = "goal-row" + (claimed ? " claimed" : ready ? " done" : "");
+      const title = document.createElement("h3");
+      title.textContent = def.name;
+      const text = document.createElement("p");
+      text.textContent = def.text;
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      track.setAttribute("role", "progressbar");
+      track.setAttribute("aria-valuemin", "0");
+      track.setAttribute("aria-valuemax", String(def.goal));
+      track.setAttribute("aria-valuenow", String(have));
+      track.setAttribute("aria-label", def.name);
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = Math.round((have / def.goal) * 100) + "%";
+      track.appendChild(fill);
+      const foot = document.createElement("div");
+      foot.className = "goal-foot";
+      const meta = document.createElement("span");
+      const pay = (def.dp || 0) + " DP" + (def.pack ? " + pack" : "");
+      meta.textContent = have + " / " + def.goal + " · " + (claimed ? "Claimed" : pay);
+      foot.appendChild(meta);
+      if (ready) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Claim";
+        btn.addEventListener("click", () => claimChallenge(id));
+        foot.appendChild(btn);
+      }
+      row.appendChild(title);
+      row.appendChild(text);
+      row.appendChild(track);
+      row.appendChild(foot);
+      list.appendChild(row);
+    });
+  }
+
+  function showChallenges() {
+    renderChallenges();
+    showScreen("challenges");
+  }
+
+  function freshTrade() {
+    return { day: localDateKey(new Date()), taken: [], total: 0 };
+  }
+
+  function saveTrade() {
+    if (!tradeSave) return;
+    if (!persist(TRADE_KEY, tradeSave)) toast("Couldn't save trades.");
+  }
+
+  function loadTrades() {
+    tradeSave = freshTrade();
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem(TRADE_KEY) || "null"); } catch (e) { raw = null; }
+    if (raw && typeof raw === "object") {
+      if (typeof raw.day === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw.day)) tradeSave.day = raw.day;
+      if (typeof raw.total === "number" && isFinite(raw.total) && raw.total > 0) {
+        tradeSave.total = Math.min(99999, Math.floor(raw.total));
+      }
+      if (Array.isArray(raw.taken)) {
+        tradeSave.taken = raw.taken.filter((id) => typeof id === "string" && id.length < 80).slice(0, 40);
+      }
+    }
+    ensureTradeDay();
+    saveTrade();
+  }
+
+  function ensureTradeDay() {
+    if (!tradeSave) tradeSave = freshTrade();
+    const today = localDateKey(new Date());
+    if (tradeSave.day === today) return;
+    tradeSave.day = today;
+    tradeSave.taken = [];
+    saveTrade();
+  }
+
+  function duelistPool(key) {
+    let deck = null;
+    if (key === "rival") {
+      const id = (tourney && tourney.rival) || wallet.rivalId || "kaiba";
+      deck = DECKS[id] || DECKS.kaiba;
+    } else deck = TOURNEY[key] || DECKS[key];
+    if (!deck) return [];
+    const seen = {};
+    const names = [];
+    (deck.main || []).concat(deck.extra || []).forEach((name) => {
+      if (seen[name] || !cardDB[name] || cardDB[name].reward) return;
+      seen[name] = true;
+      names.push(name);
+    });
+    names.sort();
+    return names;
+  }
+
+  function cardTradeValue(name) {
+    const card = cardDB[name];
+    if (!card) return 0;
+    const rarity = printedRarity(name);
+    const rank = { Common: 400, Rare: 900, "Super Rare": 1600, "Ultra Rare": 2400, "Secret Rare": 3600 };
+    let value = rank[rarity] || 400;
+    if (card.isMonster) {
+      const atk = card.atk || 0;
+      const def = card.def || 0;
+      value += Math.round(Math.max(atk, def * 0.55) * 0.45);
+      if ((card.level || 0) >= 7) value += 250;
+      else if ((card.level || 0) >= 5) value += 120;
+    } else if (card.isTrap) value += 280;
+    else if (card.isSpell) value += 220;
+    if (card.isFusion) value += 350;
+    return value;
+  }
+
+  function tradeFair(give, take) {
+    const yours = cardTradeValue(give);
+    const theirs = cardTradeValue(take);
+    if (!yours || !theirs) return false;
+    const hi = Math.max(yours, theirs);
+    const lo = Math.min(yours, theirs);
+    return lo * 100 >= hi * 75;
+  }
+
+  function dailyOffers(key) {
+    ensureTradeDay();
+    const pool = duelistPool(key);
+    const seed = hashString("trade:" + tradeSave.day + ":" + key);
+    return seededShuffle(pool, seed).slice(0, 3).map((name, index) => ({
+      id: key + ":" + index + ":" + name,
+      index: index,
+      name: name,
+      value: cardTradeValue(name),
+      rarity: printedRarity(name),
+    }));
+  }
+
+  function offerTaken(offer) {
+    return !!(offer && tradeSave && tradeSave.taken.indexOf(offer.id) >= 0);
+  }
+
+  function beatenDuelists() {
+    return ["weevil", "rex", "mai", "keith", "panik", "rival", "pegasus"].filter((key) => {
+      return wallet.cleared && wallet.cleared.indexOf(key) >= 0 && duelistPool(key).length;
+    });
+  }
+
+  function closeTradeSheet() {
+    tradeOffer = null;
+    const overlay = $("tradeOverlay");
+    if (overlay) overlay.classList.remove("open");
+  }
+
+  function spareTradeNames() {
+    return Object.keys(collection.counts || {}).filter((name) => spareCount(name) > 0 && cardDB[name]).sort();
+  }
+
+  function openTradeSheet(key, index) {
+    const offers = dailyOffers(key);
+    const offer = offers[index];
+    if (!offer || offerTaken(offer)) return;
+    tradeOffer = { key: key, index: index };
+    const title = $("tradeSheetTitle");
+    const lead = $("tradeSheetLead");
+    const list = $("tradeSheetList");
+    if (title) title.textContent = offer.name;
+    if (lead) {
+      lead.textContent = "They offer " + offer.name + " (" + offer.rarity + ", value " + offer.value + "). Offer a spare card you own. Preset decks stay untouched. A saved deck keeps the copies it needs.";
+    }
+    if (!list) return;
+    list.innerHTML = "";
+    const spares = spareTradeNames().sort((a, b) => {
+      return Math.abs(cardTradeValue(a) - offer.value) - Math.abs(cardTradeValue(b) - offer.value);
+    });
+    if (!spares.length) {
+      const empty = document.createElement("p");
+      empty.className = "empty-note";
+      empty.textContent = "No spare cards. A copy a saved deck still needs cannot be traded.";
+      list.appendChild(empty);
+    }
+    spares.forEach((name) => {
+      const fair = tradeFair(name, offer.name);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "trade-pick " + (fair ? "fair" : "unfair");
+      const img = document.createElement("img");
+      img.src = cardDB[name].image;
+      img.alt = "";
+      const copy = document.createElement("span");
+      const nm = document.createElement("div");
+      nm.className = "nm";
+      nm.textContent = name;
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = printedRarity(name) + " · value " + cardTradeValue(name) + " · " + (fair ? "Fair" : "Too far apart") + " · spare " + spareCount(name);
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      btn.appendChild(img);
+      btn.appendChild(copy);
+      btn.addEventListener("click", () => completeTrade(key, index, name));
+      list.appendChild(btn);
+    });
+    const overlay = $("tradeOverlay");
+    if (overlay) overlay.classList.add("open");
+  }
+
+  function completeTrade(key, index, giveName) {
+    ensureTradeDay();
+    const offers = dailyOffers(key);
+    const offer = offers[index];
+    if (!offer || offerTaken(offer)) { toast("That offer is gone."); closeTradeSheet(); renderTrade(); return; }
+    if (!cardDB[giveName] || spareCount(giveName) <= 0) { toast("That copy is needed by a saved deck."); return; }
+    if (!tradeFair(giveName, offer.name)) { toast("They won't take that. The values are too far apart."); return; }
+    if (!takeCard(giveName)) { toast("That card stayed in your collection."); return; }
+    const fresh = grantCards([offer.name]);
+    tradeSave.taken.push(offer.id);
+    tradeSave.total = (tradeSave.total || 0) + 1;
+    saveTrade();
+    if (profile) {
+      profile.trades = (profile.trades || 0) + 1;
+      saveProfile();
+      refreshTitles(false);
+    }
+    closeTradeSheet();
+    renderTrade();
+    toast(fresh.indexOf(offer.name) >= 0 ? offer.name + " · NEW" : "Traded for " + offer.name + ".");
+  }
+
+  function renderTrade() {
+    ensureTradeDay();
+    const title = $("tradeTitle");
+    const note = $("tradeNote");
+    const list = $("tradeList");
+    const back = $("btnTradeBack");
+    if (!list) return;
+    list.innerHTML = "";
+    if (!tradeFocus) {
+      if (title) title.textContent = "Trade";
+      if (note) note.textContent = prettyDate(tradeSave.day) + " · offers refresh tomorrow. Spare collection cards only.";
+      if (back) back.textContent = "Back";
+      const keys = beatenDuelists();
+      if (!keys.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty-note";
+        empty.textContent = "Beat a duelist in the tournament to open their offers. You trade cards you own, never a preset deck.";
+        list.appendChild(empty);
+        return;
+      }
+      keys.forEach((key) => {
+        const face = duelistFace(key);
+        if (!face) return;
+        const row = document.createElement("div");
+        row.className = "shop-row";
+        const img = document.createElement("img");
+        const ace = cardDB[face.ace];
+        if (ace) { img.src = ace.image; img.alt = ""; }
+        img.className = "trade-offer";
+        img.style.width = "36px";
+        img.style.height = "52px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "3px";
+        const copy = document.createElement("div");
+        copy.className = "copy";
+        const nm = document.createElement("div");
+        nm.className = "nm";
+        nm.textContent = face.name;
+        const sub = document.createElement("div");
+        sub.className = "sub";
+        const left = dailyOffers(key).filter((offer) => !offerTaken(offer)).length;
+        sub.textContent = left + " offer" + (left === 1 ? "" : "s") + " today";
+        copy.appendChild(nm);
+        copy.appendChild(sub);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "Offers";
+        btn.addEventListener("click", () => { tradeFocus = key; renderTrade(); });
+        row.appendChild(img);
+        row.appendChild(copy);
+        row.appendChild(btn);
+        list.appendChild(row);
+      });
+      return;
+    }
+    const face = duelistFace(tradeFocus);
+    if (title) title.textContent = face ? face.name : "Trade";
+    if (note) note.textContent = "Trade one owned card for one of theirs. Values must be close.";
+    if (back) back.textContent = "Duelists";
+    dailyOffers(tradeFocus).forEach((offer) => {
+      const taken = offerTaken(offer);
+      const row = document.createElement("div");
+      row.className = "shop-row" + (taken ? " locked" : "");
+      const img = document.createElement("img");
+      img.src = cardDB[offer.name].image;
+      img.alt = "";
+      img.style.width = "36px";
+      img.style.height = "52px";
+      img.style.objectFit = "cover";
+      img.style.borderRadius = "3px";
+      const copy = document.createElement("div");
+      copy.className = "copy";
+      const nm = document.createElement("div");
+      nm.className = "nm";
+      nm.textContent = offer.name;
+      const sub = document.createElement("div");
+      sub.className = "sub";
+      sub.textContent = offer.rarity + " · value " + offer.value + (taken ? " · taken" : "");
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = taken ? "Taken" : "Trade";
+      btn.disabled = taken;
+      if (!taken) btn.addEventListener("click", () => openTradeSheet(tradeFocus, offer.index));
+      row.appendChild(img);
+      row.appendChild(copy);
+      row.appendChild(btn);
+      list.appendChild(row);
+    });
+  }
+
+  function showTrade() {
+    tradeFocus = "";
+    closeTradeSheet();
+    renderTrade();
+    showScreen("trade");
+  }
+
+  function leaveTrade() {
+    if (tradeFocus) { tradeFocus = ""; renderTrade(); return; }
+    closeTradeSheet();
+    showScreen("menu");
+  }
+
+  function paintShadowChrome() {
+    const on = !!(state && state.shadow);
+    const active = document.querySelector("#app .screen.active");
+    const name = active ? active.id : "";
+    ["duel", "vs", "end"].forEach((id) => {
+      const node = $(id);
+      if (node) node.classList.toggle("shadow-on", on && name === id);
+    });
+  }
+
+  function paintShadowToggles() {
+    const on = !!shadowWanted;
+    const deckRow = $("deckShadowRow");
+    const deckBtn = $("deckShadowBtn");
+    if (deckRow) deckRow.hidden = !(deckPickMode === "free" || deckPickMode === "rematch");
+    if (deckBtn) {
+      deckBtn.classList.toggle("on", on);
+      deckBtn.textContent = on ? "On" : "Off";
+      deckBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    }
+    ["islandShadow", "rematchShadow"].forEach((id) => {
+      const btn = $(id);
+      if (!btn) return;
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      btn.textContent = on ? "Shadow Game · On" : "Shadow Game · Off";
+    });
+  }
+
+  function setShadowWanted(on) {
+    shadowWanted = !!on;
+    paintShadowToggles();
+  }
+
+  function deckUsesOwnedOnly(deck) {
+    if (!deck) return false;
+    const id = String(deck.id || "");
+    if (id === "yugi" || id === "kaiba" || id === "joey") return false;
+    const custom = id.indexOf("custom:") === 0 || savedDecks.some((row) => row && row.id === id);
+    if (!custom) return false;
+    const counts = countNames((deck.main || []).concat(deck.extra || []));
+    const names = Object.keys(counts);
+    if (!names.length) return false;
+    return names.every((name) => cardDB[name] && ownedCount(name) >= counts[name]);
+  }
+
+  function pickShadowStake(aiDeck) {
+    const playerBag = safeAnteNames();
+    const aiBag = ((aiDeck && aiDeck.main) || []).concat((aiDeck && aiDeck.extra) || [])
+      .filter((name) => cardDB[name] && !cardDB[name].reward);
+    const player = playerBag.length ? playerBag[Math.floor(Math.random() * playerBag.length)] : null;
+    const ai = player && aiBag.length ? aiBag[Math.floor(Math.random() * aiBag.length)] : null;
+    return { player: player, ai: ai, dp: player ? 0 : SHADOW_LOSS_DP, resolved: false, line: "" };
+  }
+
+  function resolveShadow(you) {
+    if (!state || !state.shadow || !state.shadowStake) return "";
+    const stake = state.shadowStake;
+    if (stake.resolved) return stake.line || "";
+    stake.resolved = true;
+    if (you && stake.ai) {
+      const fresh = grantCards([stake.ai]);
+      stake.line = "Shadow Game: you won " + stake.ai + (fresh.indexOf(stake.ai) >= 0 ? " · NEW" : "") + ".";
+    } else if (!you && stake.player) {
+      stake.line = takeCard(stake.player)
+        ? "Shadow Game: you forfeited " + stake.player + "."
+        : "Shadow Game: " + stake.player + " stayed. A saved deck still needs it.";
+    } else if (!you) {
+      const pay = Math.min(wallet.coins, stake.dp || SHADOW_LOSS_DP);
+      wallet.coins -= pay;
+      saveWallet();
+      paintWallet();
+      stake.line = pay
+        ? "Shadow Game: no spare card. −" + pay + " Duel Points."
+        : "Shadow Game: no spare card, and you had no Duel Points left.";
+    } else stake.line = "";
+    return stake.line || "";
+  }
+
+  function closeShadowWarn() {
+    pendingShadow = null;
+    const warn = $("shadowWarn");
+    if (warn) warn.classList.remove("open");
+  }
+
+  function confirmShadow() {
+    const job = pendingShadow;
+    pendingShadow = null;
+    const warn = $("shadowWarn");
+    if (warn) warn.classList.remove("open");
+    if (!job) return;
+    beginMatch(job.deck, job.aiId, job.opts);
+  }
+
+  function armShadowMatch(deck, aiId, opts) {
+    opts = opts || {};
+    const aiSrc = DECKS[aiId] || TOURNEY[aiId];
+    if (!deck || !aiSrc) return;
+    if (opts.shadow && !opts.shadowOk) {
+      pendingShadow = {
+        deck: deck,
+        aiId: aiId,
+        opts: Object.assign({}, opts, { shadow: true, shadowOk: true }),
+      };
+      const warn = $("shadowWarn");
+      if (warn) warn.classList.add("open");
+      return;
+    }
+    beginMatch(deck, aiId, opts);
+  }
+
+  $("btnChallenges").addEventListener("click", () => showChallenges());
+  $("btnChallengesBack").addEventListener("click", () => showScreen("menu"));
+  $("btnTrade").addEventListener("click", () => showTrade());
+  $("btnTradeBack").addEventListener("click", () => leaveTrade());
+  $("deckShadowBtn").addEventListener("click", () => setShadowWanted(!shadowWanted));
+  $("islandShadow").addEventListener("click", () => setShadowWanted(!shadowWanted));
+  $("rematchShadow").addEventListener("click", () => setShadowWanted(!shadowWanted));
+  $("shadowYes").addEventListener("click", () => confirmShadow());
+  $("shadowNo").addEventListener("click", () => closeShadowWarn());
+  $("shadowWarn").addEventListener("click", (e) => { if (e.target === $("shadowWarn")) closeShadowWarn(); });
+  $("tradeSheetClose").addEventListener("click", () => closeTradeSheet());
+  $("tradeOverlay").addEventListener("click", (e) => { if (e.target === $("tradeOverlay")) closeTradeSheet(); });
 
   el.ruleClassic.addEventListener("click", () => setRules("classic"));
   el.ruleDK.addEventListener("click", () => setRules("dk"));
@@ -13403,7 +14389,12 @@
       return;
     }
     if (!state || !state.playerDeck) { showScreen("menu"); return; }
-    beginMatch(state.playerDeck, state.aiId);
+    armShadowMatch(state.playerDeck, state.aiId, {
+      rules: state.rules,
+      field: state.field,
+      mode: "free",
+      shadow: !!state.shadow,
+    });
   });
   el.btnEndMenu.addEventListener("click", () => {
     const puzzleEnd = endPrimary === "puzzle";
@@ -13427,6 +14418,8 @@
   loadTourney();
   loadWallet();
   loadPuzzle();
+  loadChallenges();
+  loadTrades();
   loadProfile();
   savesReady = true;
   paintNewBadge();
@@ -13587,6 +14580,30 @@
       return activateManualTrap(p, slot);
     },
     profile: () => profile ? Object.assign({}, profile) : null,
+    challenges: () => challengeSave ? {
+      week: challengeSave.week,
+      ids: challengeSave.ids.slice(),
+      progress: Object.assign({}, challengeSave.progress),
+      claimed: Object.assign({}, challengeSave.claimed),
+      streak: challengeSave.streak || 0,
+      bestStreak: challengeSave.bestStreak || 0,
+      lastFull: challengeSave.lastFull || "",
+    } : null,
+    weekOf: (date) => weekKeyFromDate(date ? new Date(date) : new Date()),
+    weekChallenges: (week) => challengesForWeek(week || weekKeyFromDate(new Date())),
+    prevWeek: (week) => previousWeekKey(week),
+    claimChallenge: (id) => claimChallenge(id),
+    tradeValue: (name) => cardTradeValue(name),
+    tradeFair: (a, b) => tradeFair(a, b),
+    tradeOffers: (key) => dailyOffers(key).map((row) => ({ id: row.id, index: row.index, name: row.name, value: row.value, rarity: row.rarity, taken: offerTaken(row) })),
+    tradeTotal: () => tradeSave ? tradeSave.total : 0,
+    doTrade: (key, index, give) => completeTrade(key, index, give),
+    shadowOn: (on) => setShadowWanted(!!on),
+    begin: (deck, aiId, opts) => beginMatch(deck, aiId, opts || {}),
+    placeMonster: (side, handIdx, pos, faceup, tributes) => {
+      if (!state) return null;
+      return placeMonster(side === "ai" ? state.ai : state.player, handIdx, pos, faceup, tributes || []);
+    },
     story: (id) => {
       const scene = storyScene(id);
       if (!scene) return null;

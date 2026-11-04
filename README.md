@@ -29,11 +29,21 @@ The first time a card enters the collection — a booster, Grandpa's shop, an an
 
 A legal deck has a 40–60 card Main Deck, at most 3 copies of any card, and an Extra Deck of Fusion Monsters (max 15). The counter turns red when a deck is short, over, or over a copy limit, and Duel stays disabled until it is legal. Up to 8 named decks are saved in `localStorage` (`classicDuel_customDecks_v1`). An older save — a decks list, or one deck object — is migrated in place and keeps its cards. You can edit, rename, copy, or delete them. New Deck starts empty. Pick which deck to use before a free duel, before a tournament run, before a rematch, or from Deck on the island for the next duel in a run. The opponent for a custom deck is Yugi, Kaiba, or Joey at random.
 
+On the deck screen for a free duel or a rematch, **Shadow Game** can be turned on. The island and the Rematch list have the same switch. A warning explains the stake before the duel starts. The opponent plays harder — more traps and spells, and sharper attacks — and the field turns dark purple. A win pays double Duel Points. If you have a spare collection card, both sides put one up and the winner takes it. A loss forfeits yours. Preset decks are never edited, and a saved deck keeps the copies it needs. With no spare card, a loss costs 80 Duel Points instead of a card. Shadow wins count toward the Shadow Game Winner title.
+
 The **Forbidden/Limited** switch is off by default. Turn it on to enforce the official TCG list (Forbidden 0, Limited 1, Semi-Limited 2). Cards on that list stay marked either way. The page refreshes the list from YGOPRODeck when it can; `classic-pool.js` holds a snapshot so the builder still works offline.
 
 ## Daily Puzzle
 
 **Daily Puzzle** on the main menu opens one board for the local date. Fourteen handcrafted puzzles rotate with that date. Each one names its rules, Classic or Duelist Kingdom, and starts mid-duel: monsters, Spells, Traps, Life Points, and hands are already set. Win that turn. Ending the turn, or hitting 0 Life Points, fails it. **Hint** and **Retry** sit above the field. The first solve of a day pays 40 Duel Points. Solving on back-to-back days raises a streak, saved on this device (`classicDuel_puzzle_v1`). Reset Progress clears the streak.
+
+## Weekly challenges
+
+**Challenges** on the main menu shows 3 to 5 goals for the local calendar week. The same week always draws the same set. The next week replaces them. Goals include winning under Duelist Kingdom rules, winning without a monster being destroyed (a Tribute is not a loss), Tribute Summoning, winning with a deck of cards you own, and similar duels. Each row has a progress bar. Duel Points, and sometimes a pack, pay once per goal per week. Finish every goal in a week to build a streak. Two finished weeks in a row unlock the Weekly Streak title. Stored in `classicDuel_challenges_v1`. An older save with no challenge data starts at the current week. Reset Progress clears the streak.
+
+## Trading
+
+**Trade** opens after you have beaten a duelist. Pick one. They offer a few cards from their deck, and those offers change the next calendar day. You give one spare card from your collection. Preset Yugi, Kaiba, and Joey decks are never edited, and a copy any saved deck still needs cannot be traded. The trade goes through when the two cards are close in rarity and ATK or DEF. A card you did not own arrives in the binder with a NEW tag. Three trades unlock the Trader title. The day's offers and your trade count are stored in `classicDuel_trade_v1`. Reset Progress clears them and leaves your name.
 
 ## Tournament
 
@@ -94,7 +104,7 @@ Other effects used by the decks include Dark Hole, Raigeki, Monster Reborn, Pot 
 
 The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Both menus use that same layout, so the picture stays visible behind the buttons. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the glow. Card art for the duel intros is stored in `art/`.
 
-**Profile** on the main menu is your duelist: a portrait, a name, and the record (wins, losses, win rate, tournaments cleared, cards and set completion, foils, best puzzle streak). Titles unlock from that record — Duelist Kingdom Champion and Pegasus Slayer from beating Pegasus, Foil Collector, Puzzle Master, Deck Master, Rematch King, and others. A toast names a title when it unlocks. The one you equip shows on the profile and on the VS screen. An older save counts duelists you already beat, a cleared tournament, foils you own, a saved deck, and the puzzle streak. The name and portrait stay if you reset progress. Stored in `classicDuel_profile_v1`.
+**Profile** on the main menu is your duelist: a portrait, a name, and the record (wins, losses, win rate, tournaments cleared, cards and set completion, foils, best puzzle streak, Shadow Game wins, trades, and the weekly challenge streak). Titles unlock from that record — Duelist Kingdom Champion and Pegasus Slayer from beating Pegasus, Foil Collector, Puzzle Master, Deck Master, Rematch King, Shadow Game Winner, Trader, Weekly Streak, and others. A toast names a title when it unlocks. The one you equip shows on the profile and on the VS screen. An older save counts duelists you already beat, a cleared tournament, foils you own, a saved deck, and the puzzle streak. New title counts start at zero until you earn them. The name and portrait stay if you reset progress. Stored in `classicDuel_profile_v1`.
 
 Settings has Mute, a music slider, and a sound-effects slider. The menu, a normal duel, and a Pegasus duel each loop an original piece made in the browser. Nothing plays until the first tap, so iPhone can start the audio.
 
