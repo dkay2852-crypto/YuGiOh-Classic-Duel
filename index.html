@@ -375,6 +375,22 @@
       box-shadow: 0 0 16px rgba(240, 192, 64, 0.45);
       background: linear-gradient(180deg, rgba(48, 36, 12, 0.92), rgba(10, 12, 24, 0.9));
     }
+    #btnCitySide { min-height: 36px; font-size: 0.92rem; }
+    #btnCitySide[hidden] { display: none !important; }
+    #wagerLead, #wagerWarnBody { margin: 0; color: var(--cream); font-size: 0.82rem; line-height: 1.35; text-align: left; }
+    #wagerCards { margin: 4px 0; }
+    #duel[data-arena="roba"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(8, 4, 22, 0.5), rgba(16, 8, 36, 0.32) 46%, rgba(6, 4, 16, 0.58)),
+        radial-gradient(ellipse at 50% 18%, rgba(190, 160, 255, 0.45), transparent 42%),
+        linear-gradient(180deg, #1a1030 0%, #3a2060 40%, #120818 100%);
+    }
+    #duel[data-arena="hunter"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(8, 2, 4, 0.62), rgba(16, 4, 8, 0.4) 48%, rgba(4, 2, 4, 0.7)),
+        radial-gradient(ellipse at 50% 22%, rgba(120, 20, 30, 0.45), transparent 46%),
+        linear-gradient(180deg, #14080c 0%, #2a1014 42%, #080406 100%);
+    }
 
     @keyframes menuBreathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     @keyframes menuGlow {
@@ -2217,7 +2233,9 @@
         <p><strong>First turn.</strong> The first player does not draw, and neither player can attack on that turn.</p>
         <p><strong>Fusion.</strong> Polymerization can use monsters in your hand or on the field. A Fusion Monster cannot attack the turn it is summoned.</p>
         <p><strong>No field bonus.</strong> Duelist Kingdom's arena bonus does not apply. Field Spell cards still do.</p>
-        <p><strong>Locator cards.</strong> Walk the streets and win the duel where you stand. The first win at a district earns its locator card. Six cards reveal the KaibaCorp blimp. The finals stay locked.</p>
+        <p><strong>Locator cards.</strong> Each district has a featured duelist. Beat that duelist to earn the district's locator card. Six cards reveal the KaibaCorp blimp. The finals stay locked.</p>
+        <p><strong>Ante.</strong> Before a street duel, confirm the stake. The winner takes the loser's rarest card that can safely leave. Your opponent antes a signature card. A loss removes that card from your collection. Preset decks are never edited, a saved deck keeps the copies it needs, and you are never left unable to build a 40-card deck. If no card can be wagered, the stake is Duel Points.</p>
+        <p><strong>Rare Hunters.</strong> Hooded Ghouls sometimes stop you between districts. They play burn or Exodia copies, wager a rarer card, and pay more Duel Points. Marik is only a name they use. He is not in the city yet.</p>
       </div>
       <button type="button" class="menu-btn primary" id="btnCityEnter">Enter Domino City</button>
       <button type="button" class="menu-btn" id="btnCityRulesBack">Back</button>
@@ -2235,6 +2253,7 @@
         </div>
       </div>
       <p class="island-note" id="cityNote"></p>
+      <button type="button" class="menu-btn" id="btnCitySide" hidden>Duel Bonz</button>
       <div class="city-map" id="cityMap" role="group" aria-label="Domino City"></div>
       <div class="footer-row">
         <button type="button" class="menu-btn" id="btnCityRules">Rules</button>
@@ -2431,7 +2450,7 @@
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
         <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods, and the main menu can switch to Battle City.</p>
-        <p><strong>Battle City:</strong> After you beat Pegasus, Battle City opens the Domino City map. Walk between neighboring districts, then duel where you are standing. The opponents for now are duelists you have already beaten. The first win at a district earns its locator card. Six cards reveal the KaibaCorp blimp, which stays locked: finals coming soon. Battle City duels use their own rules: 4000 Life Points, tribute summons, no attack on the first turn, and a Fusion Monster cannot attack the turn it is summoned. Free Duel, the tournament, and puzzles are unchanged. Locator cards are kept on your profile.</p>
+        <p><strong>Battle City:</strong> After you beat Pegasus, Battle City opens the Domino City map. Walk between neighboring districts, then duel where you are standing. Joey, Kaiba, Mai, Mako, a Keith-style street thug, and Esper Roba each hold one district. Beat that featured duelist for its locator card. Bonz waits in the park graves. Before the duel you confirm an ante: the winner takes the loser's rarest safe card, or the opponent's signature card. A loss removes the card from your collection. Preset decks stay as they are, a saved deck keeps the copies it needs, and a loss never drops you below 40 cards. If no card can be wagered, you stake Duel Points instead. Hooded Rare Hunters sometimes ambush on a street, with burn or copied Exodia, a rarer ante, and a line about Marik. Marik himself is not here. Six locator cards reveal the KaibaCorp blimp, which stays locked: finals coming soon. Battle City duels use their own rules: 4000 Life Points, tribute summons, no attack on the first turn, and a Fusion Monster cannot attack the turn it is summoned. Free Duel, the tournament, puzzles, rematches, trades, and Shadow Game are unchanged. Locator cards are kept on your profile.</p>
         <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set, in a grid. Owned cards show their art. Extra copies show a count (x2, x3). Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Search and Filters narrow the grid by name, type, attribute, monster type, level, ATK, DEF, rarity, foil, and owned or new. Sort by name, ATK, DEF, level, or newest. Tap a card to see each version you own. From the deck builder, that same card can be added or removed.</p>
         <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips stay put, except when the path is clear and you still need chips for Pegasus. Those island rematches pay the same chips as the first win, and a loss costs 1.</p>
         <p><strong>Ante:</strong> Settings has an Ante rule, off unless you turn it on. Before a tournament duel, you and the opponent each put up one card. You put up a spare card from your collection. The last copy a saved deck needs stays, and preset Yugi, Kaiba, and Joey decks are never edited. The winner takes the loser's card. Both cards show before the duel, and the result shows after.</p>
@@ -2817,6 +2836,29 @@
     </div>
   </div>
 
+  <div class="overlay" id="wagerWarn">
+    <div class="sheet">
+      <h3 id="wagerTitle">Battle City ante</h3>
+      <p id="wagerLead"></p>
+      <div class="vs-ante" id="wagerCards">
+        <figure>
+          <img id="wagerYouArt" alt="" hidden />
+          <figcaption id="wagerYouCap">Your card</figcaption>
+        </figure>
+        <div class="vs-ante-mid">ANTE</div>
+        <figure>
+          <img id="wagerThemArt" alt="" hidden />
+          <figcaption id="wagerThemCap">Their card</figcaption>
+        </figure>
+      </div>
+      <p id="wagerWarnBody"></p>
+      <div class="actions">
+        <button type="button" id="wagerYes">Duel</button>
+        <button type="button" class="ghost" id="wagerNo">Back</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="shadowWarn">
     <div class="sheet">
       <h3>Shadow Game</h3>
@@ -2889,6 +2931,8 @@
   const SIMPLE_SPELLS = new Set([
     "Dark Hole", "Raigeki", "Monster Reborn", "Pot of Greed", "Fissure", "Change of Heart",
     "Harpie's Feather Duster",
+    "Ookazi", "Hinotama", "Sparks", "Final Flame", "Tremendous Fire",
+    "Upstart Goblin", "Goblin's Secret Remedy",
   ]);
 
   const FUSIONS = [
@@ -2911,6 +2955,15 @@
     yugi:    { diff: 5, style: "balanced", bias: ["Spellcaster", "Fiend"], bluff: 0.3, defend: 0.5, aggression: 0.64, trapLove: 0.72, equipLove: 0.78 },
     kaiba:   { diff: 6, style: "beatdown", bias: ["Dragon"], bluff: 0.12, defend: 0.26, aggression: 0.88, trapLove: 0.5, equipLove: 0.84 },
     joey:    { diff: 4, style: "aggro",    bias: ["Warrior", "Dragon", "Beast"], bluff: 0.18, defend: 0.3, aggression: 0.8, trapLove: 0.46, equipLove: 0.62 },
+    "city-joey":  { diff: 4, style: "aggro",    bias: ["Warrior", "Dragon"], bluff: 0.16, defend: 0.28, aggression: 0.78, trapLove: 0.5, equipLove: 0.7 },
+    "city-kaiba": { diff: 7, style: "beatdown", bias: ["Dragon"], bluff: 0.08, defend: 0.24, aggression: 0.9, trapLove: 0.55, equipLove: 0.86 },
+    "city-mai":   { diff: 4, style: "equip",    bias: ["Winged Beast"], bluff: 0.18, defend: 0.3, aggression: 0.7, trapLove: 0.48, equipLove: 0.96 },
+    "city-mako":  { diff: 3, style: "beatdown", bias: ["Aqua", "Fish", "Sea Serpent", "Warrior"], bluff: 0.14, defend: 0.34, aggression: 0.72, trapLove: 0.5, equipLove: 0.4 },
+    "city-thug":  { diff: 3, style: "beatdown", bias: ["Machine"], bluff: 0.2, defend: 0.18, aggression: 0.86, trapLove: 0.4, equipLove: 0.94 },
+    "city-roba":  { diff: 6, style: "mind",     bias: ["Machine", "Spellcaster"], bluff: 0.22, defend: 0.48, aggression: 0.7, trapLove: 0.88, equipLove: 0.55 },
+    "city-bonz":  { diff: 2, style: "aggro",    bias: ["Zombie", "Fiend"], bluff: 0.24, defend: 0.22, aggression: 0.8, trapLove: 0.46, equipLove: 0.5 },
+    "city-ghoul": { diff: 6, style: "burn",     bias: ["Pyro", "Machine"], bluff: 0.08, defend: 0.2, aggression: 0.84, trapLove: 0.62, equipLove: 0.2 },
+    "city-seeker":{ diff: 8, style: "exodia",   bias: ["Spellcaster"], bluff: 0.1, defend: 0.55, aggression: 0.22, trapLove: 0.84, equipLove: 0.15 },
   };
 
   const DECKS = {
@@ -3030,6 +3083,9 @@
   const DP_WIN = {
     weevil: 60, rex: 80, mai: 110, keith: 150, panik: 170, rival: 210, pegasus: 280,
     yugi: 90, kaiba: 90, joey: 90,
+    "city-joey": 110, "city-kaiba": 220, "city-mai": 130, "city-mako": 100,
+    "city-thug": 90, "city-roba": 160, "city-bonz": 80,
+    "city-ghoul": 260, "city-seeker": 320,
   };
   const SHOP_PACKS = [
     { set: "Legend of Blue Eyes White Dragon", short: "Legend of Blue Eyes", price: 80, key: "weevil", gate: "Weevil" },
@@ -3345,20 +3401,23 @@
 
   const CITY_KEY = "classicDuel_battlecity_v1";
   const LOCATOR_GOAL = 6;
+  const CITY_ANTE_DP = 100;
+  const HUNTER_ANTE_DP = 180;
   const CITY_BLIMP = { x: 50, y: 13 };
   const CITY_DISTRICTS = [
-    { id: "clock", name: "Clock Tower", street: "Central plaza", x: 50, y: 56, who: "weevil", links: ["corp", "pier", "works", "market"] },
-    { id: "corp", name: "KaibaCorp", street: "Tower street", x: 22, y: 33, who: "mai", links: ["clock", "park"] },
-    { id: "park", name: "Domino Park", street: "North green", x: 78, y: 33, who: "rival", links: ["corp", "pier"] },
-    { id: "pier", name: "Domino Pier", street: "Harbor street", x: 82, y: 58, who: "rex", links: ["clock", "park"] },
-    { id: "works", name: "Industrial Quarter", street: "West warehouses", x: 18, y: 58, who: "keith", links: ["clock", "market"] },
-    { id: "market", name: "Shopping Street", street: "South arcade", x: 50, y: 82, who: "panik", links: ["clock", "works"] },
+    { id: "clock", name: "Clock Tower", street: "Central plaza", x: 50, y: 56, who: "city-joey", links: ["corp", "pier", "works", "market"] },
+    { id: "corp", name: "KaibaCorp", street: "Tower street", x: 22, y: 33, who: "city-kaiba", links: ["clock", "park"] },
+    { id: "park", name: "Domino Park", street: "North green", x: 78, y: 33, who: "city-mai", links: ["corp", "pier"] },
+    { id: "pier", name: "Domino Pier", street: "Harbor street", x: 82, y: 58, who: "city-mako", links: ["clock", "park"] },
+    { id: "works", name: "Industrial Quarter", street: "West warehouses", x: 18, y: 58, who: "city-thug", links: ["clock", "market"] },
+    { id: "market", name: "Shopping Street", street: "South arcade", x: 50, y: 82, who: "city-roba", links: ["clock", "works"] },
   ];
   let citySave = null;
   let cityRulesFromMap = false;
+  let pendingCity = null;
 
   function defaultCity() {
-    return { version: 1, place: "clock", seenRules: false, deck: null };
+    return { version: 1, place: "clock", seenRules: false, deck: null, quiet: 0 };
   }
 
   function cityDistrict(id) {
@@ -3390,6 +3449,9 @@
     if (!raw || typeof raw !== "object") return;
     if (cityDistrict(raw.place)) citySave.place = raw.place;
     if (raw.seenRules === true) citySave.seenRules = true;
+    if (typeof raw.quiet === "number" && isFinite(raw.quiet) && raw.quiet > 0) {
+      citySave.quiet = Math.min(12, Math.floor(raw.quiet));
+    }
     if (raw.deck && typeof raw.deck === "object") {
       const deck = normalizeDeck(raw.deck);
       if (deck) {
@@ -3417,21 +3479,15 @@
   }
 
   function cityDuelistReady(key) {
-    if (pegasusBeaten()) return key === "rival" || !!TOURNEY[key];
-    if (!wallet || !Array.isArray(wallet.cleared)) return false;
-    return wallet.cleared.indexOf(key) >= 0;
+    const src = CITY_ROSTER[key];
+    return !!(src && src.featured);
   }
 
   function cityOpponent(dist) {
-    if (!dist || !cityDuelistReady(dist.who)) return null;
-    if (dist.who === "rival") {
-      const id = (wallet && wallet.rivalId) || (tourney && tourney.rival) || "kaiba";
-      const face = DECKS[id] || DECKS.kaiba;
-      return { key: "rival", aiId: face.id, name: face.name, ace: face.ace, taunt: rivalTaunt(face.id) };
-    }
-    const src = TOURNEY[dist.who];
+    if (!dist) return null;
+    const src = CITY_ROSTER[dist.who];
     if (!src) return null;
-    return { key: dist.who, aiId: dist.who, name: src.name, ace: src.ace, taunt: src.taunt || "" };
+    return { key: src.id, aiId: src.id, name: src.name, ace: src.ace, taunt: src.intro || "" };
   }
 
   function awardLocator(id) {
@@ -3531,11 +3587,15 @@
     if (el.cityDeck) el.cityDeck.textContent = deck ? ("4000 LP · " + deck.name) : "4000 LP · pick a deck";
     if (el.cityLocators) el.cityLocators.textContent = "◆ " + count + " / " + LOCATOR_GOAL;
     if (el.cityDp) el.cityDp.textContent = (wallet ? wallet.coins : 0) + " DP";
+    const oppHere = cityOpponent(here);
     const bits = [];
     if (!deck) bits.push("Pick a deck before you duel.");
     else bits.push("You are at " + here.name + ".");
+    if (oppHere) bits.push((locatorList().indexOf(here.id) >= 0 ? "Rematch " : "Beat ") + oppHere.name + (locatorList().indexOf(here.id) >= 0 ? "." : " for this locator card."));
+    if (here.id === "park") bits.push("Bonz is in the graves.");
+    bits.push("Street duels ante a card. Confirm the stake first.");
     if (finalsRevealed()) bits.push("The KaibaCorp blimp is revealed. Finals coming soon.");
-    else bits.push(count + " of " + LOCATOR_GOAL + " locator cards. Win where you stand to take that district's card.");
+    else bits.push(count + " of " + LOCATOR_GOAL + " locator cards.");
     if (el.cityNote) el.cityNote.textContent = bits.join(" ");
     el.cityMap.innerHTML = "";
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -3632,6 +3692,12 @@
       btn.addEventListener("click", () => moveCity(dist.id));
       el.cityMap.appendChild(btn);
     });
+    const sideBtn = $("btnCitySide");
+    if (sideBtn) {
+      const atPark = citySave.place === "park";
+      sideBtn.hidden = !atPark;
+      if (atPark) sideBtn.textContent = "Duel Bonz · park graves";
+    }
   }
 
   function showCityMap() {
@@ -3657,67 +3723,243 @@
       citySave.place = id;
       saveCity();
       renderCity();
+      maybeCityAmbush();
       return true;
     }
     startCityDuel();
     return true;
   }
 
-  function startCityDuel() {
+  function startCityDuel(duelistId) {
     const deck = cityPlayerDeck();
     if (!deck) {
       toast("Pick a deck first.");
       openCityDecks();
       return;
     }
-    const custom = String(deck.id || "").indexOf("custom:") === 0;
+    const custom = String(deck.id || "").indexOf("custom:") === 0 || savedDecks.some((d) => d.id === deck.id);
     if (custom) {
       const issues = issuesFor(deck.main, deck.extra);
       if (issues.length) { toast(issues[0]); openCityDecks(); return; }
     }
-    const dist = cityDistrict(citySave.place);
-    const opp = cityOpponent(dist);
-    if (!opp) {
+    const dist = cityDistrict(citySave && citySave.place);
+    const featured = dist && CITY_ROSTER[dist.who];
+    const src = (duelistId && CITY_ROSTER[duelistId]) || featured;
+    if (!src || !dist) {
       toast("No duelist is waiting on this street.");
       return;
     }
-    beginMatch(deck, opp.aiId, {
-      rules: "city",
-      mode: "city",
-      field: null,
-      tourneyKey: opp.key,
-      taunt: opp.taunt,
-      cityId: dist.id,
-    });
+    const ante = buildCityAnte(src);
+    pendingCity = {
+      deck: deck,
+      dist: dist,
+      src: src,
+      ante: ante,
+      featured: !!(featured && src.id === featured.id),
+    };
+    openCityAnte(pendingCity);
   }
 
   function finishCityDuel(you, reason) {
     const id = (state && state.cityId) || (citySave && citySave.place) || "";
     const dist = cityDistrict(id);
     const points = awardMatchPoints(you);
+    const anteLine = resolveCityAnte(you);
     const before = locatorList().length;
     let chipLine = "No locator card this duel.";
-    if (you && dist) {
+    const featuredWin = !!(you && dist && state && state.cityFeatured && state.cityDuelist === dist.who);
+    if (featuredWin) {
       const fresh = awardLocator(dist.id);
       const n = locatorList().length;
       if (fresh && n >= LOCATOR_GOAL) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · blimp revealed. Finals coming soon.";
       else if (fresh) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · " + dist.name;
       else chipLine = "Locator already collected · " + before + "/" + LOCATOR_GOAL;
+    } else if (state && state.cityHunter) {
+      chipLine = "Rare Hunter · no locator card.";
+    } else if (state && state.cityDuelist === "city-bonz") {
+      chipLine = "Bonz has no locator card.";
     }
+    const quote = state && (you ? state.outroWin : state.outroLoss);
     endPrimary = "city";
     el.endTitle.textContent = you ? "Victory!" : "Defeat";
-    el.endMsg.textContent = reason;
+    el.endMsg.textContent = reason + (quote ? " " + quote : "");
     el.endChips.hidden = !chipLine;
     el.endChips.textContent = chipLine;
     el.endPoints.hidden = !points.gain;
     el.endPoints.textContent = pointsText(points);
-    el.endAnte.hidden = true;
-    el.endAnte.textContent = "";
+    el.endAnte.hidden = !anteLine;
+    el.endAnte.textContent = anteLine || "";
     el.btnAgain.hidden = false;
     el.btnAgain.textContent = "Back to Domino";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
     showScreen("end");
+  }
+
+  function ownedCopies() {
+    let n = 0;
+    Object.keys((collection && collection.counts) || {}).forEach((name) => { n += ownedCount(name); });
+    return n;
+  }
+
+  function rarityRank(name) {
+    const rank = { Common: 1, Rare: 2, "Super Rare": 3, "Ultra Rare": 4, "Secret Rare": 5 };
+    return rank[printedRarity(name)] || 1;
+  }
+
+  function wagerCandidates() {
+    if (!collection || ownedCopies() <= 40) return [];
+    const need = copiesReserved();
+    const bag = [];
+    Object.keys(collection.counts || {}).forEach((name) => {
+      if (!cardDB[name]) return;
+      if (ownedCount(name) - (need[name] || 0) <= 0) return;
+      bag.push(name);
+    });
+    bag.sort((a, b) => rarityRank(b) - rarityRank(a) || (cardDB[b].atk || 0) - (cardDB[a].atk || 0) || a.localeCompare(b));
+    return bag;
+  }
+
+  function buildCityAnte(src) {
+    const hunter = !!(src && src.hunter);
+    const theirs = src && src.wager && cardDB[src.wager] ? src.wager : (src && src.ace);
+    const yours = wagerCandidates()[0] || "";
+    return {
+      player: yours || null,
+      ai: theirs || null,
+      dp: yours ? 0 : (hunter ? HUNTER_ANTE_DP : CITY_ANTE_DP),
+      city: true,
+      hunter: hunter,
+      rarity: yours ? printedRarity(yours) : "",
+      resolved: false,
+      line: "",
+    };
+  }
+
+  function cityAnteWarning(ante, src) {
+    const theirs = (ante && ante.ai) || "a card";
+    const who = src && src.name ? src.name : "They";
+    if (ante && ante.player) {
+      return "If you lose, " + ante.player + " (" + (ante.rarity || "a card") + ") leaves your collection. The deck builder can only use cards you own. Preset Yugi, Kaiba, and Joey decks are not changed. A saved deck keeps every copy it needs, and you will still have at least 40 cards. If you win, you take " + who + "'s " + theirs + ".";
+    }
+    const dp = (ante && ante.dp) || CITY_ANTE_DP;
+    return "No card can leave your collection. Taking one would drop you under 40 cards, or a saved deck still needs every spare copy. A loss costs " + dp + " Duel Points instead. Preset decks are not changed. If you win, you still take " + who + "'s " + theirs + ".";
+  }
+
+  function paintWagerArt(img, cap, name, empty) {
+    if (!img || !cap) return;
+    if (!name || !cardDB[name]) {
+      img.hidden = true;
+      img.removeAttribute("src");
+      cap.textContent = empty;
+      return;
+    }
+    img.hidden = false;
+    img.src = cardDB[name].image;
+    img.alt = name;
+    cap.textContent = name;
+  }
+
+  function openCityAnte(job) {
+    const src = job.src;
+    const ante = job.ante;
+    const title = $("wagerTitle");
+    const lead = $("wagerLead");
+    const body = $("wagerWarnBody");
+    if (title) title.textContent = src.hunter ? (src.name + " blocks the street") : (src.name + " · ante");
+    if (lead) lead.textContent = src.intro || "";
+    if (body) body.textContent = cityAnteWarning(ante, src);
+    paintWagerArt($("wagerYouArt"), $("wagerYouCap"), ante.player, (ante.dp || CITY_ANTE_DP) + " DP");
+    paintWagerArt($("wagerThemArt"), $("wagerThemCap"), ante.ai, "Their card");
+    const warn = $("wagerWarn");
+    if (warn) warn.classList.add("open");
+  }
+
+  function closeCityAnte() {
+    pendingCity = null;
+    const warn = $("wagerWarn");
+    if (warn) warn.classList.remove("open");
+  }
+
+  function confirmCityAnte() {
+    const job = pendingCity;
+    pendingCity = null;
+    const warn = $("wagerWarn");
+    if (warn) warn.classList.remove("open");
+    if (!job) return;
+    beginMatch(job.deck, job.src.id, {
+      rules: "city",
+      mode: "city",
+      field: null,
+      tourneyKey: job.src.id,
+      taunt: job.src.intro || "",
+      cityId: job.dist.id,
+      arena: job.src.arena || "",
+      cityFeatured: !!job.featured,
+      cityHunter: !!job.src.hunter,
+      cityDuelist: job.src.id,
+      copyExodia: !!job.src.copyExodia,
+      outroWin: job.src.outroWin || "",
+      outroLoss: job.src.outroLoss || "",
+      cityAnte: job.ante,
+    });
+  }
+
+  function resolveCityAnte(you) {
+    if (!state || !state.ante || !state.ante.city) return "";
+    const ante = state.ante;
+    if (ante.resolved) return ante.line || "";
+    ante.resolved = true;
+    if (you && ante.ai) {
+      const fresh = grantCards([ante.ai]);
+      ante.line = "Ante: you won " + ante.ai + (fresh.indexOf(ante.ai) >= 0 ? " · NEW" : "") + ".";
+    } else if (!you && ante.player) {
+      if (ownedCopies() <= 40) ante.line = "Ante: " + ante.player + " stayed so you can still build a 40-card deck.";
+      else {
+        ante.line = takeCard(ante.player)
+          ? "Ante: you lost " + ante.player + "."
+          : "Ante: " + ante.player + " stayed. A saved deck still needs it.";
+      }
+    } else if (!you) {
+      const pay = Math.min(wallet.coins, ante.dp || 0);
+      wallet.coins -= pay;
+      saveWallet();
+      paintWallet();
+      ante.line = pay
+        ? "Ante: no card wagered. −" + pay + " Duel Points."
+        : "Ante: no card wagered, and you had no Duel Points left.";
+    } else ante.line = "";
+    return ante.line || "";
+  }
+
+  function hunterRollId() {
+    const forced = window.__CITY_AMBUSH;
+    if (forced === "off") return "";
+    if (typeof forced === "string" && CITY_ROSTER[forced] && CITY_ROSTER[forced].hunter) return forced;
+    if (forced === "on") {
+      if (citySave) { citySave.quiet = 0; saveCity(); }
+      return Math.random() < 0.5 ? "city-seeker" : "city-ghoul";
+    }
+    if (!citySave) return "";
+    citySave.quiet = (citySave.quiet || 0) + 1;
+    const quiet = citySave.quiet;
+    let chance = 0.16;
+    if (quiet >= 3) chance = 0.4;
+    if (quiet >= 5) chance = 0.72;
+    if (Math.random() >= chance) {
+      saveCity();
+      return "";
+    }
+    citySave.quiet = 0;
+    saveCity();
+    return Math.random() < 0.5 ? "city-seeker" : "city-ghoul";
+  }
+
+  function maybeCityAmbush() {
+    if (!cityPlayerDeck()) return;
+    const id = hunterRollId();
+    if (!id) return;
+    startCityDuel(id);
   }
 
   const TOURNEY = {
@@ -3864,6 +4106,177 @@
         "Book of Secret Arts", "Book of Secret Arts",
       ],
       extra: ["Thousand-Eyes Restrict", "Thousand-Eyes Restrict"],
+    },
+  };
+
+  function cityPile(rows) {
+    const main = [];
+    (rows || []).forEach((row) => {
+      const n = row[1] || 0;
+      for (let i = 0; i < n; i++) main.push(row[0]);
+    });
+    return main;
+  }
+
+  const CITY_ROSTER = {
+    "city-joey": {
+      id: "city-joey", name: "Joey", ace: "Red-Eyes Black Dragon", arena: "joey",
+      home: "clock", featured: true, diff: 4, wager: "Red-Eyes Black Dragon",
+      intro: "Battle City rules, pal. Red-Eyes is on the line.",
+      outroWin: "Joey: \"You earned it. Don't let Kaiba hear I lost Red-Eyes.\"",
+      outroLoss: "Joey: \"Red-Eyes stays with me. Bring a stronger deck.\"",
+      main: cityPile([
+        ["Red-Eyes Black Dragon", 2], ["Time Wizard", 2], ["Baby Dragon", 3],
+        ["Gearfried the Iron Knight", 2], ["Zombyra the Dark", 1], ["Celtic Guardian", 3],
+        ["Axe Raider", 2], ["Kojikocy", 2], ["Masaki the Legendary Swordsman", 2],
+        ["Flame Manipulator", 2], ["Swordsman of Landstar", 2], ["Beaver Warrior", 2],
+        ["Hitotsu-Me Giant", 1],
+        ["Polymerization", 2], ["Sogen", 1], ["Legendary Sword", 2], ["Shield & Sword", 1],
+        ["Monster Reborn", 1], ["Pot of Greed", 1], ["Dark Hole", 1], ["Fissure", 1],
+        ["Horn of the Unicorn", 1], ["Trap Hole", 2], ["Mirror Force", 1],
+      ]),
+      extra: ["Flame Swordsman", "Flame Swordsman", "Thousand Dragon", "Thousand Dragon"],
+    },
+    "city-kaiba": {
+      id: "city-kaiba", name: "Kaiba", ace: "Blue-Eyes White Dragon", arena: "kaiba",
+      home: "corp", featured: true, diff: 7, wager: "Blue-Eyes White Dragon",
+      intro: "Battle City is my tournament. Blue-Eyes ends this.",
+      outroWin: "Kaiba: \"Hmph. Take the dragon. The finals will not be this kind.\"",
+      outroLoss: "Kaiba: \"As expected. Come back when you can keep up.\"",
+      main: cityPile([
+        ["Blue-Eyes White Dragon", 3], ["Saggi the Dark Clown", 2], ["Hitotsu-Me Giant", 2],
+        ["Battle Ox", 2], ["La Jinn the Mystical Genie of the Lamp", 2], ["Judge Man", 2],
+        ["Rude Kaiser", 2], ["Mystic Horseman", 2], ["Lesser Dragon", 2], ["Koumori Dragon", 2],
+        ["Swordstalker", 1], ["Dark Titan of Terror", 1],
+        ["Polymerization", 2], ["Dragon Treasure", 3], ["Mountain", 1], ["Raigeki", 1],
+        ["Dark Hole", 1], ["Monster Reborn", 1], ["Pot of Greed", 1], ["Fissure", 2],
+        ["Change of Heart", 1], ["Trap Hole", 2], ["Mirror Force", 1], ["Horn of the Unicorn", 1],
+      ]),
+      extra: ["Blue-Eyes Ultimate Dragon", "Rabid Horseman"],
+    },
+    "city-mai": {
+      id: "city-mai", name: "Mai", ace: "Harpie Lady Sisters", arena: "mai",
+      home: "park", featured: true, diff: 4, wager: "Harpie's Feather Duster",
+      intro: "Kiss the Harpies hello. My Feather Duster is the rare you want.",
+      outroWin: "Mai: \"Fine. The Feather Duster is yours. Don't get cute.\"",
+      outroLoss: "Mai: \"Harpie Lady does not lose twice. Remember that.\"",
+      main: cityPile([
+        ["Harpie Lady", 3], ["Cyber Harpie Lady", 3], ["Harpie Lady Sisters", 2],
+        ["Skull Red Bird", 3], ["Sky Scout", 3], ["Peacock", 2], ["Blue-Winged Crown", 2],
+        ["Tyhone", 2], ["Winged Dragon, Guardian of the Fortress #1", 2], ["Queen Bird", 1],
+        ["Niwatori", 1],
+        ["Elegant Egotist", 3], ["Harpie's Feather Duster", 1], ["Mountain", 1],
+        ["Dark Hole", 1], ["Monster Reborn", 1], ["Pot of Greed", 1], ["Raigeki", 1],
+        ["Fissure", 2], ["Swords of Revealing Light", 1], ["Trap Hole", 2], ["Mirror Force", 1],
+        ["Change of Heart", 1],
+      ]),
+      extra: [],
+    },
+    "city-mako": {
+      id: "city-mako", name: "Mako", ace: "The Legendary Fisherman", arena: "mako",
+      home: "pier", featured: true, diff: 3, wager: "The Legendary Fisherman",
+      intro: "The sea swallows careless duelists. Umi is already rising.",
+      outroWin: "Mako: \"You weathered the tide. The Fisherman is yours.\"",
+      outroLoss: "Mako: \"The ocean keeps its rare. Swim back when you can.\"",
+      main: cityPile([
+        ["The Legendary Fisherman", 2], ["Suijin", 1], ["Deepsea Warrior", 2],
+        ["7 Colored Fish", 3], ["High Tide Gyojin", 3], ["Misairuzame", 2],
+        ["Bottom Dweller", 2], ["Spike Seadra", 2], ["Flying Fish", 2], ["Root Water", 2],
+        ["Jellyfish", 2], ["The Furious Sea King", 2],
+        ["Umi", 2], ["Umiiruka", 1], ["Pot of Greed", 1], ["Monster Reborn", 1], ["Dark Hole", 1],
+        ["Fissure", 2], ["Change of Heart", 1], ["Tornado Wall", 2], ["Trap Hole", 2],
+        ["Mirror Force", 1], ["Swords of Revealing Light", 1],
+      ]),
+      extra: [],
+    },
+    "city-thug": {
+      id: "city-thug", name: "Street Thug", ace: "Barrel Dragon", arena: "keith",
+      home: "works", featured: true, diff: 3, wager: "Barrel Dragon",
+      intro: "Keith ain't here. His machines are. Ante up.",
+      outroWin: "Street Thug: \"Tch. Take the Barrel Dragon and get lost.\"",
+      outroLoss: "Street Thug: \"Machines don't lose. Your rare stays in the warehouse.\"",
+      main: cityPile([
+        ["Barrel Dragon", 2], ["Slot Machine", 1], ["Launcher Spider", 1],
+        ["Robotic Knight", 3], ["Giga-Tech Wolf", 3], ["Ground Attacker Bugroth", 3],
+        ["Steel Ogre Grotto #1", 2], ["Steel Ogre Grotto #2", 2], ["Steel Scorpion", 2],
+        ["Mechanical Snail", 2], ["Cannon Soldier", 2], ["Jinzo #7", 1], ["Science Soldier", 2],
+        ["7 Completed", 2], ["Machine Conversion Factory", 2], ["Malevolent Nuzzler", 1],
+        ["Pot of Greed", 1], ["Dark Hole", 1], ["Raigeki", 1], ["Fissure", 2],
+        ["Monster Reborn", 1], ["Trap Hole", 2], ["Mirror Force", 1],
+      ]),
+      extra: [],
+    },
+    "city-roba": {
+      id: "city-roba", name: "Esper Roba", ace: "Jinzo", arena: "roba",
+      home: "market", featured: true, diff: 6, wager: "Jinzo",
+      intro: "My brothers see your hand. Jinzo sees your traps.",
+      outroWin: "Esper Roba: \"You broke the act. Jinzo is yours.\"",
+      outroLoss: "Esper Roba: \"I told you I could read you. The rare stays with me.\"",
+      main: cityPile([
+        ["Jinzo", 2], ["Jinzo #7", 2], ["The Fiend Megacyber", 2], ["Psychic Kappa", 3],
+        ["The Immortal of Thunder", 2], ["Gemini Elf", 2], ["Mystical Elf", 2],
+        ["Neo the Magic Swordsman", 2], ["Magician of Faith", 2], ["Cyber Jar", 1],
+        ["Science Soldier", 2], ["Lady of Faith", 1], ["Aqua Madoor", 2],
+        ["Pot of Greed", 1], ["Dark Hole", 1], ["Monster Reborn", 1], ["Change of Heart", 1],
+        ["Fissure", 1], ["Swords of Revealing Light", 1], ["Book of Secret Arts", 2],
+        ["Trap Hole", 2], ["Gravity Bind", 2], ["Mirror Force", 1],
+        ["Spellbinding Circle", 1], ["Call of the Haunted", 1],
+      ]),
+      extra: [],
+    },
+    "city-bonz": {
+      id: "city-bonz", name: "Bonz", ace: "Pumpking the King of Ghosts", arena: "bonz",
+      home: "park", featured: false, diff: 2, wager: "Call of the Haunted",
+      intro: "The dead do not stay buried. Not in my graveyard.",
+      outroWin: "Bonz: \"You dug up my trap. Take it and leave the graves.\"",
+      outroLoss: "Bonz: \"The graveyard keeps your rare. Sleep well.\"",
+      main: cityPile([
+        ["Pumpking the King of Ghosts", 2], ["Shadow Ghoul", 2], ["Armored Zombie", 3],
+        ["Skull Servant", 3], ["The 13th Grave", 3], ["Vampire Baby", 2], ["Crass Clown", 2],
+        ["Headless Knight", 2], ["The Gross Ghost of Fled Dreams", 2], ["Dokuroyaiba", 2],
+        ["Souls of the Forgotten", 2], ["Castle of Dark Illusions", 1], ["Witty Phantom", 2],
+        ["Call of the Haunted", 2], ["Wasteland", 1], ["Monster Reborn", 1], ["Pot of Greed", 1],
+        ["Dark Hole", 1], ["Fissure", 2], ["Trap Hole", 2], ["Mirror Force", 1],
+        ["Malevolent Nuzzler", 1],
+      ]),
+      extra: [],
+    },
+    "city-ghoul": {
+      id: "city-ghoul", name: "Rare Hunter", ace: "Cannon Soldier", arena: "hunter",
+      home: "", featured: false, hunter: true, diff: 6, wager: "Change of Heart",
+      intro: "A Ghoul doesn't duel for fun. Lord Marik pays for rares like yours.",
+      outroWin: "Rare Hunter: \"You lived. Lord Marik still wants the rest of your deck.\"",
+      outroLoss: "Rare Hunter: \"The hood stays on. Marik will hear you fell.\"",
+      main: cityPile([
+        ["Cannon Soldier", 3], ["Catapult Turtle", 2], ["Hinotama Soul", 3],
+        ["Lady Assailant of Flames", 2], ["Fire Princess", 2], ["Spirit of Flames", 2],
+        ["Mr. Volcano", 1],
+        ["Ookazi", 3], ["Hinotama", 3], ["Sparks", 3], ["Final Flame", 3], ["Tremendous Fire", 2],
+        ["Goblin's Secret Remedy", 2], ["Pot of Greed", 1], ["Raigeki", 1], ["Dark Hole", 1],
+        ["Change of Heart", 1], ["Magic Cylinder", 2], ["Burning Land", 1], ["Trap Hole", 1],
+        ["Mirror Force", 1],
+      ]),
+      extra: [],
+    },
+    "city-seeker": {
+      id: "city-seeker", name: "Seeker", ace: "Exodia the Forbidden One", arena: "hunter",
+      home: "", featured: false, hunter: true, copyExodia: true, diff: 8,
+      wager: "Exodia the Forbidden One",
+      intro: "These Exodia pieces are perfect copies. Lord Marik sends his regards.",
+      outroWin: "Seeker: \"Keep the copy. The real Exodia still answers to Marik.\"",
+      outroLoss: "Seeker: \"The copies were enough. Marik will come for the rest himself.\"",
+      main: cityPile([
+        ["Exodia the Forbidden One", 1], ["Right Arm of the Forbidden One", 1],
+        ["Left Arm of the Forbidden One", 1], ["Right Leg of the Forbidden One", 1],
+        ["Left Leg of the Forbidden One", 1],
+        ["Skull Servant", 3], ["The 13th Grave", 3], ["Mystical Elf", 2],
+        ["Witch of the Black Forest", 2], ["Sangan", 2], ["Magician of Faith", 2],
+        ["Mask of Darkness", 1], ["Man-Eater Bug", 2], ["Bubonic Vermin", 2],
+        ["Pot of Greed", 3], ["Upstart Goblin", 3], ["Jar of Greed", 3], ["Backup Soldier", 2],
+        ["Monster Reborn", 1], ["Dark Hole", 1], ["Fissure", 1], ["Lightforce Sword", 1],
+        ["Mirror Force", 1],
+      ]),
+      extra: [],
     },
   };
 
@@ -5169,6 +5582,13 @@
       const paid = cardInst.raPower || 0;
       atk = paid;
       def = paid;
+    } else if (cardInst.name === "Shadow Ghoul") {
+      const owner = controllerOf(cardInst);
+      const buried = owner ? owner.gy.filter((c) => c.ref && c.ref.isMonster).length : 0;
+      atk += buried * 100;
+    } else if (cardInst.name === "Pumpking the King of Ghosts" && castleBoost()) {
+      atk += castleBoost();
+      def += castleBoost();
     }
     const raceNow = isGod(cardInst) ? cardInst.ref.race : effectiveRace(cardInst);
     if (fieldBonusOn() && cardInst.faceup !== false && !isGod(cardInst)) {
@@ -5294,7 +5714,12 @@
     return 0;
   }
 
+  function trapsSealed() {
+    return anyFaceup("Jinzo");
+  }
+
   function findSetTrap(owner, name) {
+    if (trapsSealed()) return -1;
     for (let i = 0; i < ZONES; i++) {
       const st = owner.spells[i];
       if (!st || st.faceup || st.name !== name) continue;
@@ -5382,6 +5807,7 @@
   }
 
   function gravityBindBlocks(monster) {
+    if (trapsSealed()) return false;
     if (!monster || isGod(monster) || !anyFaceup("Gravity Bind")) return false;
     return (monster.ref.level || 0) >= 4;
   }
@@ -5392,18 +5818,19 @@
   }
 
   function jarBlocks(monster) {
+    if (trapsSealed()) return false;
     if (!monster || isGod(monster) || !anyFaceup("Dragon Capture Jar")) return false;
     return effectiveRace(monster) === "Dragon";
   }
 
   function tribeBlocks(monster) {
-    if (!monster || isGod(monster)) return false;
+    if (trapsSealed() || !monster || isGod(monster)) return false;
     const race = effectiveRace(monster);
     return faceups("The Regulation of Tribe").some((x) => x.st.tribe && x.st.tribe === race);
   }
 
   function spellbindBlocks(monster) {
-    if (!monster || isGod(monster)) return false;
+    if (trapsSealed() || !monster || isGod(monster)) return false;
     return faceups("Spellbinding Circle").some((x) => x.st.bindUid === monster.uid);
   }
 
@@ -5557,6 +5984,9 @@
     if (!target || amount <= 0) return;
     target.lp += amount;
     log(whoName(target) + " gains " + amount + " Life Points" + (why ? " (" + why + ")" : "") + ".");
+    if (!state || state.winner || why === "Fire Princess") return;
+    const n = (target.monsters || []).filter((m) => m && m.faceup && m.name === "Fire Princess").length;
+    if (n) hurt(oppOf(target), 500 * n, "Fire Princess");
   }
 
   function discardRandom(owner, n, depth) {
@@ -5753,6 +6183,10 @@
   async function activateManualTrap(owner, index) {
     const st = owner.spells[index];
     if (!st || st.faceup) return false;
+    if (st.ref.isTrap && trapsSealed()) {
+      if (owner === state.player) toast("Jinzo negates Trap Cards.");
+      return false;
+    }
     if (st.ref.isTrap && st.setTurn === state.turnCount) {
       if (owner === state.player) toast("Can't activate a trap the turn it was Set.");
       return false;
@@ -5953,7 +6387,12 @@
       return false;
     }
     popSpell(owner, index);
-    picks.sort((a, b) => (b.ref.atk || 0) - (a.ref.atk || 0));
+    picks.sort((a, b) => {
+      const ae = /Forbidden One/.test(a.name) ? 1 : 0;
+      const be = /Forbidden One/.test(b.name) ? 1 : 0;
+      if (ae !== be) return be - ae;
+      return (b.ref.atk || 0) - (a.ref.atk || 0);
+    });
     picks.slice(0, 3).forEach((card) => {
       const gi = owner.gy.findIndex((c) => c.uid === card.uid);
       if (gi >= 0) owner.hand.push(owner.gy.splice(gi, 1)[0]);
@@ -6239,6 +6678,10 @@
     if (!state || state.winner) return;
     let m = summoner.monsters[slot];
     if (!m) return;
+    if (m.faceup && m.name === "Jinzo" && !m.jinzoLogged) {
+      m.jinzoLogged = true;
+      log("Jinzo negates every Trap Card.");
+    }
     if (kind === "set") {
       const foe = oppOf(summoner);
       const eye = findSetTrap(foe, "Shadow of Eyes");
@@ -6715,6 +7158,17 @@
         discardRandom(owner, 2);
         hurt(foe, 800, m.name);
       } else log("Fire Sorcerer needs 2 cards in hand.");
+    } else if (m.name === "Lady Assailant of Flames") {
+      log("Lady Assailant of Flames flips!");
+      const dumped = [];
+      for (let n = 0; n < 3 && owner.deck.length; n++) {
+        const card = owner.deck.pop();
+        if (!owner.banished) owner.banished = [];
+        owner.banished.push(card);
+        dumped.push(card.name);
+      }
+      if (dumped.length) log("Banished " + dumped.join(", ") + ".");
+      hurt(foe, 800, m.name);
     } else log(m.name + " flips.");
   }
 
@@ -6917,6 +7371,8 @@
       else if (st.name === "Royal Command") use = state.player.monsters.some((m) => m && !m.faceup);
       else if (st.name === "Light of Intervention") use = true;
       else if (st.name === "Messenger of Peace") use = false;
+      else if (st.name === "Tornado Wall") use = anyFaceup("Umi");
+      else if (st.name === "Backup Soldier") use = ai.gy.filter((c) => c.ref && c.ref.isMonster).length >= 5;
       else if (MAIN_TRAPS.has(st.name) || trapKind(st) === "continuous") use = st.name === "Gift of The Mystical Elf" || st.name === "Dust Tornado";
       if (!use) continue;
       await activateManualTrap(ai, i);
@@ -6927,6 +7383,12 @@
 
   async function aiUsePersistent(ai) {
     if (!state || state.winner) return;
+    const field = ai.hand.find((c) => c.name === "Umi") || ai.hand.find((c) => isFieldSpell(c));
+    if (field && !ai.spells.some((st) => st && st.faceup && isFieldSpell(st))) {
+      await activatePersistentSpell(ai, field.uid);
+      if (!state || state.winner) return;
+      await aiGlance("ai", "st", 0);
+    }
     const tryName = async (name, ok) => {
       if (!ok) return;
       const hi = ai.hand.findIndex((c) => c.name === name);
@@ -6943,7 +7405,7 @@
     await tryName("Vengeful Bog Spirit", true);
     await tryName("Toll", foeAtk && ai.lp > 1500);
     await tryName("Gravekeeper's Servant", state.player.deck && true);
-    await tryName("Burning Land", state.player.spells.some((st) => st && st.faceup && isFieldSpell(st)));
+    await tryName("Burning Land", aiProfile().style === "burn" || state.player.spells.some((st) => st && st.faceup && isFieldSpell(st)));
   }
 
   function auditCardEffects() {
@@ -7114,6 +7576,53 @@
     p.summonedThisTurn.add(card.uid);
     if (need > 0 && p === state.player && state.mode !== "puzzle") noteTributeSummon();
     return { slot: slot, monster: p.monsters[slot] };
+  }
+
+  function megacyberReady(owner) {
+    if (!owner || !state) return false;
+    const opp = occupied(oppOf(owner).monsters).length;
+    const us = occupied(owner.monsters).length;
+    return opp >= us + 2 && firstEmpty(owner.monsters) >= 0;
+  }
+
+  function specialFromHand(owner, handIdx) {
+    const card = owner.hand[handIdx];
+    const slot = firstEmpty(owner.monsters);
+    if (!card || slot < 0) return -1;
+    owner.hand.splice(handIdx, 1);
+    owner.monsters[slot] = monFrom(card, { summonWay: "special", arrived: state.turnCount, faceup: true, position: "atk" });
+    owner.summonedThisTurn.add(card.uid);
+    log(whoName(owner) + " Special Summons " + card.name + ".");
+    onSummonWindow(owner, slot, "special");
+    return slot;
+  }
+
+  function tributeBurn(owner, hostIdx, tribIdx, mode) {
+    const host = owner.monsters[hostIdx];
+    const trib = owner.monsters[tribIdx];
+    if (!state || state.winner || !host || !trib || hostIdx === tribIdx || !host.faceup) return false;
+    if (mode === "catapult" && host.turtleTurn === state.turnCount) return false;
+    const atk = trib.faceup === false ? (trib.ref.atk || 0) : getStats(trib).atk;
+    log(whoName(owner) + " tributes " + trib.name + ".");
+    sendMonsterToGY(owner, tribIdx);
+    if (!owner.monsters[hostIdx] || owner.monsters[hostIdx].uid !== host.uid) return false;
+    if (mode === "catapult") {
+      host.turtleTurn = state.turnCount;
+      hurt(oppOf(owner), Math.floor(atk / 2), "Catapult Turtle");
+    } else hurt(oppOf(owner), 500, "Cannon Soldier");
+    return true;
+  }
+
+  async function playerTributeBurn(hostIdx, mode) {
+    if (!state || state.winner) return;
+    const owner = state.player;
+    const rows = [];
+    owner.monsters.forEach((m, i) => { if (m && i !== hostIdx) rows.push({ i: i, label: m.name }); });
+    if (!rows.length) { toast("You need another monster to tribute."); return; }
+    const n = await choose(mode === "catapult" ? "Catapult Turtle — tribute" : "Cannon Soldier — tribute", rows.map((r) => r.label).concat(["Cancel"]));
+    if (!state || n < 0 || n >= rows.length) return;
+    tributeBurn(owner, hostIdx, rows[n].i, mode);
+    render();
   }
 
   function setSpellTrap(p, handIdx) {
@@ -7336,6 +7845,22 @@
           onSummonWindow(owner, slot, "special");
         }
       }
+    } else if (name === "Ookazi") {
+      hurt(foe, 800, name);
+    } else if (name === "Hinotama") {
+      hurt(foe, 500, name);
+    } else if (name === "Sparks") {
+      hurt(foe, 200, name);
+    } else if (name === "Final Flame") {
+      hurt(foe, 600, name);
+    } else if (name === "Tremendous Fire") {
+      hurt(foe, 1000, name);
+      if (state && !state.winner) hurt(owner, 500, name);
+    } else if (name === "Upstart Goblin") {
+      drawCards(owner, 1);
+      if (state && !state.winner) heal(foe, 1000, name);
+    } else if (name === "Goblin's Secret Remedy") {
+      heal(owner, 600, name);
     }
     if (card.borrowed) hurt(owner, 2000, "Graverobber");
     owner.gy.push(strip(card));
@@ -7442,7 +7967,7 @@
 
   async function dealBattleDamage(receiver, amount, opponentAttacked) {
     if (amount <= 0 || !state || state.winner) return;
-    if (faceups("Tornado Wall").some((x) => x.owner === receiver) && anyFaceup("Umi")) {
+    if (!trapsSealed() && faceups("Tornado Wall").some((x) => x.owner === receiver) && anyFaceup("Umi")) {
       log("Tornado Wall prevents the battle damage.");
       return;
     }
@@ -7961,6 +8486,13 @@
     const main = playerMain();
 
     if (ctx.owner === "player" && ctx.where === "hand" && main) {
+      if (c.name === "The Fiend Megacyber" && megacyberReady(state.player)) {
+        add("Special Summon", () => {
+          const slot = specialFromHand(state.player, ctx.index);
+          if (slot < 0) toast("No room to Special Summon.");
+          render();
+        });
+      }
       if (c.ref.isMonster && !c.ref.isFusion && canNormalSummon(c)) {
         add("Summon ATK", () => doSummon(ctx.index, "atk", true));
         add("Summon DEF", () => doSummon(ctx.index, "def", true));
@@ -8002,6 +8534,12 @@
       }
     }
     if (ctx.owner === "player" && ctx.where === "monster" && myTurn && c.faceup) {
+      if (main && c.name === "Cannon Soldier" && state.player.monsters.some((m, i) => m && i !== ctx.index)) {
+        add("Tribute a monster (500)", () => { playerTributeBurn(ctx.index, "cannon"); });
+      }
+      if (main && c.name === "Catapult Turtle" && c.turtleTurn !== state.turnCount && state.player.monsters.some((m, i) => m && i !== ctx.index)) {
+        add("Tribute a monster (half ATK)", () => { playerTributeBurn(ctx.index, "catapult"); });
+      }
       if (main && c.name === "Time Wizard" && !c.timeUsed) {
         add("Call Heads", () => activateTimeWizard(state.player, c.uid, "heads"));
         add("Call Tails", () => activateTimeWizard(state.player, c.uid, "tails"));
@@ -8312,6 +8850,7 @@
 
   function arenaKey() {
     if (!state) return "generic";
+    if (state.arena) return state.arena;
     const id = state.aiId || "";
     if (id === "yugi" || id === "kaiba" || id === "joey" || id === "weevil" || id === "rex" ||
         id === "mai" || id === "keith" || id === "panik" || id === "pegasus" || id === "mako" || id === "bonz") {
@@ -8688,6 +9227,7 @@
     ai.hand.forEach((c, i) => {
       if (!c.ref.isMonster || c.ref.isFusion || !canNormalSummon(c)) return;
       if (c.name === "Cocoon of Evolution") return;
+      if (aiProfile().style === "exodia" && /Forbidden One/.test(c.name)) return;
       list.push({ c: c, i: i });
     });
     return list;
@@ -8820,6 +9360,24 @@
       else await aiGlance();
       return true;
     };
+    const style = aiProfile().style;
+    if (style === "burn") {
+      const burns = ["Tremendous Fire", "Ookazi", "Final Flame", "Hinotama", "Sparks", "Goblin's Secret Remedy"];
+      for (let b = 0; b < burns.length; b++) {
+        const name = burns[b];
+        while (state && !state.winner && ai.hand.some((c) => c.name === name)) {
+          if (name === "Tremendous Fire" && ai.lp <= 600 && state.player.lp > 1000) break;
+          if (name === "Goblin's Secret Remedy") {
+            const princess = ai.monsters.some((m) => m && m.faceup && m.name === "Fire Princess");
+            if (!princess && ai.lp >= 2500) break;
+          }
+          await cast(name);
+        }
+      }
+    } else if (style === "exodia") {
+      while (state && !state.winner && ai.hand.some((c) => c.name === "Upstart Goblin")) await cast("Upstart Goblin");
+    }
+    if (!state || state.winner) return;
     const pots = ai.hand.filter((c) => c.name === "Pot of Greed").length;
     for (let i = 0; i < pots; i++) {
       if (!state || state.winner) return;
@@ -9059,7 +9617,7 @@
     const prof = aiProfile();
     const shadow = shadowMind();
     const maxSets = shadow ? 3 : (prof.trapLove >= 0.85 ? 2 : 1);
-    const order = ["Mirror Force", "Gravity Bind", "Magic Cylinder", "Spellbinding Circle", "Magical Hats", "Trap Hole", "Call of the Haunted"];
+    const order = ["Mirror Force", "Gravity Bind", "Magic Cylinder", "Tornado Wall", "Spellbinding Circle", "Magical Hats", "Trap Hole", "Call of the Haunted", "Backup Soldier", "Jar of Greed"];
     let sets = 0;
     for (let i = 0; i < order.length && sets < maxSets; i++) {
       if (firstEmpty(ai.spells) < 0) break;
@@ -9296,6 +9854,49 @@
     }
   }
 
+  async function aiMegacyber(ai) {
+    if (!state || state.winner) return;
+    const hi = ai.hand.findIndex((c) => c.name === "The Fiend Megacyber");
+    if (hi < 0 || !megacyberReady(ai)) return;
+    const slot = specialFromHand(ai, hi);
+    if (slot >= 0) await aiGlance("ai", "m", slot);
+  }
+
+  async function aiTributeBurn(ai) {
+    if (!state || state.winner || aiProfile().style !== "burn") return;
+    const turtle = ai.monsters.findIndex((m) => m && m.faceup && m.name === "Catapult Turtle" && m.turtleTurn !== state.turnCount);
+    if (turtle >= 0) {
+      let best = -1;
+      let bestAtk = -1;
+      ai.monsters.forEach((m, i) => {
+        if (!m || i === turtle) return;
+        const a = m.faceup === false ? (m.ref.atk || 0) : getStats(m).atk;
+        if (a > bestAtk) { bestAtk = a; best = i; }
+      });
+      if (best >= 0 && Math.floor(bestAtk / 2) >= 500) {
+        tributeBurn(ai, turtle, best, "catapult");
+        if (!state || state.winner) return;
+        await aiGlance();
+      }
+    }
+    for (let n = 0; n < 3; n++) {
+      if (!state || state.winner) return;
+      const host = ai.monsters.findIndex((m) => m && m.faceup && m.name === "Cannon Soldier");
+      if (host < 0) break;
+      let weak = -1;
+      let weakAtk = Infinity;
+      ai.monsters.forEach((m, i) => {
+        if (!m || i === host) return;
+        const a = m.faceup === false ? (m.ref.atk || 0) : getStats(m).atk;
+        if (a < weakAtk) { weakAtk = a; weak = i; }
+      });
+      if (weak < 0) break;
+      if (weakAtk > 1200 && state.player.lp > 1500) break;
+      tributeBurn(ai, host, weak, "cannon");
+      await aiGlance();
+    }
+  }
+
   async function runAITurn() {
     if (!state || state.winner) return;
     const gen = state.gen;
@@ -9328,7 +9929,11 @@
       if (!still()) return;
       await aiTryPoly(ai);
       if (!still()) return;
+      await aiMegacyber(ai);
+      if (!still()) return;
       await aiSummon(ai);
+      if (!still()) return;
+      await aiTributeBurn(ai);
       if (!still()) return;
       await aiTryPoly(ai);
       if (!still()) return;
@@ -9396,6 +10001,7 @@
     el.vsRules.textContent = (state.shadow ? "Shadow Game · " : "") +
       (state.rematch ? "Rematch · " : "") +
       vsRulesName +
+      (state.cityHunter ? " · Rare Hunter" : "") +
       (state.field ? " · " + state.field : "");
     paintAnte();
     const quote = state.taunt || DUEL_QUOTES[state.aiId] || "The duel begins now.";
@@ -9431,6 +10037,7 @@
     const duelRulesName = state.rules === "dk" ? "Duelist Kingdom" : state.rules === "city" ? "Battle City" : "Classic";
     log(state.playerName + " vs " + state.aiName + " — " + duelRulesName);
     if (state.rules === "city") log("4000 Life Points. No attacks on the first turn. A Fusion Monster cannot attack the turn it is summoned.");
+    if (state.copyExodia) log("Seeker's Exodia pieces are Ghoul copies. They still win the duel if all five meet in his hand.");
     else if (state.rules === "classic") log("No attacks on the first turn.");
     if (fieldBonusOn()) log("Field: " + state.field + " (+30% matching Types)");
     else if (state.field) log("Field: " + state.field);
@@ -9743,7 +10350,7 @@
 
   function beginMatch(playerDeck, aiId, opts) {
     opts = opts || {};
-    const aiSrc = DECKS[aiId] || TOURNEY[aiId];
+    const aiSrc = DECKS[aiId] || TOURNEY[aiId] || CITY_ROSTER[aiId];
     if (!playerDeck || !aiSrc) return;
     let aiDeck = { id: aiSrc.id, name: aiSrc.name, ace: aiSrc.ace, main: aiSrc.main.slice(), extra: (aiSrc.extra || []).slice() };
     if (opts.rematch) aiDeck = strengthenDeck(aiDeck, opts.tourneyKey || aiId);
@@ -9771,6 +10378,13 @@
       mode: opts.mode || "free",
       tourneyKey: opts.tourneyKey || null,
       cityId: opts.cityId || "",
+      arena: opts.arena || "",
+      cityFeatured: !!opts.cityFeatured,
+      cityHunter: !!opts.cityHunter,
+      cityDuelist: opts.cityDuelist || "",
+      copyExodia: !!opts.copyExodia,
+      outroWin: opts.outroWin || "",
+      outroLoss: opts.outroLoss || "",
       stake: opts.stake || 0,
       rematch: !!opts.rematch,
       chipHunt: !!opts.chipHunt,
@@ -9799,7 +10413,13 @@
       prompt: false,
     };
     stampFoils(state.player);
+    if (state.copyExodia) {
+      state.ai.deck.forEach((c) => {
+        if (EXODIA_NAMES.indexOf(c.name) >= 0) c.exodiaCopy = true;
+      });
+    }
     if (state.shadow) state.shadowStake = pickShadowStake(aiDeck);
+    else if (opts.cityAnte) state.ante = opts.cityAnte;
     else if (state.mode === "tourney" && settings.ante) state.ante = pickMatchAnte(aiDeck);
     resetBoardMemory();
     if (!drawCards(state.player, 5)) return;
@@ -10968,6 +11588,8 @@
 
   function canDirectAttack(monster, defOwner) {
     if (!monster) return false;
+    if (monster.name === "Zombyra the Dark") return false;
+    if (monster.name === "Jinzo #7" || monster.name === "Ooguchi") return true;
     if (isToon(monster)) return !defOwner.monsters.some((m) => m && isToon(m));
     return occupied(defOwner.monsters).length === 0;
   }
@@ -12026,7 +12648,10 @@
 
   function copiesReserved() {
     const need = {};
-    savedDecks.forEach((deck) => {
+    const lists = savedDecks.slice();
+    const cityDeck = citySave && citySave.deck;
+    if (cityDeck && cityDeck.id !== "yugi" && cityDeck.id !== "kaiba" && cityDeck.id !== "joey") lists.push(cityDeck);
+    lists.forEach((deck) => {
       const counts = countNames((deck.main || []).concat(deck.extra || []));
       Object.keys(counts).forEach((n) => { need[n] = Math.max(need[n] || 0, counts[n]); });
     });
@@ -14689,6 +15314,10 @@
   $("rematchShadow").addEventListener("click", () => setShadowWanted(!shadowWanted));
   $("shadowYes").addEventListener("click", () => confirmShadow());
   $("shadowNo").addEventListener("click", () => closeShadowWarn());
+  $("wagerYes").addEventListener("click", () => confirmCityAnte());
+  $("wagerNo").addEventListener("click", () => closeCityAnte());
+  $("wagerWarn").addEventListener("click", (e) => { if (e.target === $("wagerWarn")) closeCityAnte(); });
+  if ($("btnCitySide")) $("btnCitySide").addEventListener("click", () => startCityDuel("city-bonz"));
   $("shadowWarn").addEventListener("click", (e) => { if (e.target === $("shadowWarn")) closeShadowWarn(); });
   $("tradeSheetClose").addEventListener("click", () => closeTradeSheet());
   $("tradeOverlay").addEventListener("click", (e) => { if (e.target === $("tradeOverlay")) closeTradeSheet(); });
@@ -15018,7 +15647,8 @@
   CITY_DISTRICTS.forEach((dist) => {
     if (!dist || citySeen[dist.id] || !dist.links || !dist.links.length) console.error("Bad Battle City district", dist && dist.id);
     citySeen[dist.id] = true;
-    if (dist.who !== "rival" && !TOURNEY[dist.who]) console.error("Battle City duelist missing", dist.who);
+    const face = CITY_ROSTER[dist.who];
+    if (!face || !face.featured || face.home !== dist.id) console.error("Battle City featured duelist missing", dist && dist.id);
     dist.links.forEach((link) => {
       const other = CITY_DISTRICTS.find((row) => row.id === link);
       if (!other || other.links.indexOf(dist.id) < 0) console.error("Battle City street is one-way", dist.id, link);
@@ -15035,6 +15665,35 @@
     });
   }
   if (Object.keys(cityReach).length !== CITY_DISTRICTS.length) console.error("A Battle City district is cut off");
+  const cityHomes = {};
+  Object.keys(CITY_ROSTER).forEach((id) => {
+    const src = CITY_ROSTER[id];
+    const main = src.main || [];
+    if (main.length !== 40) console.error("Battle City deck is not 40 cards", id, main.length);
+    const counts = {};
+    main.concat(src.extra || []).forEach((name) => {
+      if (!cardDB[name]) console.error("Battle City card missing", id, name);
+      counts[name] = (counts[name] || 0) + 1;
+      if (counts[name] > 3) console.error("Battle City deck has more than 3", id, name);
+    });
+    if (!src.wager || !cardDB[src.wager]) console.error("Battle City wager missing", id);
+    else if (main.indexOf(src.wager) < 0 && (src.extra || []).indexOf(src.wager) < 0) console.error("Battle City wager is not in the deck", id);
+    if (!src.intro || !src.outroWin || !src.outroLoss) console.error("Battle City lines missing", id);
+    if (src.featured) {
+      if (cityHomes[src.home]) console.error("Two featured duelists in one district", src.home);
+      cityHomes[src.home] = id;
+    }
+    if (src.hunter && rarityRank(src.wager) < 4 && !(cardDB[src.wager] && cardDB[src.wager].reward)) {
+      console.error("Rare Hunter wager is not rare enough", id, src.wager);
+    }
+  });
+  if (Object.keys(cityHomes).length !== LOCATOR_GOAL) console.error("Locator duelists do not cover the city");
+  const seeker = CITY_ROSTER["city-seeker"];
+  if (!seeker || !seeker.copyExodia || !EXODIA_NAMES.every((name) => seeker.main.indexOf(name) >= 0)) {
+    console.error("Exodia Rare Hunter is incomplete");
+  }
+  if (!CITY_ROSTER["city-ghoul"] || !CITY_ROSTER["city-ghoul"].hunter) console.error("Burn Rare Hunter is missing");
+  if (!CITY_ROSTER["city-bonz"] || CITY_ROSTER["city-bonz"].featured) console.error("Bonz should not award a locator");
   if (lifeStart("city") !== 4000 || lifeStart("classic") !== 8000 || lifeStart("dk") !== 2000) console.error("Life Point totals drifted");
   if (STARTER_NAMES.length !== 20 || STARTER_NAMES.some((n) => !cardDB[n])) console.error("Starter collection is incomplete");
   if (PUZZLES.length < 10) console.error("Puzzle pool is short", PUZZLES.length);
@@ -15148,8 +15807,24 @@
       locators: locatorList(),
       revealed: finalsRevealed(),
       deck: cityPlayerDeck() ? cityPlayerDeck().name : "",
+      quiet: citySave ? (citySave.quiet || 0) : 0,
       districts: CITY_DISTRICTS.map((d) => ({ id: d.id, name: d.name, links: d.links.slice(), who: d.who })),
+      duelists: Object.keys(CITY_ROSTER).map((id) => {
+        const src = CITY_ROSTER[id];
+        return {
+          id: id, name: src.name, home: src.home || "", featured: !!src.featured,
+          hunter: !!src.hunter, wager: src.wager, diff: src.diff, ace: src.ace,
+        };
+      }),
     }),
+    cityAnte: (id) => {
+      const src = CITY_ROSTER[id];
+      if (!src) return null;
+      const ante = buildCityAnte(src);
+      return { you: ante.player || "", them: ante.ai || "", dp: ante.dp || 0, rarity: ante.rarity || "" };
+    },
+    confirmCity: () => confirmCityAnte(),
+    declineCity: () => closeCityAnte(),
     lifeStart: (mode) => lifeStart(mode),
     awardLocator: (id) => awardLocator(id),
     moveCity: (id) => moveCity(id),

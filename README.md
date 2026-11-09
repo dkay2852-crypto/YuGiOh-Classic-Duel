@@ -113,11 +113,24 @@ The first visit opens a short rules screen. Those rules apply only to duels star
 - A Fusion Monster cannot attack the turn it is summoned
 - Duelist Kingdom's arena bonus does not apply
 
-The map is Domino at night: Clock Tower, KaibaCorp, Domino Park, Domino Pier, the Industrial Quarter, and Shopping Street, with the KaibaCorp blimp in the sky. You start at the Clock Tower. Tap a neighboring district to walk the street. Tap the district you are standing in to duel. The opponents for now are duelists you have already beaten. Street duelists, card wagers, and Rare Hunters are not in this part.
+The map is Domino at night: Clock Tower, KaibaCorp, Domino Park, Domino Pier, the Industrial Quarter, and Shopping Street, with the KaibaCorp blimp in the sky. You start at the Clock Tower. Tap a neighboring district to walk the street. Tap the district you are standing in to duel the duelist who holds it.
 
-The first win in a district earns its locator card. The count is on the map and on your profile (`locators` in `classicDuel_profile_v1`). Where you are standing, whether you have read the rules, and the deck you picked are stored in `classicDuel_battlecity_v1`. An older save with none of that starts at the Clock Tower with zero locator cards. Six cards light the blimp. The finals themselves stay locked: "Finals coming soon."
+Each district has one featured duelist, with a classic-era deck, a short line before the duel, and another after:
 
-Free Duel, the tournament, puzzles, rematches, and trades keep their own rules. Reset Progress clears locator cards and the city deck. Your name and portrait stay.
+- Clock Tower — Joey. Warriors, Time Wizard, and Red-Eyes. He antes Red-Eyes Black Dragon.
+- KaibaCorp — Kaiba. Blue-Eyes. The hardest street duel. He antes a Blue-Eyes White Dragon.
+- Domino Park — Mai. Harpies. She antes Harpie's Feather Duster. Bonz is in the park graves, with zombies, and he does not hold a locator card.
+- Domino Pier — Mako. The ocean, Umi, and The Legendary Fisherman.
+- Industrial Quarter — a street thug running Keith's machines. He antes Barrel Dragon.
+- Shopping Street — Esper Roba. Jinzo and his psychic act. He antes Jinzo.
+
+The first win against that district's featured duelist earns its locator card. Beating Bonz, a rematch, or a Rare Hunter does not. The count is on the map and on your profile (`locators` in `classicDuel_profile_v1`). Where you are standing, whether you have read the rules, the deck you picked, and how long it has been since a Rare Hunter appeared are stored in `classicDuel_battlecity_v1`. An older save with none of that starts at the Clock Tower with zero locator cards. Six cards light the blimp. The finals themselves stay locked: "Finals coming soon."
+
+**Ante.** Before every street duel you see both cards and confirm. The winner takes the loser's rarest card that can leave your collection. The opponent puts up the signature card above. A loss removes your card from the collection, so the deck builder can no longer use that copy. Preset Yugi, Kaiba, and Joey decks are never edited. A copy any saved deck still needs is left alone, and so is the deck you picked for the city. You are never left with fewer than 40 cards. If nothing can be wagered, the stake is Duel Points instead (more, against a Rare Hunter).
+
+**Rare Hunters.** Walking the streets sometimes brings a hooded Ghoul. One burns with direct damage and Cannon Soldier. Seeker plays Exodia: the five pieces are Ghoul copies, Backup Soldier can pull the limbs back, and they still win the duel if all five meet in his hand. They wager a rarer card (Change of Heart, or Exodia the Forbidden One) and pay more Duel Points. Their lines name Marik. Marik himself is not in this part.
+
+Free Duel, the tournament, puzzles, rematches, trades, and Shadow Game keep their own rules. Reset Progress clears locator cards and the city deck. Your name and portrait stay.
 
 ## Main menu
 
