@@ -100,11 +100,30 @@ Equip spells in these decks: Legendary Sword (Warrior), Book of Secret Arts (Spe
 
 Other effects used by the decks include Dark Hole, Raigeki, Monster Reborn, Pot of Greed, Fissure, Change of Heart, Trap Hole, Mirror Force, Swords of Revealing Light, Shield & Sword, Magical Hats, Kuriboh, and Panther Warrior’s attack tribute.
 
+## Battle City
+
+Beating Pegasus unlocks **Battle City** on the main menu. The night skyline can still be chosen in Settings after that win. Before it, the button stays locked.
+
+The first visit opens a short rules screen. Those rules apply only to duels started from the Domino City map:
+
+- 4000 Life Points
+- Level 5–6 needs 1 tribute, Level 7 or higher needs 2, and Egyptian Gods need 3
+- The first player does not draw, and neither duelist can attack on that turn
+- Polymerization can use monsters in the hand or on the field
+- A Fusion Monster cannot attack the turn it is summoned
+- Duelist Kingdom's arena bonus does not apply
+
+The map is Domino at night: Clock Tower, KaibaCorp, Domino Park, Domino Pier, the Industrial Quarter, and Shopping Street, with the KaibaCorp blimp in the sky. You start at the Clock Tower. Tap a neighboring district to walk the street. Tap the district you are standing in to duel. The opponents for now are duelists you have already beaten. Street duelists, card wagers, and Rare Hunters are not in this part.
+
+The first win in a district earns its locator card. The count is on the map and on your profile (`locators` in `classicDuel_profile_v1`). Where you are standing, whether you have read the rules, and the deck you picked are stored in `classicDuel_battlecity_v1`. An older save with none of that starts at the Clock Tower with zero locator cards. Six cards light the blimp. The finals themselves stay locked: "Finals coming soon."
+
+Free Duel, the tournament, puzzles, rematches, and trades keep their own rules. Reset Progress clears locator cards and the city deck. Your name and portrait stay.
+
 ## Main menu
 
-The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Both menus use that same layout, so the picture stays visible behind the buttons. Settings can switch back to the castle; Battle City stays locked until Pegasus is beaten. Animations Off stops the glow. Card art for the duel intros is stored in `art/`.
+The menu is one screen. Duel Points and the current run's Star Chips sit in the top corners. Before Pegasus is beaten, the background is his castle. After that win, it switches to the Battle City night skyline: the KaibaCorp blimp sits in the open sky above the buttons, and the lit towers show through the translucent menu. Both menus use that same layout, so the picture stays visible behind the buttons. Settings can switch the picture back to the castle. Battle City on the menu stays locked until Pegasus is beaten, then opens the Domino City map. Animations Off stops the glow. Card art for the duel intros is stored in `art/`.
 
-**Profile** on the main menu is your duelist: a portrait, a name, and the record (wins, losses, win rate, tournaments cleared, cards and set completion, foils, best puzzle streak, Shadow Game wins, trades, and the weekly challenge streak). Titles unlock from that record — Duelist Kingdom Champion and Pegasus Slayer from beating Pegasus, Foil Collector, Puzzle Master, Deck Master, Rematch King, Shadow Game Winner, Trader, Weekly Streak, and others. A toast names a title when it unlocks. The one you equip shows on the profile and on the VS screen. An older save counts duelists you already beat, a cleared tournament, foils you own, a saved deck, and the puzzle streak. New title counts start at zero until you earn them. The name and portrait stay if you reset progress. Stored in `classicDuel_profile_v1`.
+**Profile** on the main menu is your duelist: a portrait, a name, and the record (wins, losses, win rate, tournaments cleared, cards and set completion, foils, best puzzle streak, Shadow Game wins, trades, the weekly challenge streak, and locator cards). Titles unlock from that record — Duelist Kingdom Champion and Pegasus Slayer from beating Pegasus, Foil Collector, Puzzle Master, Deck Master, Rematch King, Shadow Game Winner, Trader, Weekly Streak, Battle City Finalist from 6 locator cards, and others. A toast names a title when it unlocks. The one you equip shows on the profile and on the VS screen. An older save counts duelists you already beat, a cleared tournament, foils you own, a saved deck, and the puzzle streak. New title counts start at zero until you earn them. The name and portrait stay if you reset progress. Stored in `classicDuel_profile_v1`.
 
 Settings has Mute, a music slider, and a sound-effects slider. The menu, a normal duel, and a Pegasus duel each loop an original piece made in the browser. Nothing plays until the first tap, so iPhone can start the audio.
 

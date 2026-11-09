@@ -287,6 +287,95 @@
     #btnProfile .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.3 0-8 1.7-8 4v2h16v-2c0-2.3-4.7-4-8-4z'/></svg>"); }
     #btnHowto .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0c040' d='M7 3h8l5 5v13H7V3zm7 1.5V9h4.5L14 4.5zM9 12h8v1.6H9V12zm0 3.2h8v1.6H9v-1.6z'/></svg>"); }
     #btnSettings .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23c9a6ff' d='M10.2 2h3.6l.4 2.2a7.6 7.6 0 0 1 2.1 1.2l2.1-1 1.8 3.1-1.8 1.4a7.8 7.8 0 0 1 0 2.2l1.8 1.4-1.8 3.1-2.1-1a7.6 7.6 0 0 1-2.1 1.2L13.8 22h-3.6l-.4-2.2a7.6 7.6 0 0 1-2.1-1.2l-2.1 1-1.8-3.1 1.8-1.4a7.8 7.8 0 0 1 0-2.2L2 9.5l1.8-3.1 2.1 1a7.6 7.6 0 0 1 2.1-1.2L10.2 2zM12 9.2A2.8 2.8 0 1 0 12 14.8 2.8 2.8 0 0 0 12 9.2z'/></svg>"); }
+    #btnCity .m-ico::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%239fd0ff' d='M4 11c0-4 3.6-7 8-7s8 3 8 7-3.6 6-8 6-8-2-8-6zm8 2.2c2.6 0 4.8-1 5.6-2.2H6.4c.8 1.2 3 2.2 5.6 2.2zM11 17.2h2l.8 2.8h-3.6l.8-2.8z'/></svg>"); }
+    #menu .menu-btn.city {
+      border-color: #9fd0ff;
+      box-shadow: inset 0 0 0 1px rgba(180, 220, 255, 0.28), 0 0 12px rgba(80, 140, 255, 0.22);
+    }
+    #menu .menu-btn.locked { opacity: 0.48; }
+
+    /* —— Battle City map —— */
+    #city, #cityrules { padding: 8px 10px 8px; gap: 6px; background: #070b16; }
+    #cityrules { padding-top: 12px; }
+    #cityrules h2, #city .island-top h2 { margin: 0; color: var(--gold); font-size: 1.12rem; line-height: 1.05; }
+    #cityrules .deck-head p { margin: 2px 0 0; color: var(--muted); font-size: 0.72rem; }
+    #cityrules .scroll {
+      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+      font-size: 0.88rem; line-height: 1.4; color: var(--cream);
+    }
+    #cityrules .scroll p { margin: 0 0 8px; }
+    #city .footer-row .menu-btn, #cityrules .menu-btn { min-height: 40px; }
+    .city-map {
+      flex: 1; min-height: 0; position: relative;
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(126, 176, 255, 0.55);
+      background:
+        linear-gradient(180deg, rgba(5, 10, 24, 0.15) 0%, rgba(5, 10, 24, 0.28) 42%, rgba(5, 8, 18, 0.72) 100%),
+        url("art/battle-city.jpg") center 22% / cover no-repeat;
+      box-shadow: inset 0 0 28px rgba(0, 0, 0, 0.45);
+    }
+    .city-streets { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .city-streets line {
+      stroke: rgba(240, 200, 90, 0.92);
+      stroke-width: 1.15;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 1.5px rgba(240, 192, 64, 0.9));
+    }
+    .city-streets line.sky { stroke: rgba(160, 210, 255, 0.7); stroke-dasharray: 1.6 1.3; }
+    html[data-anim="off"] .city-streets line { filter: none; }
+    .city-node, .city-blimp {
+      position: absolute; z-index: 1;
+      transform: translate(-50%, -50%);
+      display: flex; align-items: center; gap: 5px;
+      padding: 3px 6px; border-radius: 8px; text-align: left;
+      border: 1px solid rgba(170, 200, 255, 0.45);
+      background: rgba(6, 10, 24, 0.84);
+      color: var(--cream);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.38);
+    }
+    .city-node { width: 30%; max-width: 158px; min-height: 44px; }
+    .city-node img {
+      width: 20px; height: 28px; object-fit: cover; border-radius: 3px;
+      flex-shrink: 0; background: #111; border: 1px solid rgba(212, 160, 23, 0.35);
+    }
+    .city-node .copy, .city-blimp .copy { min-width: 0; flex: 1; }
+    .city-node .nm, .city-blimp .nm {
+      font-weight: 700; font-size: 0.68rem; color: var(--gold); line-height: 1.1;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .city-node .sub, .city-blimp .sub {
+      font-size: 0.58rem; color: #f4efe2; line-height: 1.15;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .city-node.here {
+      border-color: #f0c040; z-index: 2;
+      box-shadow: 0 0 0 2px rgba(240, 192, 64, 0.9), 0 0 16px rgba(240, 192, 64, 0.35);
+    }
+    .city-node.near { border-color: rgba(140, 206, 255, 0.95); }
+    .city-node.far { opacity: 0.78; }
+    .city-node.got { box-shadow: inset 3px 0 0 #8ce6aa; }
+    .city-blimp {
+      width: 62%; max-width: 240px; min-height: 42px; z-index: 2;
+      border-color: rgba(150, 180, 220, 0.4);
+      background: rgba(8, 14, 28, 0.78);
+    }
+    .city-blimp .mark {
+      width: 28px; height: 18px; flex-shrink: 0; border-radius: 9px 9px 4px 4px;
+      background: linear-gradient(180deg, #d7e6ff, #6d8fbf 55%, #2a3d5c);
+      box-shadow: 0 2px 0 #1a2436;
+      position: relative;
+    }
+    .city-blimp .mark::after {
+      content: ""; position: absolute; left: 11px; top: 16px; width: 6px; height: 7px;
+      background: #c5d4ea; clip-path: polygon(0 0, 100% 0, 50% 100%);
+    }
+    .city-blimp.locked { filter: grayscale(0.55) brightness(0.85); }
+    .city-blimp.revealed {
+      filter: none; border-color: #f0c040;
+      box-shadow: 0 0 16px rgba(240, 192, 64, 0.45);
+      background: linear-gradient(180deg, rgba(48, 36, 12, 0.92), rgba(10, 12, 24, 0.9));
+    }
+
     @keyframes menuBreathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
     @keyframes menuGlow {
       0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,220,140,0.15), 0 0 6px rgba(120,60,200,0.18); }
@@ -2038,6 +2127,7 @@
       <p class="rules-hint" id="rulesHint">Free Duel: 8000 LP · tributes · no attack on the first turn</p>
       <div class="menu-actions">
         <button type="button" class="menu-btn tourney" id="btnTourney"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Tournament</span><span class="m-go" aria-hidden="true">›</span></button>
+        <button type="button" class="menu-btn city" id="btnCity"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Battle City</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn puzzle" id="btnPuzzle"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Daily Puzzle</span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn" id="btnChallenges"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Challenges<span class="menu-badge" id="challengeBadge" hidden>0</span></span><span class="m-go" aria-hidden="true">›</span></button>
         <button type="button" class="menu-btn primary" id="btnStart"><span class="m-ico" aria-hidden="true"></span><span class="m-label">Free Duel</span><span class="m-go" aria-hidden="true">›</span></button>
@@ -2113,6 +2203,43 @@
         <button type="button" class="menu-btn" id="btnIslandDeck">Deck</button>
         <button type="button" class="menu-btn" id="btnIslandRetire">Retire</button>
         <button type="button" class="menu-btn" id="btnIslandMenu">Main Menu</button>
+      </div>
+    </section>
+
+    <section id="cityrules" class="screen" hidden>
+      <div class="deck-head">
+        <h2>Battle City Rules</h2>
+        <p>These rules apply only to duels on the Domino City map.</p>
+      </div>
+      <div class="scroll">
+        <p><strong>4000 Life Points.</strong> Both duelists start at 4000.</p>
+        <p><strong>Tributes.</strong> Level 5–6 needs 1 tribute. Level 7 or higher needs 2. Egyptian Gods need 3.</p>
+        <p><strong>First turn.</strong> The first player does not draw, and neither player can attack on that turn.</p>
+        <p><strong>Fusion.</strong> Polymerization can use monsters in your hand or on the field. A Fusion Monster cannot attack the turn it is summoned.</p>
+        <p><strong>No field bonus.</strong> Duelist Kingdom's arena bonus does not apply. Field Spell cards still do.</p>
+        <p><strong>Locator cards.</strong> Walk the streets and win the duel where you stand. The first win at a district earns its locator card. Six cards reveal the KaibaCorp blimp. The finals stay locked.</p>
+      </div>
+      <button type="button" class="menu-btn primary" id="btnCityEnter">Enter Domino City</button>
+      <button type="button" class="menu-btn" id="btnCityRulesBack">Back</button>
+    </section>
+
+    <section id="city" class="screen" hidden>
+      <div class="island-top">
+        <div style="min-width:0">
+          <h2 id="cityTitle">Battle City</h2>
+          <p id="cityDeck">Pick a deck</p>
+        </div>
+        <div class="island-pills">
+          <div class="chip-pill" id="cityLocators">◆ 0 / 6</div>
+          <div class="dp-pill" id="cityDp">0 DP</div>
+        </div>
+      </div>
+      <p class="island-note" id="cityNote"></p>
+      <div class="city-map" id="cityMap" role="group" aria-label="Domino City"></div>
+      <div class="footer-row">
+        <button type="button" class="menu-btn" id="btnCityRules">Rules</button>
+        <button type="button" class="menu-btn" id="btnCityDeck">Deck</button>
+        <button type="button" class="menu-btn" id="btnCityMenu">Main Menu</button>
       </div>
     </section>
 
@@ -2304,6 +2431,7 @@
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
         <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods, and the main menu can switch to Battle City.</p>
+        <p><strong>Battle City:</strong> After you beat Pegasus, Battle City opens the Domino City map. Walk between neighboring districts, then duel where you are standing. The opponents for now are duelists you have already beaten. The first win at a district earns its locator card. Six cards reveal the KaibaCorp blimp, which stays locked: finals coming soon. Battle City duels use their own rules: 4000 Life Points, tribute summons, no attack on the first turn, and a Fusion Monster cannot attack the turn it is summoned. Free Duel, the tournament, and puzzles are unchanged. Locator cards are kept on your profile.</p>
         <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set, in a grid. Owned cards show their art. Extra copies show a count (x2, x3). Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Search and Filters narrow the grid by name, type, attribute, monster type, level, ATK, DEF, rarity, foil, and owned or new. Sort by name, ATK, DEF, level, or newest. Tap a card to see each version you own. From the deck builder, that same card can be added or removed.</p>
         <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips stay put, except when the path is clear and you still need chips for Pegasus. Those island rematches pay the same chips as the first win, and a loss costs 1.</p>
         <p><strong>Ante:</strong> Settings has an Ante rule, off unless you turn it on. Before a tournament duel, you and the opponent each put up one card. You put up a spare card from your collection. The last copy a saved deck needs stays, and preset Yugi, Kaiba, and Joey decks are never edited. The winner takes the loser's card. Both cards show before the duel, and the result shows after.</p>
@@ -2714,7 +2842,7 @@
   <div class="overlay" id="confirmOverlay">
     <div class="sheet">
       <h3 id="confirmTitle">Reset progress?</h3>
-      <p id="confirmBody">This erases the tournament, Duel Points, the puzzle streak, weekly challenges, trades, titles, duel record, saved decks, and your collection. Your duelist name and portrait stay. A starter pile of commons comes back. Settings stay.</p>
+      <p id="confirmBody">This erases the tournament, Battle City progress, Duel Points, the puzzle streak, weekly challenges, trades, titles, duel record, saved decks, and your collection. Your duelist name and portrait stay. A starter pile of commons comes back. Settings stay.</p>
       <div class="actions">
         <button type="button" id="confirmYes">Reset</button>
         <button type="button" class="ghost" id="confirmNo">Cancel</button>
@@ -3215,6 +3343,383 @@
   /* Stakes sum to 8, so 2 + one win each = 10 and the castle opens. */
   const STAKES = { weevil: 1, rex: 1, mai: 1, keith: 2, panik: 1, rival: 2 };
 
+  const CITY_KEY = "classicDuel_battlecity_v1";
+  const LOCATOR_GOAL = 6;
+  const CITY_BLIMP = { x: 50, y: 13 };
+  const CITY_DISTRICTS = [
+    { id: "clock", name: "Clock Tower", street: "Central plaza", x: 50, y: 56, who: "weevil", links: ["corp", "pier", "works", "market"] },
+    { id: "corp", name: "KaibaCorp", street: "Tower street", x: 22, y: 33, who: "mai", links: ["clock", "park"] },
+    { id: "park", name: "Domino Park", street: "North green", x: 78, y: 33, who: "rival", links: ["corp", "pier"] },
+    { id: "pier", name: "Domino Pier", street: "Harbor street", x: 82, y: 58, who: "rex", links: ["clock", "park"] },
+    { id: "works", name: "Industrial Quarter", street: "West warehouses", x: 18, y: 58, who: "keith", links: ["clock", "market"] },
+    { id: "market", name: "Shopping Street", street: "South arcade", x: 50, y: 82, who: "panik", links: ["clock", "works"] },
+  ];
+  let citySave = null;
+  let cityRulesFromMap = false;
+
+  function defaultCity() {
+    return { version: 1, place: "clock", seenRules: false, deck: null };
+  }
+
+  function cityDistrict(id) {
+    return CITY_DISTRICTS.find((d) => d.id === id) || null;
+  }
+
+  function locatorList() {
+    if (!profile || !Array.isArray(profile.locators)) return [];
+    const out = [];
+    profile.locators.forEach((id) => {
+      if (cityDistrict(id) && out.indexOf(id) < 0 && out.length < LOCATOR_GOAL) out.push(id);
+    });
+    return out;
+  }
+
+  function finalsRevealed() {
+    return locatorList().length >= LOCATOR_GOAL;
+  }
+
+  function saveCity() {
+    if (!citySave) return;
+    if (!persist(CITY_KEY, citySave)) toast("Couldn't save Battle City.");
+  }
+
+  function loadCity() {
+    citySave = defaultCity();
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem(CITY_KEY) || "null"); } catch (e) { raw = null; }
+    if (!raw || typeof raw !== "object") return;
+    if (cityDistrict(raw.place)) citySave.place = raw.place;
+    if (raw.seenRules === true) citySave.seenRules = true;
+    if (raw.deck && typeof raw.deck === "object") {
+      const deck = normalizeDeck(raw.deck);
+      if (deck) {
+        deck.main = deck.main.filter((name) => !!cardDB[name]);
+        deck.extra = deck.extra.filter((name) => !!cardDB[name]);
+        if (deck.main.length) citySave.deck = deck;
+      }
+    }
+  }
+
+  function cityPlayerDeck() {
+    const saved = citySave && citySave.deck;
+    if (!saved || !saved.main || !saved.main.length) return null;
+    if (DECKS[saved.id]) {
+      const d = DECKS[saved.id];
+      return { id: d.id, name: d.name, ace: d.ace, main: d.main.slice(), extra: (d.extra || []).slice() };
+    }
+    return {
+      id: saved.id,
+      name: saved.name,
+      ace: saved.ace || pickAce(saved.main, saved.extra),
+      main: saved.main.slice(),
+      extra: (saved.extra || []).slice(),
+    };
+  }
+
+  function cityDuelistReady(key) {
+    if (pegasusBeaten()) return key === "rival" || !!TOURNEY[key];
+    if (!wallet || !Array.isArray(wallet.cleared)) return false;
+    return wallet.cleared.indexOf(key) >= 0;
+  }
+
+  function cityOpponent(dist) {
+    if (!dist || !cityDuelistReady(dist.who)) return null;
+    if (dist.who === "rival") {
+      const id = (wallet && wallet.rivalId) || (tourney && tourney.rival) || "kaiba";
+      const face = DECKS[id] || DECKS.kaiba;
+      return { key: "rival", aiId: face.id, name: face.name, ace: face.ace, taunt: rivalTaunt(face.id) };
+    }
+    const src = TOURNEY[dist.who];
+    if (!src) return null;
+    return { key: dist.who, aiId: dist.who, name: src.name, ace: src.ace, taunt: src.taunt || "" };
+  }
+
+  function awardLocator(id) {
+    if (!profile || !cityDistrict(id)) return false;
+    if (!Array.isArray(profile.locators)) profile.locators = [];
+    if (profile.locators.indexOf(id) >= 0) return false;
+    if (locatorList().length >= LOCATOR_GOAL) return false;
+    profile.locators.push(id);
+    saveProfile();
+    refreshTitles(false);
+    return true;
+  }
+
+  function showCityRules(fromMap) {
+    cityRulesFromMap = !!fromMap;
+    if (el.btnCityEnter) el.btnCityEnter.textContent = cityRulesFromMap ? "Back to the City" : "Enter Domino City";
+    showScreen("cityrules");
+  }
+
+  function enterCityFromRules() {
+    if (!pegasusBeaten()) {
+      toast("Beat Pegasus to unlock Battle City.");
+      showScreen("menu");
+      return;
+    }
+    if (!citySave) citySave = defaultCity();
+    if (!citySave.seenRules) {
+      citySave.seenRules = true;
+      saveCity();
+    }
+    showCityMap();
+  }
+
+  function leaveCityRules() {
+    if (cityRulesFromMap && pegasusBeaten()) showCityMap();
+    else showScreen("menu");
+  }
+
+  function openBattleCity() {
+    if (!pegasusBeaten()) {
+      toast("Beat Pegasus to unlock Battle City.");
+      return;
+    }
+    if (!citySave || !citySave.seenRules) {
+      showCityRules(false);
+      return;
+    }
+    showCityMap();
+  }
+
+  function openCityDecks() {
+    if (!pegasusBeaten()) {
+      toast("Beat Pegasus to unlock Battle City.");
+      return;
+    }
+    deckPickMode = "city";
+    el.tourneyRules.hidden = true;
+    el.tourneyRulesHint.hidden = true;
+    el.deckRules.textContent = "Battle City · 4000 LP · tributes · Fusion cannot attack when summoned";
+    paintCustomPicker();
+    showScreen("decks");
+  }
+
+  function applyCityDeck(deck) {
+    if (!deck || !pegasusBeaten()) return;
+    const custom = String(deck.id || "").indexOf("custom:") === 0 || savedDecks.some((d) => d.id === deck.id);
+    if (custom) {
+      const issues = issuesFor(deck.main, deck.extra);
+      if (issues.length) { toast(issues[0]); return; }
+    }
+    if (!citySave) citySave = defaultCity();
+    citySave.deck = {
+      id: deck.id,
+      name: deck.name,
+      ace: deck.ace || pickAce(deck.main, deck.extra),
+      main: deck.main.slice(),
+      extra: (deck.extra || []).slice(),
+    };
+    saveCity();
+    toast(deck.name + " will duel in Battle City.");
+    showCityMap();
+  }
+
+  function cityRelation(id) {
+    if (!citySave) return "far";
+    if (citySave.place === id) return "here";
+    const here = cityDistrict(citySave.place);
+    if (here && here.links.indexOf(id) >= 0) return "near";
+    return "far";
+  }
+
+  function renderCity() {
+    if (!el.cityMap || !citySave) return;
+    const here = cityDistrict(citySave.place) || CITY_DISTRICTS[0];
+    const deck = cityPlayerDeck();
+    const count = locatorList().length;
+    if (el.cityDeck) el.cityDeck.textContent = deck ? ("4000 LP · " + deck.name) : "4000 LP · pick a deck";
+    if (el.cityLocators) el.cityLocators.textContent = "◆ " + count + " / " + LOCATOR_GOAL;
+    if (el.cityDp) el.cityDp.textContent = (wallet ? wallet.coins : 0) + " DP";
+    const bits = [];
+    if (!deck) bits.push("Pick a deck before you duel.");
+    else bits.push("You are at " + here.name + ".");
+    if (finalsRevealed()) bits.push("The KaibaCorp blimp is revealed. Finals coming soon.");
+    else bits.push(count + " of " + LOCATOR_GOAL + " locator cards. Win where you stand to take that district's card.");
+    if (el.cityNote) el.cityNote.textContent = bits.join(" ");
+    el.cityMap.innerHTML = "";
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "city-streets");
+    svg.setAttribute("viewBox", "0 0 100 100");
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.setAttribute("aria-hidden", "true");
+    const drawn = {};
+    CITY_DISTRICTS.forEach((dist) => {
+      dist.links.forEach((link) => {
+        const other = cityDistrict(link);
+        if (!other) return;
+        const key = [dist.id, other.id].sort().join("-");
+        if (drawn[key]) return;
+        drawn[key] = true;
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", String(dist.x));
+        line.setAttribute("y1", String(dist.y));
+        line.setAttribute("x2", String(other.x));
+        line.setAttribute("y2", String(other.y));
+        svg.appendChild(line);
+      });
+    });
+    if (finalsRevealed()) {
+      const corp = cityDistrict("corp");
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("class", "sky");
+      line.setAttribute("x1", String(corp.x));
+      line.setAttribute("y1", String(corp.y));
+      line.setAttribute("x2", String(CITY_BLIMP.x));
+      line.setAttribute("y2", String(CITY_BLIMP.y));
+      svg.appendChild(line);
+    }
+    el.cityMap.appendChild(svg);
+    const blimp = document.createElement("button");
+    blimp.type = "button";
+    const revealed = finalsRevealed();
+    blimp.className = "city-blimp " + (revealed ? "revealed" : "locked");
+    blimp.style.left = CITY_BLIMP.x + "%";
+    blimp.style.top = CITY_BLIMP.y + "%";
+    blimp.setAttribute("aria-label", revealed ? "KaibaCorp blimp, finals coming soon" : "KaibaCorp blimp, still hidden");
+    const mark = document.createElement("span");
+    mark.className = "mark";
+    mark.setAttribute("aria-hidden", "true");
+    const blimpCopy = document.createElement("span");
+    blimpCopy.className = "copy";
+    const blimpName = document.createElement("span");
+    blimpName.className = "nm";
+    blimpName.textContent = "KaibaCorp Blimp";
+    const blimpSub = document.createElement("span");
+    blimpSub.className = "sub";
+    blimpSub.textContent = revealed ? "Finals coming soon" : ("Locked · " + count + "/" + LOCATOR_GOAL + " locators");
+    blimpCopy.appendChild(blimpName);
+    blimpCopy.appendChild(blimpSub);
+    blimp.appendChild(mark);
+    blimp.appendChild(blimpCopy);
+    blimp.addEventListener("click", () => {
+      if (finalsRevealed()) toast("The finals are aboard the blimp. Finals coming soon.");
+      else toast("The blimp stays dark until you hold " + LOCATOR_GOAL + " locator cards.");
+    });
+    el.cityMap.appendChild(blimp);
+    CITY_DISTRICTS.forEach((dist) => {
+      const relation = cityRelation(dist.id);
+      const opp = cityOpponent(dist);
+      const got = locatorList().indexOf(dist.id) >= 0;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "city-node " + relation + (got ? " got" : "");
+      btn.style.left = dist.x + "%";
+      btn.style.top = dist.y + "%";
+      if (relation === "here") btn.setAttribute("aria-current", "true");
+      const img = document.createElement("img");
+      img.alt = "";
+      if (opp) {
+        const card = cardDB[opp.ace];
+        if (card) img.src = card.image;
+      }
+      const copy = document.createElement("span");
+      copy.className = "copy";
+      const nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = dist.name;
+      const sub = document.createElement("span");
+      sub.className = "sub";
+      if (!opp) sub.textContent = relation === "here" ? "No duelist here" : dist.street;
+      else if (relation === "here") sub.textContent = "You · " + (got ? "Rematch · " : "Duel · ") + opp.name;
+      else if (relation === "near") sub.textContent = "Walk · " + opp.name;
+      else sub.textContent = opp.name;
+      if (got && relation !== "here") sub.textContent = "◆ " + sub.textContent;
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      if (opp) btn.appendChild(img);
+      btn.appendChild(copy);
+      btn.addEventListener("click", () => moveCity(dist.id));
+      el.cityMap.appendChild(btn);
+    });
+  }
+
+  function showCityMap() {
+    if (!pegasusBeaten()) {
+      toast("Beat Pegasus to unlock Battle City.");
+      showScreen("menu");
+      return;
+    }
+    if (!citySave) citySave = defaultCity();
+    if (!cityDistrict(citySave.place)) citySave.place = "clock";
+    renderCity();
+    showScreen("city");
+  }
+
+  function moveCity(id) {
+    if (!citySave || !cityDistrict(id)) return false;
+    if (citySave.place !== id) {
+      const here = cityDistrict(citySave.place);
+      if (!here || here.links.indexOf(id) < 0) {
+        toast("Take the streets through a neighboring district.");
+        return false;
+      }
+      citySave.place = id;
+      saveCity();
+      renderCity();
+      return true;
+    }
+    startCityDuel();
+    return true;
+  }
+
+  function startCityDuel() {
+    const deck = cityPlayerDeck();
+    if (!deck) {
+      toast("Pick a deck first.");
+      openCityDecks();
+      return;
+    }
+    const custom = String(deck.id || "").indexOf("custom:") === 0;
+    if (custom) {
+      const issues = issuesFor(deck.main, deck.extra);
+      if (issues.length) { toast(issues[0]); openCityDecks(); return; }
+    }
+    const dist = cityDistrict(citySave.place);
+    const opp = cityOpponent(dist);
+    if (!opp) {
+      toast("No duelist is waiting on this street.");
+      return;
+    }
+    beginMatch(deck, opp.aiId, {
+      rules: "city",
+      mode: "city",
+      field: null,
+      tourneyKey: opp.key,
+      taunt: opp.taunt,
+      cityId: dist.id,
+    });
+  }
+
+  function finishCityDuel(you, reason) {
+    const id = (state && state.cityId) || (citySave && citySave.place) || "";
+    const dist = cityDistrict(id);
+    const points = awardMatchPoints(you);
+    const before = locatorList().length;
+    let chipLine = "No locator card this duel.";
+    if (you && dist) {
+      const fresh = awardLocator(dist.id);
+      const n = locatorList().length;
+      if (fresh && n >= LOCATOR_GOAL) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · blimp revealed. Finals coming soon.";
+      else if (fresh) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · " + dist.name;
+      else chipLine = "Locator already collected · " + before + "/" + LOCATOR_GOAL;
+    }
+    endPrimary = "city";
+    el.endTitle.textContent = you ? "Victory!" : "Defeat";
+    el.endMsg.textContent = reason;
+    el.endChips.hidden = !chipLine;
+    el.endChips.textContent = chipLine;
+    el.endPoints.hidden = !points.gain;
+    el.endPoints.textContent = pointsText(points);
+    el.endAnte.hidden = true;
+    el.endAnte.textContent = "";
+    el.btnAgain.hidden = false;
+    el.btnAgain.textContent = "Back to Domino";
+    el.btnEndMenu.hidden = false;
+    el.btnEndMenu.textContent = "Main Menu";
+    showScreen("end");
+  }
+
   const TOURNEY = {
     weevil: {
       id: "weevil", name: "Weevil", ace: "Great Moth", field: "Forest", stake: 1,
@@ -3419,7 +3924,11 @@
   const $ = (id) => document.getElementById(id);
   const el = {
     ruleClassic: $("ruleClassic"), ruleDK: $("ruleDK"), rulesHint: $("rulesHint"),
-    btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnContinue: $("btnContinue"),
+    btnStart: $("btnStart"), btnTourney: $("btnTourney"), btnCity: $("btnCity"), btnContinue: $("btnContinue"),
+    cityDeck: $("cityDeck"), cityLocators: $("cityLocators"), cityDp: $("cityDp"),
+    cityNote: $("cityNote"), cityMap: $("cityMap"),
+    btnCityRules: $("btnCityRules"), btnCityDeck: $("btnCityDeck"), btnCityMenu: $("btnCityMenu"),
+    btnCityEnter: $("btnCityEnter"), btnCityRulesBack: $("btnCityRulesBack"),
     btnShop: $("btnShop"), btnShopBack: $("btnShopBack"), shopLabel: $("shopLabel"),
     menuDp: $("menuDp"), menuChips: $("menuChips"), continueLabel: $("continueLabel"),
     setMenuCastle: $("setMenuCastle"), setMenuCity: $("setMenuCity"), menuThemeHint: $("menuThemeHint"),
@@ -3536,9 +4045,9 @@
     });
     EXODIA_NAMES.forEach((name) => { if (cardDB[name]) cardDB[name].reward = true; });
     const gods = [
-      ["Obelisk the Tormentor", 10000000, 4000, 4000, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. Unaffected by Spells and Traps. Once per turn: Tribute 2 other monsters; destroy every monster your opponent controls. Obelisk cannot attack the turn this effect is used."],
-      ["Slifer the Sky Dragon", 10000020, null, null, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. ATK and DEF equal the number of cards in your hand × 1000. A monster Summoned to your opponent in face-up Attack Position is destroyed if its ATK is less than or equal to this card. A monster Summoned in Defense Position has 0 DEF. Unaffected by Spells and Traps."],
-      ["The Winged Dragon of Ra", 10000010, null, null, "Requires 3 Tributes to Normal Summon in Classic rules, and none in Duelist Kingdom. When Summoned, pay Life Points; this card's ATK and DEF become the amount paid. Unaffected by Spells and Traps."],
+      ["Obelisk the Tormentor", 10000000, 4000, 4000, "Requires 3 Tributes to Normal Summon in Classic and Battle City, and none in Duelist Kingdom. Unaffected by Spells and Traps. Once per turn: Tribute 2 other monsters; destroy every monster your opponent controls. Obelisk cannot attack the turn this effect is used."],
+      ["Slifer the Sky Dragon", 10000020, null, null, "Requires 3 Tributes to Normal Summon in Classic and Battle City, and none in Duelist Kingdom. ATK and DEF equal the number of cards in your hand × 1000. A monster Summoned to your opponent in face-up Attack Position is destroyed if its ATK is less than or equal to this card. A monster Summoned in Defense Position has 0 DEF. Unaffected by Spells and Traps."],
+      ["The Winged Dragon of Ra", 10000010, null, null, "Requires 3 Tributes to Normal Summon in Classic and Battle City, and none in Duelist Kingdom. When Summoned, pay Life Points; this card's ATK and DEF become the amount paid. Unaffected by Spells and Traps."],
     ];
     gods.forEach((row) => {
       cardDB[row[0]] = makeCard(row[0], row[1], "Effect Monster", "Divine-Beast", "DIVINE", 10, row[2], row[3], row[4], 1);
@@ -3567,7 +4076,7 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile", "challenges", "trade"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "city", "cityrules", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile", "challenges", "trade"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -3756,7 +4265,7 @@
       el.setMenuCity.classList.toggle("on", theme === "city");
       el.setMenuCity.disabled = !beaten;
       el.menuThemeHint.textContent = beaten
-        ? "Castle or the Battle City skyline. Switch any time."
+        ? "Castle or the Battle City skyline. Battle City on the menu opens Domino."
         : "Battle City unlocks after you beat Pegasus.";
     }
     applyAnimMode();
@@ -3786,6 +4295,11 @@
     const chips = tourney && typeof tourney.chips === "number" ? tourney.chips : 0;
     if (el.menuChips) el.menuChips.textContent = groupNum(chips);
     paintChallengeBadge();
+    if (el.btnCity) {
+      const open = pegasusBeaten();
+      el.btnCity.classList.toggle("locked", !open);
+      el.btnCity.setAttribute("aria-disabled", open ? "false" : "true");
+    }
   }
 
   function setMenuTheme(mode) {
@@ -4277,6 +4791,7 @@
     if (tourney) persist(TOURNEY_KEY, tourney);
     if (challengeSave) persist(CHALLENGE_KEY, challengeSave);
     if (tradeSave) persist(TRADE_KEY, tradeSave);
+    if (citySave) persist(CITY_KEY, citySave);
   }
 
   function cardLine(c, stats) {
@@ -4425,10 +4940,16 @@
 
   function oppOf(p) { return p === state.player ? state.ai : state.player; }
 
+  function lifeStart(mode) {
+    if (mode === "dk") return 2000;
+    if (mode === "city") return 4000;
+    return 8000;
+  }
+
   function makePlayer(def, rules) {
     const mode = rules || rulesMode;
     return {
-      lp: mode === "classic" ? 8000 : 2000,
+      lp: lifeStart(mode),
       deck: shuffle(def.main.map(inst)),
       extra: def.extra.map(inst),
       hand: [], gy: [],
@@ -4566,7 +5087,7 @@
   }
 
   function openingTurn() {
-    return !!(state && state.rules === "classic" && state.firstTurn && state.turnCount === 1);
+    return !!(state && state.firstTurn && state.turnCount === 1 && (state.rules === "classic" || state.rules === "city"));
   }
 
   function fieldBonusOn() {
@@ -4600,6 +5121,10 @@
     const msg = reason || (you ? state.playerName + " wins the duel." : state.aiName + " wins the duel.");
     if (state.mode === "tourney") {
       finishTourneyDuel(you, msg);
+      return;
+    }
+    if (state.mode === "city") {
+      finishCityDuel(you, msg);
       return;
     }
     if (state.mode === "puzzle") {
@@ -4896,6 +5421,7 @@
     if (!state || !monster) return "Cannot attack";
     if (monster.position !== "atk" || !monster.faceup) return "Cannot attack";
     if (openingTurn()) return "No first-turn attack";
+    if (state.rules === "city" && monster.ref && monster.ref.isFusion && owner.summonedThisTurn.has(monster.uid)) return "Fusion cannot attack";
     if (monster.obeliskSpent === state.turnCount) return "Obelisk cannot attack";
     if (owner.attackedThisTurn.has(monster.uid)) return "Already attacked";
     if (swordsUp(defender)) return "Swords of Revealing Light";
@@ -6554,6 +7080,7 @@
     owner.summonedThisTurn.add(fusion.uid);
     owner.gy.push(strip(poly));
     log(whoName(owner) + " Fusion Summons " + fusion.name + "!");
+    if (state.rules === "city") log(fusion.name + " cannot attack this turn.");
     if (owner === state.player && state.mode !== "puzzle") noteFusionSummon();
     return true;
   }
@@ -6864,6 +7391,7 @@
         owner.monsters[babyIdx] = monFrom(td, { justFusion: true });
         owner.summonedThisTurn.add(td.uid);
         log("Baby Dragon grows into Thousand Dragon!");
+        if (state.rules === "city") log("Thousand Dragon cannot attack this turn.");
       }
     } else {
       let total = 0;
@@ -7835,11 +8363,10 @@
     el.plExtra.textContent = pl.extra.length;
     el.aiExtra.textContent = ai.extra.length;
     const shadowTag = state.shadow ? "Shadow · " : "";
+    const rulesTag = state.rules === "dk" ? "Duelist Kingdom" : state.rules === "city" ? "Battle City" : "Classic Rules";
     el.fieldTag.textContent = shadowTag + (fieldBonusOn()
       ? "Field: " + state.field + " · +30% " + (FIELD_TYPES[state.field] || []).join(", ")
-      : (state.field
-        ? "Field: " + state.field
-        : (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom")));
+      : (state.field ? "Field: " + state.field : rulesTag));
     const who = state.turn === "player" ? "YOUR TURN" : state.aiName.toUpperCase();
     el.phaseLabel.textContent = who + " · " + (PHASE_LABEL[state.phase] || "").toUpperCase();
     renderZones(el.aiST, ai.spells, "ai", "st");
@@ -8865,9 +9392,10 @@
       el.vsPTitle.textContent = titleName || "";
     }
     if (el.vsPArt && el.vsPArt.parentElement) el.vsPArt.parentElement.classList.toggle("has-title", !!titleName);
+    const vsRulesName = state.rules === "dk" ? "Duelist Kingdom" : state.rules === "city" ? "Battle City" : "Classic Rules";
     el.vsRules.textContent = (state.shadow ? "Shadow Game · " : "") +
       (state.rematch ? "Rematch · " : "") +
-      (state.rules === "classic" ? "Classic Rules" : "Duelist Kingdom") +
+      vsRulesName +
       (state.field ? " · " + state.field : "");
     paintAnte();
     const quote = state.taunt || DUEL_QUOTES[state.aiId] || "The duel begins now.";
@@ -8900,8 +9428,10 @@
     if (!state || state.winner) return;
     if ($("duel").classList.contains("active")) return;
     showScreen("duel");
-    log(state.playerName + " vs " + state.aiName + " — " + (state.rules === "classic" ? "Classic" : "Duelist Kingdom"));
-    if (state.rules === "classic") log("No attacks on the first turn.");
+    const duelRulesName = state.rules === "dk" ? "Duelist Kingdom" : state.rules === "city" ? "Battle City" : "Classic";
+    log(state.playerName + " vs " + state.aiName + " — " + duelRulesName);
+    if (state.rules === "city") log("4000 Life Points. No attacks on the first turn. A Fusion Monster cannot attack the turn it is summoned.");
+    else if (state.rules === "classic") log("No attacks on the first turn.");
     if (fieldBonusOn()) log("Field: " + state.field + " (+30% matching Types)");
     else if (state.field) log("Field: " + state.field);
     if (state.mode === "tourney" && state.rematch) {
@@ -9240,6 +9770,7 @@
       field: field,
       mode: opts.mode || "free",
       tourneyKey: opts.tourneyKey || null,
+      cityId: opts.cityId || "",
       stake: opts.stake || 0,
       rematch: !!opts.rematch,
       chipHunt: !!opts.chipHunt,
@@ -9285,6 +9816,7 @@
       id: d.id, name: d.name, ace: d.ace,
       main: d.main.slice(), extra: d.extra.slice(),
     };
+    if (deckPickMode === "city") { applyCityDeck(deck); return; }
     if (deckPickMode === "swap") { applyRunDeck(deck); return; }
     if (deckPickMode === "rematch" && pendingRematch) {
       const key = pendingRematch;
@@ -9555,6 +10087,8 @@
       const owned = "Collection: " + ownedKinds() + " cards.";
       const lead = deckPickMode === "tourney"
         ? "A legal saved deck enters the tournament."
+        : deckPickMode === "city"
+          ? "This deck fights in Domino City under Battle City rules."
         : deckPickMode === "swap"
           ? "This run uses the deck you pick. Chips and progress stay."
           : deckPickMode === "rematch"
@@ -9608,7 +10142,7 @@
       const duel = document.createElement("button");
       duel.type = "button";
       duel.className = "primary";
-      duel.textContent = deckPickMode === "tourney" ? "Enter" : deckPickMode === "swap" ? "Use" : "Duel";
+      duel.textContent = deckPickMode === "tourney" ? "Enter" : deckPickMode === "swap" || deckPickMode === "city" ? "Use" : "Duel";
       duel.disabled = issues.length > 0;
       duel.addEventListener("click", () => startCustom(deck));
       const edit = document.createElement("button");
@@ -9649,6 +10183,7 @@
       main: deck.main.slice(),
       extra: deck.extra.slice(),
     };
+    if (deckPickMode === "city") { applyCityDeck(built); return; }
     if (deckPickMode === "swap") { applyRunDeck(built); return; }
     if (deckPickMode === "rematch" && pendingRematch) {
       const key = pendingRematch;
@@ -11951,7 +12486,7 @@
       name: "Duelist", avatar: "yugi", title: "",
       wins: 0, losses: 0, tournaments: 0, pegasusWins: 0, rematchWins: 0, cleanWins: 0,
       shadowWins: 0, trades: 0, challengeStreak: 0,
-      bestStreak: 0, announced: {},
+      bestStreak: 0, announced: {}, locators: [],
     };
   }
 
@@ -12003,6 +12538,7 @@
     { id: "shadow", name: "Shadow Game Winner", need: "Win a Shadow Game", test: () => profile && profile.shadowWins > 0 },
     { id: "trader", name: "Trader", need: "Complete 3 trades", test: () => profile && profile.trades >= 3 },
     { id: "weekstreak", name: "Weekly Streak", need: "Finish every weekly challenge, two weeks in a row", test: () => (profile && profile.challengeStreak >= 2) || (challengeSave && challengeSave.bestStreak >= 2) },
+    { id: "locator", name: "Battle City Finalist", need: "Collect 6 locator cards", test: () => locatorList().length >= 6 },
   ];
 
   function saveProfile() {
@@ -12019,7 +12555,7 @@
         profile.pegasusWins += 1;
         if (state.mode === "tourney" && !state.rematch) profile.tournaments += 1;
       }
-      const start = state.rules === "classic" ? 8000 : 2000;
+      const start = lifeStart(state.rules);
       if (state.player && state.player.lp * 2 >= start) profile.cleanWins += 1;
       if (state.shadow) profile.shadowWins += 1;
     } else profile.losses += 1;
@@ -12074,6 +12610,14 @@
         if (typeof raw[key] === "number" && isFinite(raw[key]) && raw[key] > 0) profile[key] = Math.floor(raw[key]);
       });
       if (raw.announced && typeof raw.announced === "object") profile.announced = raw.announced;
+      profile.locators = [];
+      if (Array.isArray(raw.locators)) {
+        raw.locators.forEach((id) => {
+          if (typeof id === "string" && cityDistrict(id) && profile.locators.indexOf(id) < 0 && profile.locators.length < LOCATOR_GOAL) {
+            profile.locators.push(id);
+          }
+        });
+      }
     } else {
       profile.wins = (wallet.cleared || []).length;
       profile.tournaments = pegasusBeaten() ? 1 : 0;
@@ -12124,6 +12668,7 @@
       ["Shadow wins", String(profile.shadowWins || 0)],
       ["Trades", String(profile.trades || 0)],
       ["Challenge streak", String(challengeSave ? (challengeSave.streak || 0) : (profile.challengeStreak || 0))],
+      ["Locator cards", locatorList().length + " / " + LOCATOR_GOAL],
     ];
     if (el.profileStats) {
       el.profileStats.innerHTML = "";
@@ -12258,7 +12803,7 @@
   }
 
   function awardMatchPoints(you) {
-    const key = state && state.mode === "tourney" ? (state.tourneyKey || "weevil") : ((state && state.aiId) || "yugi");
+    const key = state && (state.mode === "tourney" || state.mode === "city") ? (state.tourneyKey || state.aiId || "weevil") : ((state && state.aiId) || "yugi");
     const rematch = !!(state && state.rematch);
     const shadow = !!(state && state.shadow);
     if (shadow && !you) {
@@ -12269,7 +12814,7 @@
     if (you && shadow) base = Math.round(base * SHADOW_PAY);
     let bonus = 0;
     if (you && state && state.player) {
-      const start = state.rules === "classic" ? 8000 : 2000;
+      const start = lifeStart(state.rules);
       if (state.player.lp * 2 >= start) bonus = Math.round(base * 0.5);
     }
     const gain = base + bonus;
@@ -13376,6 +13921,7 @@
     puzzleSave = { lastSolved: "", streak: 0, claimed: "" };
     challengeSave = freshChallenges();
     tradeSave = freshTrade();
+    citySave = defaultCity();
     if (profile) {
       const name = profile.name;
       const avatar = profile.avatar;
@@ -13391,6 +13937,7 @@
     const okProfile = profile ? persist(PROFILE_KEY, profile) : true;
     const okChallenge = persist(CHALLENGE_KEY, challengeSave);
     const okTrade = persist(TRADE_KEY, tradeSave);
+    const okCity = persist(CITY_KEY, null);
     paintNewBadge();
     refreshContinue();
     syncFL();
@@ -13400,7 +13947,7 @@
     if ($("binder").classList.contains("active")) renderBinder();
     if ($("rematch").classList.contains("active")) renderRematch();
     closeConfirm();
-    toast(okT && okC && okD && okW && okP && okProfile && okChallenge && okTrade ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
+    toast(okT && okC && okD && okW && okP && okProfile && okChallenge && okTrade && okCity ? "Progress reset. Starter cards restored." : "Couldn't clear every save.");
   }
 
   function setRules(mode) {
@@ -13617,7 +14164,7 @@
     if (state.shadow) bumpChallenge("shadow1", 1);
     if (state.rematch) bumpChallenge("rematch1", 1);
     if (state.mode === "tourney") bumpChallenge("tourney2", 1);
-    const start = state.rules === "classic" ? 8000 : 2000;
+    const start = lifeStart(state.rules);
     if (state.player && state.player.lp * 2 >= start) bumpChallenge("half", 1);
   }
 
@@ -14246,6 +14793,12 @@
     paintCustomPicker();
     showScreen("decks");
   });
+  if (el.btnCity) el.btnCity.addEventListener("click", () => openBattleCity());
+  if (el.btnCityEnter) el.btnCityEnter.addEventListener("click", () => enterCityFromRules());
+  if (el.btnCityRulesBack) el.btnCityRulesBack.addEventListener("click", () => leaveCityRules());
+  if (el.btnCityRules) el.btnCityRules.addEventListener("click", () => showCityRules(true));
+  if (el.btnCityDeck) el.btnCityDeck.addEventListener("click", () => openCityDecks());
+  if (el.btnCityMenu) el.btnCityMenu.addEventListener("click", () => showScreen("menu"));
   el.btnTourney.addEventListener("click", () => {
     deckPickMode = "tourney";
     el.tourneyRules.hidden = false;
@@ -14331,6 +14884,7 @@
   el.buildOverlay.addEventListener("click", (e) => { if (e.target === el.buildOverlay) closeBuildSheet(); });
   el.btnDeckBack.addEventListener("click", () => {
     pendingRematch = null;
+    if (deckPickMode === "city") { showCityMap(); return; }
     if (deckPickMode === "swap" && tourney) { showIsland(); return; }
     showScreen("menu");
   });
@@ -14373,6 +14927,13 @@
       }
       return;
     }
+    if (state && state.mode === "city") {
+      if (confirm("Return to Domino City? This duel will not count.")) {
+        abandon();
+        showCityMap();
+      }
+      return;
+    }
     if (confirm("Return to the main menu? This duel will end.")) {
       abandon();
       showScreen("menu");
@@ -14381,6 +14942,7 @@
   el.btnAgain.addEventListener("click", () => {
     if (endPrimary === "pack") { abandon(); openPrize(); return; }
     if (endPrimary === "map") { abandon(); showIsland(); return; }
+    if (endPrimary === "city") { abandon(); showCityMap(); return; }
     if (endPrimary === "puzzle") {
       const puzzle = state && state.puzzle;
       abandon();
@@ -14421,6 +14983,7 @@
   loadChallenges();
   loadTrades();
   loadProfile();
+  loadCity();
   savesReady = true;
   paintNewBadge();
   syncUnlocksFromTourney();
@@ -14450,6 +15013,29 @@
   });
   const stakeSum = PATH.reduce((n, k) => n + (STAKES[k] || 0), 0);
   if (STAR_START + stakeSum !== STAR_CASTLE) console.error("Star chip path does not reach the castle", STAR_START + stakeSum);
+  if (CITY_DISTRICTS.length !== LOCATOR_GOAL) console.error("Battle City locator districts", CITY_DISTRICTS.length);
+  const citySeen = {};
+  CITY_DISTRICTS.forEach((dist) => {
+    if (!dist || citySeen[dist.id] || !dist.links || !dist.links.length) console.error("Bad Battle City district", dist && dist.id);
+    citySeen[dist.id] = true;
+    if (dist.who !== "rival" && !TOURNEY[dist.who]) console.error("Battle City duelist missing", dist.who);
+    dist.links.forEach((link) => {
+      const other = CITY_DISTRICTS.find((row) => row.id === link);
+      if (!other || other.links.indexOf(dist.id) < 0) console.error("Battle City street is one-way", dist.id, link);
+    });
+  });
+  const cityReach = { clock: true };
+  const cityQueue = ["clock"];
+  while (cityQueue.length) {
+    const hop = cityQueue.pop();
+    const hopDist = CITY_DISTRICTS.find((row) => row.id === hop);
+    if (!hopDist) continue;
+    hopDist.links.forEach((link) => {
+      if (!cityReach[link]) { cityReach[link] = true; cityQueue.push(link); }
+    });
+  }
+  if (Object.keys(cityReach).length !== CITY_DISTRICTS.length) console.error("A Battle City district is cut off");
+  if (lifeStart("city") !== 4000 || lifeStart("classic") !== 8000 || lifeStart("dk") !== 2000) console.error("Life Point totals drifted");
   if (STARTER_NAMES.length !== 20 || STARTER_NAMES.some((n) => !cardDB[n])) console.error("Starter collection is incomplete");
   if (PUZZLES.length < 10) console.error("Puzzle pool is short", PUZZLES.length);
   const puzzleIds = {};
@@ -14557,6 +15143,17 @@
     safeAnte: () => safeAnteNames(),
     chipHunt: () => chipHunt(),
     menuTheme: () => menuTheme(),
+    city: () => ({
+      place: citySave ? citySave.place : "",
+      locators: locatorList(),
+      revealed: finalsRevealed(),
+      deck: cityPlayerDeck() ? cityPlayerDeck().name : "",
+      districts: CITY_DISTRICTS.map((d) => ({ id: d.id, name: d.name, links: d.links.slice(), who: d.who })),
+    }),
+    lifeStart: (mode) => lifeStart(mode),
+    awardLocator: (id) => awardLocator(id),
+    moveCity: (id) => moveCity(id),
+    showCity: () => openBattleCity(),
     dailyDeal: () => {
       const deal = dailyDeal();
       return deal ? { name: deal.name, price: deal.price, rarity: deal.rarity, foil: deal.foil || "", date: deal.date } : null;
