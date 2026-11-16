@@ -1,0 +1,10 @@
+{
+  "name": "yugioh-classic-duel",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/monster-effects.test.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^24.15.0"
+  }
+}
