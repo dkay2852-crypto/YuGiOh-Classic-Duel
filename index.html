@@ -5669,14 +5669,14 @@
     });
   }
 
-  function sendMonsterToGY(p, idx) {
+  function sendMonsterToGY(p, idx, how) {
     const m = p.monsters[idx];
     if (!m) return null;
     detachEquips(m);
     p.monsters[idx] = null;
     const gone = strip(m);
     p.gy.push(gone);
-    afterMonsterLeft(p, m);
+    afterMonsterLeft(p, m, how || "leave");
     return m;
   }
 
@@ -5689,8 +5689,8 @@
     }
     if (p === state.player && state.mode !== "puzzle") state.monstersLost = (state.monstersLost || 0) + 1;
     fxShatter(p, "m", idx);
-    sendMonsterToGY(p, idx);
     log(m.name + " is destroyed.");
+    sendMonsterToGY(p, idx, battleKill ? "battle" : "effect");
   }
 
   function destroyAllMonsters(p) {
@@ -5921,7 +5921,7 @@
     if (st.name === "Mask of Dispel") { /* the curse leaves with the card */ }
   }
 
-  function afterMonsterLeft(owner, monster) {
+  function afterMonsterLeft(owner, monster, how) {
     if (!monster || !state) return;
     faceups("Call of the Haunted").forEach((x) => {
       if (x.st.hauntUid === monster.uid && !x.st.leaving) sendSpellToGY(x.owner, x.index);
@@ -5929,7 +5929,7 @@
     faceups("Spellbinding Circle").forEach((x) => {
       if (x.st.bindUid === monster.uid && !x.st.leaving) sendSpellToGY(x.owner, x.index);
     });
-    if (monster.name === "The Immortal of Thunder" && monster.flipDone) {
+    if (monster.name === "The Immortal of Thunder" && monster.flipDone && !monster.flipSkipped) {
       owner.lp = Math.max(0, owner.lp - 5000);
       log("The Immortal of Thunder costs 5000 Life Points.");
       checkLP();
@@ -5958,6 +5958,275 @@
       owner.lp = Math.max(0, owner.lp - 300 * n);
       log("Skull Invitation — " + whoName(owner) + " takes " + (300 * n) + ".");
     }
+    queueLeave(owner, monster, how || "leave");
+  }
+
+  // Sent from the field to the Graveyard. Sangan and Witch use the classic
+  // lines (1000 ATK / 1500 DEF). Battle recruiters only answer a battle send.
+  const GY_SEARCH = {
+    "Sangan": { stat: "atk", max: 1000 },
+    "Witch of the Black Forest": { stat: "def", max: 1500 },
+  };
+  const BATTLE_RECRUIT = {
+    "Mystic Tomato": "DARK",
+    "Giant Rat": "EARTH",
+    "Shining Angel": "LIGHT",
+    "Mother Grizzly": "WATER",
+    "Flying Kamakiri #1": "WIND",
+    "UFO Turtle": "FIRE",
+  };
+
+  function queueLeave(owner, monster, how) {
+    if (!state || !owner || !monster) return;
+    if (!state.leaveQ) state.leaveQ = [];
+    state.leaveQ.push({ owner: owner, monster: monster, how: how || "leave" });
+    if (!state.leaveRun) state.leaveRun = pumpLeaves();
+  }
+
+  async function pumpLeaves() {
+    while (state && state.leaveQ && state.leaveQ.length) {
+      const item = state.leaveQ.shift();
+      try {
+        await resolveLeave(item.owner, item.monster, item.how);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    if (state && !state.winner) render();
+    if (state) state.leaveRun = null;
+    if (state && state.leaveQ && state.leaveQ.length) state.leaveRun = pumpLeaves();
+  }
+
+  function leavesDone() {
+    return (state && state.leaveRun) || Promise.resolve();
+  }
+
+  function printedStat(card, stat) {
+    const ref = (card && card.ref) || {};
+    const n = ref[stat];
+    return typeof n === "number" ? n : 0;
+  }
+
+  function deckMonsterChoices(owner, pred) {
+    const seen = {};
+    const out = [];
+    (owner.deck || []).forEach((c) => {
+      if (!c || !c.ref || !c.ref.isMonster || c.ref.isFusion || seen[c.name]) return;
+      if (!pred(c)) return;
+      seen[c.name] = true;
+      out.push(c);
+    });
+    return out;
+  }
+
+  function monsterLabel(c) {
+    return c.name + " (" + printedStat(c, "atk") + "/" + printedStat(c, "def") + ")";
+  }
+
+  function aiPickMonster(cards, stat) {
+    return cards.slice().sort((a, b) => {
+      const as = printedStat(a, stat || "atk");
+      const bs = printedStat(b, stat || "atk");
+      if (bs !== as) return bs - as;
+      return (printedStat(b, "atk") + printedStat(b, "def")) - (printedStat(a, "atk") + printedStat(a, "def"));
+    })[0];
+  }
+
+  function takeDeckCard(owner, card) {
+    const i = owner.deck.findIndex((c) => c && card && c.uid === card.uid);
+    if (i < 0) return null;
+    return owner.deck.splice(i, 1)[0];
+  }
+
+  function haltBattle(why) {
+    if (!state || state.battleOver) return;
+    state.battleOver = true;
+    log(why);
+    if (state.phase === "battle") {
+      state.phase = "main2";
+      state.pending = null;
+      log("The Battle Phase ends.");
+    }
+  }
+
+  async function searchFromDeck(owner, source, pred, stat) {
+    const targets = deckMonsterChoices(owner, pred);
+    if (!targets.length) {
+      log(source + " has no valid target.");
+      return null;
+    }
+    let pick = null;
+    if (owner === state.player) {
+      targets.sort((a, b) => a.name.localeCompare(b.name));
+      const i = await choose(source + " — add 1 monster to your hand", targets.map(monsterLabel));
+      if (!state || state.winner || i < 0 || i >= targets.length) return null;
+      pick = targets[i];
+    } else pick = aiPickMonster(targets, stat);
+    const card = takeDeckCard(owner, pick);
+    if (!card) return null;
+    owner.hand.push(card);
+    shuffle(owner.deck);
+    log(source + " adds " + card.name + " to " + (owner === state.player ? "your" : whoName(owner) + "'s") + " hand. The Deck is shuffled.");
+    return card;
+  }
+
+  function summonMonsterFrom(owner, card, faceup, pos) {
+    const slot = firstEmpty(owner.monsters);
+    if (slot < 0) return -1;
+    owner.monsters[slot] = monFrom(card, {
+      position: pos || "atk", faceup: faceup !== false, summonWay: "special", arrived: state.turnCount,
+    });
+    owner.summonedThisTurn.add(card.uid);
+    onSummonWindow(owner, slot, "special");
+    return slot;
+  }
+
+  async function recruitFromDeck(owner, source, pred) {
+    if (firstEmpty(owner.monsters) < 0) return false;
+    const targets = deckMonsterChoices(owner, pred);
+    if (!targets.length) return false;
+    let pick = null;
+    if (owner === state.player) {
+      targets.sort((a, b) => a.name.localeCompare(b.name));
+      const labels = targets.map(monsterLabel).concat(["Don't summon"]);
+      const i = await choose(source + " — Special Summon", labels);
+      if (!state || state.winner || i < 0 || i >= targets.length) return false;
+      pick = targets[i];
+    } else pick = aiPickMonster(targets, "atk");
+    const card = takeDeckCard(owner, pick);
+    if (!card) return false;
+    shuffle(owner.deck);
+    const slot = summonMonsterFrom(owner, card, true, "atk");
+    if (slot < 0) { owner.deck.push(card); return false; }
+    log(source + " Special Summons " + card.name + ".");
+    return true;
+  }
+
+  async function summonCopies(owner, source, name, faceup, pos) {
+    const copies = (owner.deck || []).filter((c) => c && c.name === name).length;
+    let room = 0;
+    owner.monsters.forEach((m, i) => { if (!m && !zoneBlocked(owner, i)) room++; });
+    const max = Math.min(copies, room);
+    if (!max) return 0;
+    let n = max;
+    if (owner === state.player) {
+      const labels = [];
+      for (let k = max; k >= 1; k--) labels.push("Summon " + k);
+      labels.push("Don't summon");
+      const i = await choose(source, labels);
+      if (!state || state.winner || i < 0 || i >= max) return 0;
+      n = max - i;
+    }
+    let summoned = 0;
+    for (let k = 0; k < n; k++) {
+      if (!state || state.winner) break;
+      const idx = owner.deck.findIndex((c) => c && c.name === name);
+      if (idx < 0) break;
+      const card = owner.deck.splice(idx, 1)[0];
+      const slot = summonMonsterFrom(owner, card, faceup, pos);
+      if (slot < 0) { owner.deck.push(card); break; }
+      summoned++;
+    }
+    if (summoned) {
+      shuffle(owner.deck);
+      log(source + " Special Summons " + summoned + " " + name + (summoned === 1 ? "" : "s") + ".");
+    }
+    return summoned;
+  }
+
+  async function offerRevival(owner, monster) {
+    if (!owner || owner.lp < 1000) return;
+    let pay = false;
+    if (owner === state.player) {
+      const i = await choose("Revival Jam — pay 1000 Life Points to return next Standby?", ["Pay 1000 LP", "Don't pay"]);
+      pay = i === 0;
+    } else pay = owner.lp > 1000;
+    if (!state || state.winner || !pay) return;
+    const gyCard = owner.gy.find((c) => c && c.uid === monster.uid);
+    if (!gyCard) return;
+    owner.lp -= 1000;
+    gyCard.reviveNext = true;
+    log(whoName(owner) + " pays 1000 LP. Revival Jam will return.");
+    checkLP();
+  }
+
+  function reviveWaiting(p) {
+    if (!state || !p || !p.gy) return;
+    for (let i = p.gy.length - 1; i >= 0; i--) {
+      const c = p.gy[i];
+      if (!c || !c.reviveNext) continue;
+      delete c.reviveNext;
+      const slot = firstEmpty(p.monsters);
+      if (slot < 0) {
+        log("Revival Jam has no monster zone.");
+        continue;
+      }
+      p.gy.splice(i, 1);
+      p.monsters[slot] = monFrom(c, { position: "def", faceup: true, summonWay: "special", arrived: state.turnCount });
+      p.summonedThisTurn.add(c.uid);
+      log("Revival Jam returns in Defense Position.");
+      onSummonWindow(p, slot, "special");
+      if (!state || state.winner) return;
+    }
+  }
+
+  async function spearCretin(owner) {
+    log("Spear Cretin calls a monster from each Graveyard.");
+    const sides = [owner, oppOf(owner)];
+    for (let s = 0; s < sides.length; s++) {
+      const p = sides[s];
+      if (!state || state.winner || !p) return;
+      const pool = p.gy.filter((c) => c && c.ref && c.ref.isMonster && !c.ref.isFusion);
+      if (!pool.length || firstEmpty(p.monsters) < 0) continue;
+      let pick = null;
+      if (p === state.player) {
+        const labels = pool.map(monsterLabel).concat(["Skip"]);
+        const i = await choose("Spear Cretin — Special Summon from your Graveyard", labels);
+        if (!state || state.winner || i < 0 || i >= pool.length) continue;
+        pick = pool[i];
+      } else pick = aiPickMonster(pool, "atk");
+      const gi = p.gy.findIndex((c) => c && pick && c.uid === pick.uid);
+      if (gi < 0) continue;
+      const card = p.gy.splice(gi, 1)[0];
+      const slot = summonMonsterFrom(p, card, true, "atk");
+      if (slot < 0) { p.gy.push(card); continue; }
+      log(whoName(p) + " Special Summons " + card.name + ".");
+    }
+  }
+
+  async function resolveLeave(owner, monster, how) {
+    if (!state || state.winner || !owner || !monster || prohibited(monster.name)) return;
+    const search = GY_SEARCH[monster.name];
+    if (search) {
+      await searchFromDeck(owner, monster.name, (c) => printedStat(c, search.stat) <= search.max, search.stat);
+      return;
+    }
+    if (how === "battle") {
+      const attr = BATTLE_RECRUIT[monster.name];
+      if (attr) {
+        await recruitFromDeck(owner, monster.name, (c) => c.ref.attribute === attr && printedStat(c, "atk") <= 1500);
+        return;
+      }
+      if (monster.name === "Giant Germ") {
+        hurt(oppOf(owner), 500, "Giant Germ");
+        if (state && !state.winner) await summonCopies(owner, "Giant Germ", "Giant Germ", true, "atk");
+        return;
+      }
+      if (monster.name === "Nimble Momonga") {
+        heal(owner, 1000, "Nimble Momonga");
+        if (state && !state.winner) await summonCopies(owner, "Nimble Momonga", "Nimble Momonga", false, "def");
+        return;
+      }
+      if (monster.name === "The Unhappy Maiden") {
+        haltBattle("The Unhappy Maiden ends the Battle Phase.");
+        return;
+      }
+      if (monster.name === "Revival Jam") {
+        await offerRevival(owner, monster);
+        return;
+      }
+    }
+    if (monster.name === "Spear Cretin" && monster.flipDone) await spearCretin(owner);
   }
 
   function clearDestiny(owner) {
@@ -6834,6 +7103,8 @@
 
   function upkeep(p) {
     if (!state || state.winner || !p) return;
+    reviveWaiting(p);
+    if (!state || state.winner) return;
     returnDueBanish(p);
     if (p.skipUpkeep) {
       p.skipUpkeep = false;
@@ -7908,6 +8179,8 @@
     log(heads ? "The coin lands on Heads." : "The coin lands on Tails.");
     if (correct) {
       destroyAllMonsters(oppOf(owner));
+      await leavesDone();
+      if (!state || state.gen !== gen || state.winner) return;
       const babyIdx = owner.monsters.findIndex((x) => x && x.name === "Baby Dragon");
       const tdIdx = owner.extra.findIndex((x) => x.name === "Thousand Dragon");
       if (babyIdx >= 0 && tdIdx >= 0) {
@@ -8001,6 +8274,10 @@
 
   async function battle(atkOwner, atkIdx, defOwner, defIdx) {
     if (!state || state.winner) return;
+    if (state.battleOver) {
+      if (atkOwner === state.player) toast("The Battle Phase is over.");
+      return;
+    }
     if (atkOwner === state.player && state.busy) return;
     let atkM = atkOwner.monsters[atkIdx];
     if (!atkM || atkM.position !== "atk" || !atkM.faceup) return;
@@ -8162,6 +8439,7 @@
       if (atkOwner.monsters[atkIdx]) atkOwner.attackedThisTurn.add(atkUid);
       render();
     } finally {
+      if (state && state.gen === gen) await leavesDone();
       if (state && state.gen === gen && lockUi) state.busy = false;
       if (state && state.gen === gen) render();
     }
@@ -8197,7 +8475,10 @@
         m.tempControl = null;
         const slot = firstEmpty(original.monsters);
         if (slot >= 0) original.monsters[slot] = m;
-        else original.gy.push(strip(m));
+        else {
+          original.gy.push(strip(m));
+          queueLeave(original, m, "leave");
+        }
         log(m.name + " returns to its owner.");
       }
     }
@@ -8206,6 +8487,7 @@
   function beginTurn(who) {
     if (state) state.ending = false;
     if (!state || state.winner) return;
+    state.battleOver = false;
     state.turn = who;
     state.phase = "draw";
     state.pending = null;
@@ -9354,6 +9636,7 @@
       if (idx < 0) return false;
       const before = ai.monsters.map((m) => (m ? m.uid : 0));
       activateSimple(ai, ai.hand[idx].uid);
+      await leavesDone();
       if (!state || state.winner) return true;
       const slot = ai.monsters.findIndex((m, i) => m && before[i] !== m.uid);
       if (slot >= 0) await aiGlance("ai", "m", slot);
@@ -9448,6 +9731,8 @@
       return br - ar;
     });
     if (!performFusion(ai, uid, options[0])) return;
+    await leavesDone();
+    if (!state || state.winner) return;
     const slot = ai.monsters.findIndex((m) => m && m.name === options[0].fusion.result);
     if (slot >= 0) await aiGlance("ai", "m", slot);
     else await aiGlance();
@@ -9472,7 +9757,8 @@
     const hi = ai.hand.findIndex((c) => c.uid === pick.c.uid);
     if (hi < 0) return;
     const res = placeMonster(ai, hi, stance.pos, stance.faceup, pick.tributes);
-    if (!res) return;
+    await leavesDone();
+    if (!state || state.winner || !res) return;
     if (state.intel && state.intel.bigName && state.intel.big > ourBestAtk(ai)) {
       eyeLine("I see " + state.intel.bigName + " in your hand.");
     }
@@ -9772,7 +10058,7 @@
     }
     let swings = 0;
     const scared = scareMirror();
-    while (state && !state.winner) {
+    while (state && !state.winner && !state.battleOver) {
       let best = null;
       for (let i = 0; i < ZONES; i++) {
         const m = ai.monsters[i];
@@ -9875,6 +10161,7 @@
       });
       if (best >= 0 && Math.floor(bestAtk / 2) >= 500) {
         tributeBurn(ai, turtle, best, "catapult");
+        await leavesDone();
         if (!state || state.winner) return;
         await aiGlance();
       }
@@ -9893,6 +10180,7 @@
       if (weak < 0) break;
       if (weakAtk > 1200 && state.player.lp > 1500) break;
       tributeBurn(ai, host, weak, "cannon");
+      await leavesDone();
       await aiGlance();
     }
   }
@@ -11607,7 +11895,7 @@
 
   function destroyByBattle(p, idx) {
     if (absorbSaves(p, idx)) return;
-    destroyMonster(p, idx);
+    destroyMonster(p, idx, true);
   }
 
   function absorbSaves(p, idx) {
@@ -15875,6 +16163,21 @@
     placeMonster: (side, handIdx, pos, faceup, tributes) => {
       if (!state) return null;
       return placeMonster(side === "ai" ? state.ai : state.player, handIdx, pos, faceup, tributes || []);
+    },
+    settled: () => leavesDone(),
+    cast: async (side, name) => {
+      if (!state || !cardDB[name] || !SIMPLE_SPELLS.has(name)) return false;
+      const p = side === "ai" ? state.ai : state.player;
+      let idx = p.hand.findIndex((c) => c.name === name);
+      if (idx < 0) {
+        const di = p.deck.findIndex((c) => c.name === name);
+        const card = di >= 0 ? p.deck.splice(di, 1)[0] : inst(name);
+        p.hand.push(card);
+        idx = p.hand.length - 1;
+      }
+      const ok = activateSimple(p, p.hand[idx].uid);
+      await leavesDone();
+      return !!ok;
     },
     story: (id) => {
       const scene = storyScene(id);
