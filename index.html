@@ -5440,7 +5440,11 @@
         endGame(p === state.player ? "ai" : "player", whoName(p) + " decked out.");
         return false;
       }
-      p.hand.push(p.deck.pop());
+      const drawn = p.deck.pop();
+      if (drawn && drawn.parasite) {
+        hatchParasite(p, drawn);
+        if (!state || state.winner) return false;
+      } else p.hand.push(drawn);
     }
     if (state && !state.winner) {
       const wishes = faceups("Solemn Wishes").filter((x) => x.owner === p).length;
@@ -5669,14 +5673,22 @@
     });
   }
 
+  function gyHome(controller, monster) {
+    if (!state || !monster) return controller;
+    if (monster.home === "player") return state.player;
+    if (monster.home === "ai") return state.ai;
+    return controller;
+  }
+
   function sendMonsterToGY(p, idx, how) {
     const m = p.monsters[idx];
     if (!m) return null;
     detachEquips(m);
     p.monsters[idx] = null;
     const gone = strip(m);
-    p.gy.push(gone);
-    afterMonsterLeft(p, m, how || "leave");
+    const dest = gyHome(p, m);
+    dest.gy.push(gone);
+    afterMonsterLeft(dest, m, how || "leave");
     return m;
   }
 
@@ -5793,6 +5805,7 @@
     if (!monster) return "";
     const dna = faceups("DNA Surgery")[0];
     if (dna && dna.st.dna && monster.faceup && !isGod(monster)) return dna.st.dna;
+    if (monster.faceup && !isGod(monster) && !monster.parasite && parasiteInsects(monster)) return "Insect";
     return monster.ref.race || "";
   }
 
@@ -7169,6 +7182,7 @@
     const eye = faceups("The Eye of Truth").find((x) => x.owner !== p);
     if (eye && p.hand.some((c) => c.ref && c.ref.isSpell)) heal(p, 1000, "The Eye of Truth");
     if (anyFaceup("Respect Play") || anyFaceup("The Eye of Truth")) revealHands();
+    detonateJigen(p);
     checkLP();
   }
 
@@ -7277,7 +7291,412 @@
     });
   }
 
-  function resolveFlip(owner, idx) {
+  function sideKey(p) { return p === state.player ? "player" : "ai"; }
+
+  function cardHome(controller, monster) {
+    if (!state || !monster) return controller;
+    if (monster.home === "player" || monster.tempControl === "player") return state.player;
+    if (monster.home === "ai" || monster.tempControl === "ai") return state.ai;
+    return controller;
+  }
+
+  function stampHome(controller, monster) {
+    if (!monster || monster.home) return;
+    monster.home = monster.tempControl || sideKey(controller);
+  }
+
+  function transferFlags(from, to, uid) {
+    ["summonedThisTurn", "positionChanged", "attackedThisTurn"].forEach((key) => {
+      if (from[key] && from[key].has && from[key].has(uid)) {
+        from[key].delete(uid);
+        if (to[key] && to[key].add) to[key].add(uid);
+      }
+    });
+  }
+
+  function markFusionMaterial(uid) {
+    if (!uid || !state) return;
+    [state.player, state.ai].forEach((p) => {
+      const card = p.gy.find((c) => c && c.uid === uid);
+      if (card) card.fusionMaterial = true;
+    });
+  }
+
+  function isEffectMonsterCard(card) {
+    if (!card || card.token || !card.ref || !card.ref.isMonster) return false;
+    const type = card.ref.type || "";
+    if (/Normal Monster/i.test(type)) return false;
+    if (/^Fusion Monster$/i.test(type)) return false;
+    if (/^Ritual Monster$/i.test(type)) return false;
+    return true;
+  }
+
+  function peekLabel(card) {
+    const ref = (card && card.ref) || {};
+    const mark = card && card.parasite ? " · face-up in the Deck" : "";
+    if (ref.isMonster) return card.name + " (" + (ref.atk || 0) + "/" + (ref.def || 0) + ")" + mark;
+    if (ref.isSpell) return card.name + " (Spell)" + mark;
+    if (ref.isTrap) return card.name + " (Trap)" + mark;
+    return (card && card.name) || "Card";
+  }
+
+  function topdeckScore(card) {
+    const ref = (card && card.ref) || {};
+    let score = cardPower(ref);
+    if (ref.isSpell && (DANGER_SPELLS.has(card.name) || card.name === "Pot of Greed" || card.name === "Monster Reborn" || card.name === "Fissure" || card.name === "Swords of Revealing Light")) score += 2000;
+    if (ref.isTrap && (card.name === "Mirror Force" || card.name === "Trap Hole")) score += 800;
+    if (ref.isMonster && (ref.level || 0) <= 4) score += 400;
+    return score;
+  }
+
+  function parasiteInsects(monster) {
+    const owner = controllerOf(monster);
+    if (!owner) return false;
+    return owner.monsters.some((m) => m && m.faceup && m.parasite);
+  }
+
+  function hatchParasite(owner, card) {
+    const slot = firstEmpty(owner.monsters);
+    if (slot < 0) {
+      owner.gy.push(strip(card));
+      log("Parasite Paracide has no monster zone and is sent to the Graveyard.");
+      return;
+    }
+    owner.monsters[slot] = monFrom(card, {
+      position: "def", faceup: true, summonWay: "special", arrived: state.turnCount, parasite: true,
+    });
+    owner.summonedThisTurn.add(card.uid);
+    log("Parasite Paracide hatches on " + whoName(owner) + "'s field!");
+    hurt(owner, 1000, "Parasite Paracide");
+    if (!state || state.winner) return;
+    log("While it is face-up, " + whoName(owner) + "'s other monsters are Insects.");
+    onSummonWindow(owner, slot, "special");
+  }
+
+  function buryParasite(owner, idx) {
+    const m = owner.monsters[idx];
+    if (!m || m.name !== "Parasite Paracide") return;
+    detachEquips(m);
+    owner.monsters[idx] = null;
+    const foe = oppOf(owner);
+    const card = strip(m);
+    card.parasite = true;
+    foe.deck.push(card);
+    shuffle(foe.deck);
+    log(m.name + " is shuffled face-up into " + whoName(foe) + "'s Deck.");
+  }
+
+  function liftMonster(controller, idx) {
+    const m = controller.monsters[idx];
+    if (!m) return null;
+    detachEquips(m);
+    controller.monsters[idx] = null;
+    return m;
+  }
+
+  function excavateJar(owner, need) {
+    if (!need || !owner) return;
+    const pulled = [];
+    let monsters = 0;
+    while (monsters < need && owner.deck.length && state && !state.winner) {
+      const card = owner.deck.pop();
+      pulled.push(card);
+      if (card && card.ref && card.ref.isMonster) monsters++;
+    }
+    let summoned = 0;
+    let dumped = 0;
+    pulled.forEach((card) => {
+      const level = (card.ref && card.ref.level) || 0;
+      const low = card.ref && card.ref.isMonster && !card.ref.isFusion && !isGodName(card.name) && level <= 4;
+      if (low && firstEmpty(owner.monsters) >= 0) {
+        const slot = firstEmpty(owner.monsters);
+        owner.monsters[slot] = monFrom(card, {
+          position: "def", faceup: false, summonWay: "special", arrived: state.turnCount,
+        });
+        summoned++;
+      } else {
+        owner.gy.push(strip(card));
+        dumped++;
+      }
+    });
+    log(whoName(owner) + " excavates " + pulled.length + " card" + (pulled.length === 1 ? "" : "s") + ". " + summoned + " summoned face-down, " + dumped + " sent to the Graveyard.");
+  }
+
+  function morphingJar2() {
+    const counts = { player: 0, ai: 0 };
+    [state.player, state.ai].forEach((p) => {
+      for (let i = ZONES - 1; i >= 0; i--) {
+        const m = p.monsters[i];
+        if (!m) continue;
+        if (isGod(m)) {
+          log(m.name + " is unaffected.");
+          continue;
+        }
+        if (m.token) {
+          liftMonster(p, i);
+          continue;
+        }
+        const home = cardHome(p, m);
+        home.deck.push(strip(liftMonster(p, i)));
+        if (home === state.player) counts.player++;
+        else counts.ai++;
+      }
+    });
+    if (counts.player) shuffle(state.player.deck);
+    if (counts.ai) shuffle(state.ai.deck);
+    log("Morphing Jar #2 shuffles the monsters into their owners' Decks.");
+    excavateJar(state.player, counts.player);
+    if (state && !state.winner) excavateJar(state.ai, counts.ai);
+  }
+
+  async function arrangeBigEye(owner) {
+    const count = Math.min(5, owner.deck.length);
+    if (!count) {
+      log("Big Eye flips, but the Deck is empty.");
+      return;
+    }
+    if (count === 1) {
+      log("Big Eye looks at " + owner.deck[owner.deck.length - 1].name + ".");
+      return;
+    }
+    const pile = owner.deck.splice(owner.deck.length - count, count);
+    const restore = () => { pile.forEach((c) => owner.deck.push(c)); };
+    if (owner !== state.player) {
+      const ranked = pile.slice().sort((a, b) => topdeckScore(b) - topdeckScore(a) || a.name.localeCompare(b.name));
+      for (let i = ranked.length - 1; i >= 0; i--) owner.deck.push(ranked[i]);
+      log("Big Eye puts " + ranked[0].name + " on top of the Deck.");
+      return;
+    }
+    const remain = pile.slice();
+    const placed = [];
+    while (remain.length) {
+      if (!state || state.winner) { restore(); return; }
+      const labels = [];
+      for (let i = remain.length - 1; i >= 0; i--) labels.push(peekLabel(remain[i]));
+      const title = placed.length
+        ? "Big Eye — next card (" + (placed.length + 1) + " of " + count + ")"
+        : "Big Eye — choose the new top card";
+      const pick = await choose(title, labels);
+      if (!state || state.winner || pick < 0 || pick >= remain.length) { restore(); return; }
+      const idx = remain.length - 1 - pick;
+      placed.push(remain.splice(idx, 1)[0]);
+    }
+    for (let i = placed.length - 1; i >= 0; i--) owner.deck.push(placed[i]);
+    log("Big Eye puts " + placed[0].name + " on top of the Deck.");
+  }
+
+  async function bombardmentBeetle(owner) {
+    const foe = oppOf(owner);
+    const rows = [];
+    foe.monsters.forEach((m, i) => {
+      if (m && !m.faceup && m.position === "def") rows.push(i);
+    });
+    if (!rows.length) {
+      log("Bombardment Beetle flips, but there is no face-down monster.");
+      return;
+    }
+    let idx = rows.slice().sort((a, b) => {
+      const am = foe.monsters[a];
+      const bm = foe.monsters[b];
+      const ae = isEffectMonsterCard(am) ? 1 : 0;
+      const be = isEffectMonsterCard(bm) ? 1 : 0;
+      if (ae !== be) return be - ae;
+      return ((bm.ref.atk || 0) + (bm.ref.def || 0)) - ((am.ref.atk || 0) + (am.ref.def || 0));
+    })[0];
+    if (owner === state.player && rows.length > 1) {
+      const labels = rows.map((i) => "Monster zone " + (i + 1));
+      const pick = await choose("Bombardment Beetle — check a face-down monster", labels);
+      if (!state || state.winner || pick < 0 || pick >= rows.length) return;
+      idx = rows[pick];
+    }
+    const target = foe.monsters[idx];
+    if (!target || target.faceup || target.position !== "def") return;
+    if (isEffectMonsterCard(target)) {
+      log("Bombardment Beetle checks " + target.name + " and destroys it. Its Flip effect does not activate.");
+      destroyMonster(foe, idx);
+    } else {
+      log("Bombardment Beetle checks " + target.name + ". It is not an Effect Monster, so it stays face-down.");
+    }
+  }
+
+  function detonateJigen(owner) {
+    if (!state || state.winner || !owner) return;
+    const armed = [];
+    owner.monsters.forEach((m, i) => {
+      if (m && m.faceup && m.name === "Jigen Bakudan" && m.jigenArmed) armed.push(i);
+    });
+    armed.forEach((i) => {
+      if (!state || state.winner) return;
+      const m = owner.monsters[i];
+      if (!m || m.name !== "Jigen Bakudan" || !m.jigenArmed || !m.faceup) return;
+      if (prohibited(m.name)) {
+        log("Prohibition stops Jigen Bakudan.");
+        return;
+      }
+      if (tributesBlocked()) {
+        log("Mask of Restrict stops Jigen Bakudan from being Tributed.");
+        return;
+      }
+      let total = 0;
+      let spared = false;
+      const dying = [];
+      owner.monsters.forEach((mon, z) => {
+        if (!mon || z === i) return;
+        if (isGod(mon)) { spared = true; return; }
+        total += getStats(mon).atk;
+        dying.push(z);
+      });
+      log("Jigen Bakudan is Tributed.");
+      sendMonsterToGY(owner, i);
+      dying.sort((a, b) => b - a);
+      dying.forEach((z) => { if (owner.monsters[z]) destroyMonster(owner, z); });
+      if (spared) log("An Egyptian God is unaffected.");
+      const dmg = Math.floor(total / 2);
+      if (dmg > 0 && state && !state.winner) hurt(oppOf(owner), dmg, "Jigen Bakudan");
+      else if (state && !state.winner) log("Jigen Bakudan leaves no ATK to burn.");
+    });
+  }
+
+  async function invaderOfTheThrone(owner, idx) {
+    const m = owner.monsters[idx];
+    if (!m) return;
+    if (state.phase === "battle") {
+      log("Invader of the Throne cannot switch control during the Battle Phase.");
+      return;
+    }
+    const foe = oppOf(owner);
+    const rows = [];
+    foe.monsters.forEach((tm, i) => { if (tm) rows.push(i); });
+    if (!rows.length) {
+      log("Invader of the Throne flips, but there is no monster to switch with.");
+      return;
+    }
+    let pick = rows.slice().sort((a, b) => invaderValue(foe.monsters[b]) - invaderValue(foe.monsters[a]))[0];
+    if (owner === state.player && rows.length > 1) {
+      const labels = rows.map((i) => {
+        const tm = foe.monsters[i];
+        if (!tm.faceup) return "Face-down monster (zone " + (i + 1) + ")";
+        return tm.name + " (" + getStats(tm).atk + " ATK, zone " + (i + 1) + ")";
+      });
+      const n = await choose("Invader of the Throne — switch control", labels);
+      if (!state || state.winner || n < 0 || n >= rows.length) return;
+      pick = rows[n];
+    }
+    if (!owner.monsters[idx] || owner.monsters[idx].uid !== m.uid || !foe.monsters[pick]) return;
+    const theirs = foe.monsters[pick];
+    stampHome(owner, m);
+    stampHome(foe, theirs);
+    m.tempControl = null;
+    theirs.tempControl = null;
+    transferFlags(owner, foe, m.uid);
+    transferFlags(foe, owner, theirs.uid);
+    owner.monsters[idx] = theirs;
+    foe.monsters[pick] = m;
+    log(m.name + " and " + theirs.name + " switch control.");
+  }
+
+  function invaderValue(m) {
+    if (!m) return 0;
+    if (!m.faceup) return (m.ref.atk || 0) + Math.floor((m.ref.def || 0) * 0.25);
+    const s = getStats(m);
+    return s.atk + Math.floor(s.def * 0.1);
+  }
+
+  async function summonerOfIllusions(owner, idx) {
+    const host = owner.monsters[idx];
+    if (!host) return;
+    const others = [];
+    owner.monsters.forEach((mon, i) => {
+      if (mon && i !== idx && !isGod(mon) && !mon.token) others.push(i);
+    });
+    const seen = {};
+    const fusions = [];
+    (owner.extra || []).forEach((c) => {
+      if (!c || !c.ref || !c.ref.isFusion || seen[c.name]) return;
+      seen[c.name] = c;
+      fusions.push(c);
+    });
+    if (!others.length || !fusions.length) {
+      log("Summoner of Illusions flips, but it needs another monster and a Fusion Monster.");
+      return;
+    }
+    let trib = others.slice().sort((a, b) => (owner.monsters[a].ref.atk || 0) - (owner.monsters[b].ref.atk || 0))[0];
+    let fusion = fusions.slice().sort((a, b) => (b.ref.atk || 0) - (a.ref.atk || 0))[0];
+    if (owner === state.player && others.length > 1) {
+      const labels = others.map((i) => owner.monsters[i].name + " (" + (owner.monsters[i].ref.atk || 0) + " ATK)");
+      const n = await choose("Summoner of Illusions — tribute 1 other monster", labels);
+      if (!state || state.winner || n < 0 || n >= others.length) return;
+      trib = others[n];
+    }
+    if (owner === state.player && fusions.length > 1) {
+      const labels = fusions.map((c) => c.name + " (" + (c.ref.atk || 0) + ")");
+      const n = await choose("Summoner of Illusions — Special Summon", labels);
+      if (!state || state.winner || n < 0 || n >= fusions.length) return;
+      fusion = fusions[n];
+    }
+    if (!state || state.winner || !owner.monsters[idx] || !owner.monsters[trib]) return;
+    log("Summoner of Illusions tributes " + owner.monsters[trib].name + ".");
+    sendMonsterToGY(owner, trib);
+    await leavesDone();
+    if (!state || state.winner || !owner.monsters[idx]) return;
+    const ei = owner.extra.findIndex((c) => c && c.uid === fusion.uid);
+    if (ei < 0) return;
+    const card = owner.extra.splice(ei, 1)[0];
+    const slot = firstEmpty(owner.monsters);
+    if (slot < 0) {
+      owner.extra.push(card);
+      log("No monster zone for " + card.name + ".");
+      return;
+    }
+    owner.monsters[slot] = monFrom(card, {
+      summonWay: "special", arrived: state.turnCount, illusion: true, position: "atk", faceup: true,
+    });
+    owner.summonedThisTurn.add(card.uid);
+    log("Summoner of Illusions Special Summons " + card.name + ". It is destroyed at the End Phase.");
+  }
+
+  function sweepIllusions() {
+    if (!state) return;
+    [state.player, state.ai].forEach((p) => {
+      for (let i = ZONES - 1; i >= 0; i--) {
+        const m = p.monsters[i];
+        if (!m || !m.illusion) continue;
+        log(m.name + " vanishes at the End Phase.");
+        destroyMonster(p, i);
+      }
+    });
+  }
+
+  async function supplyFlip(owner) {
+    const mats = owner.gy.filter((c) => c && c.fusionMaterial && c.ref && c.ref.isMonster);
+    if (mats.length < 2) {
+      log("Supply flips, but there are not 2 Fusion Material monsters in the Graveyard.");
+      return;
+    }
+    let picks = [];
+    if (owner === state.player && mats.length > 2) {
+      const firstLabels = mats.map(monsterLabel);
+      const i = await choose("Supply — return a Fusion Material", firstLabels);
+      if (!state || state.winner || i < 0 || i >= mats.length) return;
+      const first = mats[i];
+      const rest = mats.filter((c) => c.uid !== first.uid);
+      const j = await choose("Supply — return the second Fusion Material", rest.map(monsterLabel));
+      if (!state || state.winner || j < 0 || j >= rest.length) return;
+      picks = [first, rest[j]];
+    } else if (owner !== state.player) {
+      picks = mats.slice().sort((a, b) => printedStat(b, "atk") - printedStat(a, "atk") || printedStat(b, "def") - printedStat(a, "def")).slice(0, 2);
+    } else picks = mats.slice(0, 2);
+    const names = [];
+    picks.forEach((card) => {
+      const gi = owner.gy.findIndex((c) => c && c.uid === card.uid);
+      if (gi < 0) return;
+      owner.hand.push(owner.gy.splice(gi, 1)[0]);
+      names.push(card.name);
+    });
+    if (names.length) log("Supply returns " + names.join(" and ") + " to the hand.");
+  }
+
+  async function resolveFlip(owner, idx) {
     const m = owner.monsters[idx];
     if (!m) return;
     if (anyFaceup("Royal Command")) {
@@ -7315,7 +7734,12 @@
         log("Hane-Hane returns " + card.name + " to the hand.");
         detachEquips(card);
         t.p.monsters[t.i] = null;
-        (card.tempControl ? (card.tempControl === "player" ? state.player : state.ai) : t.p).hand.push(strip(card));
+        const home = card.home === "player" ? state.player
+          : card.home === "ai" ? state.ai
+          : card.tempControl === "player" ? state.player
+          : card.tempControl === "ai" ? state.ai
+          : t.p;
+        home.hand.push(strip(card));
       }
     } else if (m.name === "Magician of Faith" || m.name === "Mask of Darkness") {
       const wantSpell = m.name === "Magician of Faith";
@@ -7440,6 +7864,26 @@
       }
       if (dumped.length) log("Banished " + dumped.join(", ") + ".");
       hurt(foe, 800, m.name);
+    } else if (m.name === "Big Eye") {
+      await arrangeBigEye(owner);
+    } else if (m.name === "Bombardment Beetle") {
+      await bombardmentBeetle(owner);
+    } else if (m.name === "Jigen Bakudan") {
+      m.jigenArmed = true;
+      log("Jigen Bakudan is armed. It goes off on " + (owner === state.player ? "your" : whoName(owner) + "'s") + " next Standby Phase.");
+    } else if (m.name === "Morphing Jar #2") {
+      morphingJar2();
+    } else if (m.name === "Invader of the Throne") {
+      await invaderOfTheThrone(owner, idx);
+    } else if (m.name === "Parasite Paracide") {
+      if (state.phase === "battle") {
+        m.parasiteWait = true;
+        log("Parasite Paracide is flipped.");
+      } else buryParasite(owner, idx);
+    } else if (m.name === "Summoner of Illusions") {
+      await summonerOfIllusions(owner, idx);
+    } else if (m.name === "Supply") {
+      await supplyFlip(owner);
     } else log(m.name + " flips.");
   }
 
@@ -7795,10 +8239,18 @@
       owner.spells[zi] = null;
     }
     const fieldPicks = option.picks.filter((p) => p.where === "field").sort((a, b) => b.index - a.index);
-    fieldPicks.forEach((p) => sendMonsterToGY(owner, p.index));
+    fieldPicks.forEach((p) => {
+      const uid = owner.monsters[p.index] && owner.monsters[p.index].uid;
+      sendMonsterToGY(owner, p.index);
+      markFusionMaterial(uid);
+    });
     option.picks.filter((p) => p.where === "hand").forEach((p) => {
       const i = owner.hand.findIndex((c) => c.uid === p.card.uid);
-      if (i >= 0) owner.gy.push(strip(owner.hand.splice(i, 1)[0]));
+      if (i >= 0) {
+        const gyCard = strip(owner.hand.splice(i, 1)[0]);
+        gyCard.fusionMaterial = true;
+        owner.gy.push(gyCard);
+      }
     });
     const ei = owner.extra.findIndex((c) => c.name === option.fusion.result);
     if (ei < 0) { owner.gy.push(strip(poly)); return false; }
@@ -7924,7 +8376,7 @@
     return card;
   }
 
-  function activateSwords(owner, uid) {
+  async function activateSwords(owner, uid) {
     if (owner === state.player && !playerMain()) return false;
     const slot = firstEmpty(owner.spells);
     const fromHand = owner.hand.some((c) => c.uid === uid);
@@ -7941,8 +8393,19 @@
       owner.spells[zi].swordsLeft = 3;
     }
     const foe = oppOf(owner);
-    foe.monsters.forEach((m) => { if (m && !m.faceup) m.faceup = true; });
+    const hidden = [];
+    foe.monsters.forEach((m, i) => { if (m && !m.faceup) hidden.push(i); });
+    hidden.forEach((i) => {
+      const m = foe.monsters[i];
+      if (m && !m.faceup) m.faceup = true;
+    });
     log(whoName(owner) + " activates Swords of Revealing Light!");
+    for (let n = 0; n < hidden.length; n++) {
+      if (!state || state.winner) return true;
+      const i = hidden[n];
+      const m = foe.monsters[i];
+      if (m && m.faceup && !m.flipDone) await onFlip(foe, i);
+    }
     return true;
   }
 
@@ -8400,7 +8863,7 @@
       if (!defM) return;
       const wasHidden = !defM.faceup;
       defM.faceup = true;
-      if (wasHidden) onFlip(defOwner, defIdx);
+      if (wasHidden) await onFlip(defOwner, defIdx);
       if (!state || state.winner) return;
       atkM = atkOwner.monsters.find((m) => m && m.uid === atkUid);
       if (!atkM) { render(); return; }
@@ -8436,6 +8899,8 @@
         destroyByBattle(defOwner, defIdx);
         log("Both monsters are destroyed.");
       }
+      const hatched = defOwner.monsters[defIdx];
+      if (hatched && hatched.parasiteWait) buryParasite(defOwner, defIdx);
       if (atkOwner.monsters[atkIdx]) atkOwner.attackedThisTurn.add(atkUid);
       render();
     } finally {
@@ -8529,6 +8994,8 @@
       return;
     }
     state.ending = true;
+    sweepIllusions();
+    if (!state || state.winner) return;
     const gen = state.gen;
     clearSwaps();
     const ending = state.turn === "player" ? state.player : state.ai;
@@ -8637,7 +9104,7 @@
     render();
   }
 
-  function changePosition(p, zoneIdx) {
+  async function changePosition(p, zoneIdx) {
     const m = p.monsters[zoneIdx];
     const why = positionBlockReason(p, m);
     if (why) {
@@ -8656,8 +9123,12 @@
         render();
         return true;
       }
-      onFlip(p, zoneIdx);
-      onSummonWindow(p, zoneIdx, "flip", true);
+      const flippedUid = m.uid;
+      render();
+      await onFlip(p, zoneIdx);
+      if (!state || state.winner) return true;
+      const live = p.monsters[zoneIdx];
+      if (live && live.uid === flippedUid) onSummonWindow(p, zoneIdx, "flip", true);
     } else {
       m.position = m.position === "atk" ? "def" : "atk";
       p.positionChanged.add(m.uid);
@@ -8734,6 +9205,21 @@
     if (known && c.name === "Castle of Dark Illusions") {
       desc += "\n\nDuelist Kingdom: while face-up, every Fiend gains 200 ATK and DEF, plus 200 more on each of your later turns (max +1000).";
     }
+    if (known && c.name === "Jigen Bakudan") {
+      desc += "\n\nIn this game the Standby Phase is the start of your turn, before the draw. The bomb waits for that phase on a later turn. Damage is half the ATK of the other monsters it destroys, rounded down.";
+    }
+    if (known && c.name === "Summoner of Illusions") {
+      desc += "\n\nThe Fusion Monster can attack. It is destroyed at the End Phase of the turn it was summoned. Egyptian Gods cannot be tributed for it.";
+    }
+    if (known && c.name === "Parasite Paracide") {
+      desc += "\n\nThe duelist who draws it Special Summons it in face-up Defense and takes 1000 damage. While it is face-up, that duelist's other face-up monsters are Insects. If the battle that flipped it destroys it, it goes to the Graveyard instead.";
+    }
+    if (known && c.name === "Supply") {
+      desc += "\n\nOnly monsters sent to the Graveyard by a Fusion Summon count. Time Wizard's coin does not.";
+    }
+    if (known && c.name === "Morphing Jar #2") {
+      desc += "\n\nEgyptian Gods stay. Tokens vanish. Level 4 or lower monsters come back face-down. Other excavated cards go to the Graveyard. Fusion Monsters are not Special Summoned this way.";
+    }
     if (known && isToon(c) && state && state.rules === "dk") {
       desc += "\n\nDuelist Kingdom: no tributes. You need Toon World. A Toon cannot attack the turn it is summoned, pays 500 LP to attack, and can attack directly unless the opponent controls a Toon.";
     }
@@ -8800,7 +9286,9 @@
           render();
         }, "", { fuse: o.fusion.result }));
       }
-      if (c.name === "Swords of Revealing Light") add("Activate", () => { if (activateSwords(state.player, c.uid)) render(); else toast("No free Spell & Trap zone."); });
+      if (c.name === "Swords of Revealing Light") add("Activate", () => {
+        activateSwords(state.player, c.uid).then((ok) => { if (ok) render(); else toast("No free Spell & Trap zone."); });
+      });
       if (c.name === "Shield & Sword") add("Activate", () => { activateShield(state.player, c.uid); render(); });
       if (SIMPLE_SPELLS.has(c.name)) add("Activate", () => { activateSimple(state.player, c.uid); render(); });
       if ((c.ref.isSpell || c.ref.isTrap) && firstEmpty(state.player.spells) >= 0) {
@@ -8880,7 +9368,9 @@
             performFusion(state.player, c.uid, o); render();
           }, "", { fuse: o.fusion.result }));
         }
-        if (c.name === "Swords of Revealing Light") add("Activate", () => { activateSwords(state.player, c.uid); render(); });
+        if (c.name === "Swords of Revealing Light") add("Activate", () => {
+          activateSwords(state.player, c.uid).then((ok) => { if (state && ok) render(); });
+        });
         if (c.name === "Shield & Sword") add("Activate", () => { activateShield(state.player, c.uid); render(); });
         if (c.name === "Toon World") add("Activate (1000 LP)", () => { if (activateToonWorld(state.player, c.uid)) render(); });
         if (c.name === "Insect Barrier") add("Activate", () => { if (activateBarrier(state.player, c.uid)) render(); });
@@ -9848,7 +10338,7 @@
     const oppBest = opp.length ? Math.max.apply(null, opp.map((m) => (m.faceup ? getStats(m).atk : (m.ref.atk || 1200)))) : 0;
     if (!(incoming || opp.some((m) => !m.faceup) || oppBest > myBest + 200)) return;
     if (incoming && state.intel.bigName) eyeLine("I see " + state.intel.bigName + " in your hand.");
-    if (!activateSwords(ai, uid)) return;
+    if (!await activateSwords(ai, uid)) return;
     const slot = ai.spells.findIndex((st) => st && st.uid === uid);
     await aiGlance("ai", "st", slot >= 0 ? slot : 0);
   }
@@ -10012,7 +10502,7 @@
         if (isFlipCard(m) || m.name === "Castle of Dark Illusions") continue;
         const pwr = projectedStats(m);
         if (pwr.atk >= 1500 && (prof.aggression >= 0.55 || pwr.atk > opp) && !aiSloppy() && !lockedAttack(m)) {
-          changePosition(ai, i);
+          await changePosition(ai, i);
           await aiGlance("ai", "m", i);
         }
         continue;
@@ -11957,11 +12447,12 @@
     }
   }
 
-  function onFlip(owner, idx) {
+  async function onFlip(owner, idx) {
     const m = owner.monsters[idx];
     if (!m || m.flipDone) return;
     m.flipDone = true;
-    resolveFlip(owner, idx);
+    if (owner === state.player) render();
+    await resolveFlip(owner, idx);
   }
 
   function tickCocoons(owner) {
@@ -12385,7 +12876,7 @@
     for (let i = 0; i < ZONES; i++) {
       const m = ai.monsters[i];
       if (m && !m.faceup && m.name === "Castle of Dark Illusions" && !ai.summonedThisTurn.has(m.uid)) {
-        changePosition(ai, i);
+        await changePosition(ai, i);
         await aiGlance("ai", "m", i);
         break;
       }
