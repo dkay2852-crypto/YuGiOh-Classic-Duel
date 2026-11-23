@@ -375,6 +375,52 @@
       box-shadow: 0 0 16px rgba(240, 192, 64, 0.45);
       background: linear-gradient(180deg, rgba(48, 36, 12, 0.92), rgba(10, 12, 24, 0.9));
     }
+    .city-blimp.champion { border-color: #8ce6aa; box-shadow: 0 0 16px rgba(140, 230, 170, 0.4); }
+    #blimp { padding: 8px 10px 8px; gap: 6px; background: #070b16; }
+    #blimp h2 { margin: 0; color: var(--gold); font-size: 1.12rem; line-height: 1.05; }
+    #blimp .island-note { margin: 0; }
+    #blimpList {
+      flex: 1; min-height: 0; overflow: auto; -webkit-overflow-scrolling: touch;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .blimp-row {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; min-height: 56px; padding: 8px 10px;
+      border-radius: 12px; text-align: left;
+      border: 1px solid rgba(170, 200, 255, 0.4);
+      background: rgba(8, 14, 28, 0.92);
+      color: var(--cream);
+    }
+    .blimp-row img {
+      width: 36px; height: 50px; object-fit: cover; border-radius: 4px;
+      flex-shrink: 0; background: #111; border: 1px solid rgba(212, 160, 23, 0.35);
+    }
+    .blimp-row .copy { min-width: 0; flex: 1; }
+    .blimp-row .nm { display: block; font-weight: 700; color: var(--gold); font-size: 0.95rem; line-height: 1.15; }
+    .blimp-row .sub {
+      display: block; font-size: 0.75rem; color: #f4efe2; line-height: 1.25;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .blimp-row .round {
+      flex-shrink: 0; font-size: 0.66rem; letter-spacing: 0.04em;
+      color: #9fd0ff; text-transform: uppercase; max-width: 5.6rem; text-align: right;
+    }
+    .blimp-row.next { border-color: #f0c040; box-shadow: 0 0 12px rgba(240, 192, 64, 0.35); }
+    .blimp-row.done { border-color: rgba(140, 230, 170, 0.75); }
+    .blimp-row.locked, .blimp-row:disabled { opacity: 0.55; }
+    #blimp .menu-btn { min-height: 48px; }
+    #duel[data-arena="odion"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(18, 12, 4, 0.55), rgba(40, 24, 8, 0.35) 48%, rgba(8, 6, 4, 0.68)),
+        radial-gradient(ellipse at 50% 18%, rgba(212, 168, 72, 0.38), transparent 46%),
+        linear-gradient(180deg, #2a1c08 0%, #4a3414 42%, #120c06 100%);
+    }
+    #duel[data-arena="marik"] .arena-bg {
+      background:
+        linear-gradient(180deg, rgba(20, 4, 28, 0.62), rgba(40, 8, 16, 0.4) 48%, rgba(6, 2, 8, 0.72)),
+        radial-gradient(ellipse at 50% 16%, rgba(255, 196, 64, 0.42), transparent 44%),
+        linear-gradient(180deg, #1a0618 0%, #4a1028 42%, #10040c 100%);
+    }
     #btnCitySide { min-height: 36px; font-size: 0.92rem; }
     #btnCitySide[hidden] { display: none !important; }
     #wagerLead, #wagerWarnBody { margin: 0; color: var(--cream); font-size: 0.82rem; line-height: 1.35; text-align: left; }
@@ -2233,9 +2279,10 @@
         <p><strong>First turn.</strong> The first player does not draw, and neither player can attack on that turn.</p>
         <p><strong>Fusion.</strong> Polymerization can use monsters in your hand or on the field. A Fusion Monster cannot attack the turn it is summoned.</p>
         <p><strong>No field bonus.</strong> Duelist Kingdom's arena bonus does not apply. Field Spell cards still do.</p>
-        <p><strong>Locator cards.</strong> Each district has a featured duelist. Beat that duelist to earn the district's locator card. Six cards reveal the KaibaCorp blimp. The finals stay locked.</p>
+        <p><strong>Locator cards.</strong> Each district has a featured duelist. Beat that duelist to earn the district's locator card. Six cards open the KaibaCorp blimp.</p>
+        <p><strong>Finals.</strong> The blimp is a bracket: Mai, Joey, Odion, Kaiba, then Marik. A short welcome plays the first time you board. Win in order. A loss lets you retry that duel. There is no ante on the blimp. Odion's win gives Slifer the Sky Dragon, Kaiba's win gives Obelisk the Tormentor, and Marik's win gives The Winged Dragon of Ra. Those cards join your collection and can go in a custom deck. Beating Marik makes you Battle City Champion. After that, every finalist and Marik can be rematched.</p>
         <p><strong>Ante.</strong> Before a street duel, confirm the stake. The winner takes the loser's rarest card that can safely leave. Your opponent antes a signature card. A loss removes that card from your collection. Preset decks are never edited, a saved deck keeps the copies it needs, and you are never left unable to build a 40-card deck. If no card can be wagered, the stake is Duel Points.</p>
-        <p><strong>Rare Hunters.</strong> Hooded Ghouls sometimes stop you between districts. They play burn or Exodia copies, wager a rarer card, and pay more Duel Points. Marik is only a name they use. He is not in the city yet.</p>
+        <p><strong>Rare Hunters.</strong> Hooded Ghouls sometimes stop you between districts. They play burn or Exodia copies, wager a rarer card, and pay more Duel Points. They speak for Marik. He waits on the blimp.</p>
       </div>
       <button type="button" class="menu-btn primary" id="btnCityEnter">Enter Domino City</button>
       <button type="button" class="menu-btn" id="btnCityRulesBack">Back</button>
@@ -2260,6 +2307,20 @@
         <button type="button" class="menu-btn" id="btnCityDeck">Deck</button>
         <button type="button" class="menu-btn" id="btnCityMenu">Main Menu</button>
       </div>
+    </section>
+
+    <section id="blimp" class="screen" hidden>
+      <div class="island-top">
+        <div style="min-width:0">
+          <h2>KaibaCorp Blimp</h2>
+          <p id="blimpDeck">Finals</p>
+        </div>
+        <div class="chip-pill" id="blimpProgress">0 / 5</div>
+      </div>
+      <p class="island-note" id="blimpNote"></p>
+      <div id="blimpList" role="list"></div>
+      <button type="button" class="menu-btn" id="btnBlimpIntro">Replay the welcome</button>
+      <button type="button" class="menu-btn" id="btnBlimpBack">Back to Domino</button>
     </section>
 
     <section id="vs" class="screen" hidden>
@@ -2449,8 +2510,8 @@
       <h2>How to Play</h2>
       <div class="scroll">
         <p><strong>Free Duel:</strong> Pick Classic or Duelist Kingdom, then Free Duel, then Yugi, Kaiba, Joey, or Custom Deck. A duelist opponent is one of the other two. A custom deck faces Yugi, Kaiba, or Joey at random.</p>
-        <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia and the Egyptian Gods, and the main menu can switch to Battle City.</p>
-        <p><strong>Battle City:</strong> After you beat Pegasus, Battle City opens the Domino City map. Walk between neighboring districts, then duel where you are standing. Joey, Kaiba, Mai, Mako, a Keith-style street thug, and Esper Roba each hold one district. Beat that featured duelist for its locator card. Bonz waits in the park graves. Before the duel you confirm an ante: the winner takes the loser's rarest safe card, or the opponent's signature card. A loss removes the card from your collection. Preset decks stay as they are, a saved deck keeps the copies it needs, and a loss never drops you below 40 cards. If no card can be wagered, you stake Duel Points instead. Hooded Rare Hunters sometimes ambush on a street, with burn or copied Exodia, a rarer ante, and a line about Marik. Marik himself is not here. Six locator cards reveal the KaibaCorp blimp, which stays locked: finals coming soon. Battle City duels use their own rules: 4000 Life Points, tribute summons, no attack on the first turn, and a Fusion Monster cannot attack the turn it is summoned. Free Duel, the tournament, puzzles, rematches, trades, and Shadow Game are unchanged. Locator cards are kept on your profile.</p>
+        <p><strong>Tournament:</strong> Pick Classic or Duelist Kingdom when the run starts. Continue keeps that choice, and the island shows it. You start with 2 Star Chips. Weevil, Rex, Mai, Keith, and Panik, then a rival (Kaiba, or Yugi if you are playing Kaiba), hold 1, 1, 1, 2, 1, and 2 Star Chips. Beating each once reaches exactly 10, which opens Pegasus's castle. The island always shows how many chips you still need. A loss costs 1. At 0 the run is over. If you have beaten everyone on the path and still have fewer than 10, rematch those duelists: a win pays their chips again, and a loss still costs 1. Each first win opens a booster from that duelist's set. Progress is saved on this device. Deck on the island swaps the deck for the next duel without erasing the run. Each arena keeps its field in both rule sets. In Duelist Kingdom that field gives +30% ATK and DEF. Opponents get sharper along the path. Pegasus reads your hand with the Millennium Eye. Beating him unlocks Exodia. The Egyptian Gods are won in the Battle City finals, and the main menu can switch to Battle City.</p>
+        <p><strong>Battle City:</strong> After you beat Pegasus, Battle City opens the Domino City map. Walk between neighboring districts, then duel where you are standing. Joey, Kaiba, Mai, Mako, a Keith-style street thug, and Esper Roba each hold one district. Beat that featured duelist for its locator card. Bonz waits in the park graves. Before the duel you confirm an ante: the winner takes the loser's rarest safe card, or the opponent's signature card. A loss removes the card from your collection. Preset decks stay as they are, a saved deck keeps the copies it needs, and a loss never drops you below 40 cards. If no card can be wagered, you stake Duel Points instead. Hooded Rare Hunters sometimes ambush on a street, with burn or copied Exodia, a rarer ante, and a line about Marik. Six locator cards open the KaibaCorp blimp. The finals are Mai, Joey, Odion, Kaiba, and then Marik, in that order. The blimp has no ante. Beating Odion, Kaiba, and Marik adds Slifer, Obelisk, and The Winged Dragon of Ra to your collection. Winning the bracket equips the Battle City Champion title once you choose it, and the finalists can be rematched. Battle City duels use their own rules: 4000 Life Points, tribute summons, no attack on the first turn, and a Fusion Monster cannot attack the turn it is summoned. Free Duel, the tournament, puzzles, rematches, trades, and Shadow Game are unchanged. Locator cards are kept on your profile.</p>
         <p><strong>Card Binder:</strong> The main menu opens every card in the classic pool, grouped by set, in a grid. Owned cards show their art. Extra copies show a count (x2, x3). Missing cards are a dark silhouette. Each set, and the whole binder, shows a completion percent. Search and Filters narrow the grid by name, type, attribute, monster type, level, ATK, DEF, rarity, foil, and owned or new. Sort by name, ATK, DEF, level, or newest. Tap a card to see each version you own. From the deck builder, that same card can be added or removed.</p>
         <p><strong>Rematch:</strong> After you beat a duelist, fight them again from their island stop or from Rematch on the main menu. The deck is meaner and the plays are sharper. A win pays more Duel Points than the first time and the pack is more likely to hold a rare. Star Chips stay put, except when the path is clear and you still need chips for Pegasus. Those island rematches pay the same chips as the first win, and a loss costs 1.</p>
         <p><strong>Ante:</strong> Settings has an Ante rule, off unless you turn it on. Before a tournament duel, you and the opponent each put up one card. You put up a spare card from your collection. The last copy a saved deck needs stays, and preset Yugi, Kaiba, and Joey decks are never edited. The winner takes the loser's card. Both cards show before the duel, and the result shows after.</p>
@@ -2964,6 +3025,11 @@
     "city-bonz":  { diff: 2, style: "aggro",    bias: ["Zombie", "Fiend"], bluff: 0.24, defend: 0.22, aggression: 0.8, trapLove: 0.46, equipLove: 0.5 },
     "city-ghoul": { diff: 6, style: "burn",     bias: ["Pyro", "Machine"], bluff: 0.08, defend: 0.2, aggression: 0.84, trapLove: 0.62, equipLove: 0.2 },
     "city-seeker":{ diff: 8, style: "exodia",   bias: ["Spellcaster"], bluff: 0.1, defend: 0.55, aggression: 0.22, trapLove: 0.84, equipLove: 0.15 },
+    "blimp-mai":  { diff: 5, style: "equip",    bias: ["Winged Beast"], bluff: 0.14, defend: 0.34, aggression: 0.74, trapLove: 0.55, equipLove: 0.98 },
+    "blimp-joey": { diff: 5, style: "aggro",    bias: ["Warrior", "Dragon"], bluff: 0.12, defend: 0.3, aggression: 0.84, trapLove: 0.55, equipLove: 0.72 },
+    "blimp-odion":{ diff: 7, style: "wall",     bias: ["Rock", "Spellcaster", "Fiend"], bluff: 0.16, defend: 0.92, aggression: 0.36, trapLove: 0.97, equipLove: 0.4 },
+    "blimp-kaiba":{ diff: 8, style: "beatdown", bias: ["Dragon", "Divine-Beast"], bluff: 0.06, defend: 0.22, aggression: 0.92, trapLove: 0.62, equipLove: 0.84 },
+    "blimp-marik":{ diff: 9, style: "god",      bias: ["Fiend", "Divine-Beast"], bluff: 0.04, defend: 0.28, aggression: 0.95, trapLove: 0.72, equipLove: 0.3 },
   };
 
   const DECKS = {
@@ -3086,6 +3152,7 @@
     "city-joey": 110, "city-kaiba": 220, "city-mai": 130, "city-mako": 100,
     "city-thug": 90, "city-roba": 160, "city-bonz": 80,
     "city-ghoul": 260, "city-seeker": 320,
+    "blimp-mai": 180, "blimp-joey": 200, "blimp-odion": 260, "blimp-kaiba": 320, "blimp-marik": 420,
   };
   const SHOP_PACKS = [
     { set: "Legend of Blue Eyes White Dragon", short: "Legend of Blue Eyes", price: 80, key: "weevil", gate: "Weevil" },
@@ -3354,6 +3421,9 @@
     "Blue-Eyes White Dragon": true,
     "Dark Magician": true,
     "Red-Eyes Black Dragon": true,
+    "Slifer the Sky Dragon": true,
+    "Obelisk the Tormentor": true,
+    "The Winged Dragon of Ra": true,
   };
   const DUEL_QUOTES = {
     yugi: "The heart of the cards is on my side.",
@@ -3415,9 +3485,10 @@
   let citySave = null;
   let cityRulesFromMap = false;
   let pendingCity = null;
+  let cityDeckReturn = "city";
 
   function defaultCity() {
-    return { version: 1, place: "clock", seenRules: false, deck: null, quiet: 0 };
+    return { version: 1, place: "clock", seenRules: false, deck: null, quiet: 0, blimpSeen: false, marikSeen: false, beaten: [], champion: false };
   }
 
   function cityDistrict(id) {
@@ -3460,6 +3531,21 @@
         if (deck.main.length) citySave.deck = deck;
       }
     }
+    citySave.blimpSeen = raw.blimpSeen === true;
+    citySave.marikSeen = raw.marikSeen === true;
+    const savedBeaten = [];
+    if (Array.isArray(raw.beaten)) {
+      raw.beaten.forEach((id) => {
+        if (typeof id === "string" && FINALS.some((row) => row.id === id) && savedBeaten.indexOf(id) < 0) savedBeaten.push(id);
+      });
+    }
+    const prefix = [];
+    for (let i = 0; i < FINALS.length; i++) {
+      if (savedBeaten.indexOf(FINALS[i].id) < 0) break;
+      prefix.push(FINALS[i].id);
+    }
+    citySave.beaten = prefix;
+    citySave.champion = prefix.length === FINALS.length;
   }
 
   function cityPlayerDeck() {
@@ -3499,6 +3585,80 @@
     saveProfile();
     refreshTitles(false);
     return true;
+  }
+
+  function finalsBeaten() {
+    if (!citySave || !Array.isArray(citySave.beaten)) return [];
+    const prefix = [];
+    for (let i = 0; i < FINALS.length; i++) {
+      if (citySave.beaten.indexOf(FINALS[i].id) < 0) break;
+      prefix.push(FINALS[i].id);
+    }
+    return prefix;
+  }
+
+  function isCityChampion() {
+    return !!(citySave && citySave.champion && finalsBeaten().length >= FINALS.length);
+  }
+
+  function nextFinalist() {
+    const beaten = finalsBeaten();
+    return FINALS[beaten.length] || null;
+  }
+
+  function finalsAccess(id) {
+    if (!finalsRevealed()) return "locked";
+    const idx = FINALS.findIndex((row) => row.id === id);
+    if (idx < 0) return "locked";
+    if (isCityChampion()) return "rematch";
+    if (idx < finalsBeaten().length) return "done";
+    const next = nextFinalist();
+    return next && next.id === id ? "next" : "locked";
+  }
+
+  function finalsSnapshot() {
+    const next = nextFinalist();
+    return {
+      ids: FINALS.map((row) => row.id),
+      rounds: FINALS.map((row) => ({ id: row.id, round: row.round, god: row.god || "" })),
+      beaten: finalsBeaten(),
+      next: next ? next.id : "",
+      champion: isCityChampion(),
+      open: finalsRevealed(),
+      gods: FINALS.filter((row) => row.god).map((row) => ({
+        id: row.id, god: row.god, owned: ownedCount(row.god),
+      })),
+    };
+  }
+
+  function recordFinalsWin(id) {
+    const row = FINALS.find((item) => item.id === id);
+    if (!row || !citySave) return { ok: false, line: "That duel is not on the blimp.", god: "", granted: false, becameChampion: false };
+    if (!finalsRevealed()) return { ok: false, line: "The blimp is still dark.", god: "", granted: false, becameChampion: false };
+    const access = finalsAccess(id);
+    if (access !== "next") {
+      return { ok: false, line: "Win the duel before this one.", god: row.god || "", granted: false, becameChampion: false };
+    }
+    if (!Array.isArray(citySave.beaten)) citySave.beaten = [];
+    citySave.beaten.push(id);
+    const becameChampion = citySave.beaten.length >= FINALS.length;
+    if (becameChampion) citySave.champion = true;
+    saveCity();
+    let granted = false;
+    let godLine = "";
+    if (row.god) {
+      if (ownedCount(row.god) <= 0) {
+        const fresh = grantCards([row.god]);
+        granted = fresh.indexOf(row.god) >= 0;
+        godLine = row.god + " joins your collection.";
+      } else godLine = row.god + " is already in your collection.";
+    }
+    refreshTitles(false);
+    const n = finalsBeaten().length;
+    let line = row.round + " clear · " + n + " / " + FINALS.length;
+    if (becameChampion) line = "Battle City Champion";
+    if (godLine) line += " · " + godLine;
+    return { ok: true, line: line, god: row.god || "", granted: granted, becameChampion: becameChampion };
   }
 
   function showCityRules(fromMap) {
@@ -3568,7 +3728,10 @@
     };
     saveCity();
     toast(deck.name + " will duel in Battle City.");
-    showCityMap();
+    const back = cityDeckReturn;
+    cityDeckReturn = "city";
+    if (back === "blimp" && finalsRevealed()) showBlimp();
+    else showCityMap();
   }
 
   function cityRelation(id) {
@@ -3594,7 +3757,8 @@
     if (oppHere) bits.push((locatorList().indexOf(here.id) >= 0 ? "Rematch " : "Beat ") + oppHere.name + (locatorList().indexOf(here.id) >= 0 ? "." : " for this locator card."));
     if (here.id === "park") bits.push("Bonz is in the graves.");
     bits.push("Street duels ante a card. Confirm the stake first.");
-    if (finalsRevealed()) bits.push("The KaibaCorp blimp is revealed. Finals coming soon.");
+    if (isCityChampion()) bits.push("You are the Battle City Champion. The blimp offers rematches.");
+    else if (finalsRevealed()) bits.push("The KaibaCorp blimp is open. Tap it for the finals.");
     else bits.push(count + " of " + LOCATOR_GOAL + " locator cards.");
     if (el.cityNote) el.cityNote.textContent = bits.join(" ");
     el.cityMap.innerHTML = "";
@@ -3633,10 +3797,11 @@
     const blimp = document.createElement("button");
     blimp.type = "button";
     const revealed = finalsRevealed();
-    blimp.className = "city-blimp " + (revealed ? "revealed" : "locked");
+    const champion = isCityChampion();
+    blimp.className = "city-blimp " + (champion ? "revealed champion" : revealed ? "revealed" : "locked");
     blimp.style.left = CITY_BLIMP.x + "%";
     blimp.style.top = CITY_BLIMP.y + "%";
-    blimp.setAttribute("aria-label", revealed ? "KaibaCorp blimp, finals coming soon" : "KaibaCorp blimp, still hidden");
+    blimp.setAttribute("aria-label", champion ? "KaibaCorp blimp, champion rematches" : revealed ? "KaibaCorp blimp, finals" : "KaibaCorp blimp, still hidden");
     const mark = document.createElement("span");
     mark.className = "mark";
     mark.setAttribute("aria-hidden", "true");
@@ -3647,15 +3812,12 @@
     blimpName.textContent = "KaibaCorp Blimp";
     const blimpSub = document.createElement("span");
     blimpSub.className = "sub";
-    blimpSub.textContent = revealed ? "Finals coming soon" : ("Locked · " + count + "/" + LOCATOR_GOAL + " locators");
+    blimpSub.textContent = champion ? "Champion · rematches" : revealed ? "Finals" : ("Locked · " + count + "/" + LOCATOR_GOAL + " locators");
     blimpCopy.appendChild(blimpName);
     blimpCopy.appendChild(blimpSub);
     blimp.appendChild(mark);
     blimp.appendChild(blimpCopy);
-    blimp.addEventListener("click", () => {
-      if (finalsRevealed()) toast("The finals are aboard the blimp. Finals coming soon.");
-      else toast("The blimp stays dark until you hold " + LOCATOR_GOAL + " locator cards.");
-    });
+    blimp.addEventListener("click", () => openBlimp());
     el.cityMap.appendChild(blimp);
     CITY_DISTRICTS.forEach((dist) => {
       const relation = cityRelation(dist.id);
@@ -3761,17 +3923,28 @@
   }
 
   function finishCityDuel(you, reason) {
+    const finals = !!(state && state.cityFinals);
     const id = (state && state.cityId) || (citySave && citySave.place) || "";
     const dist = cityDistrict(id);
     const points = awardMatchPoints(you);
     const anteLine = resolveCityAnte(you);
     const before = locatorList().length;
     let chipLine = "No locator card this duel.";
-    const featuredWin = !!(you && dist && state && state.cityFeatured && state.cityDuelist === dist.who);
-    if (featuredWin) {
+    let championStory = false;
+    const featuredWin = !finals && !!(you && dist && state && state.cityFeatured && state.cityDuelist === dist.who);
+    if (finals) {
+      chipLine = you ? "The bracket is unchanged." : "The bracket is waiting. This duel is still next.";
+      if (you && state && !state.rematch) {
+        const rec = recordFinalsWin(state.cityDuelist);
+        chipLine = rec.line || chipLine;
+        championStory = !!rec.becameChampion;
+      } else if (you && state && state.rematch) {
+        chipLine = "Rematch · the blimp bracket stays.";
+      }
+    } else if (featuredWin) {
       const fresh = awardLocator(dist.id);
       const n = locatorList().length;
-      if (fresh && n >= LOCATOR_GOAL) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · blimp revealed. Finals coming soon.";
+      if (fresh && n >= LOCATOR_GOAL) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · the blimp is open.";
       else if (fresh) chipLine = "Locator " + n + "/" + LOCATOR_GOAL + " · " + dist.name;
       else chipLine = "Locator already collected · " + before + "/" + LOCATOR_GOAL;
     } else if (state && state.cityHunter) {
@@ -3780,8 +3953,8 @@
       chipLine = "Bonz has no locator card.";
     }
     const quote = state && (you ? state.outroWin : state.outroLoss);
-    endPrimary = "city";
-    el.endTitle.textContent = you ? "Victory!" : "Defeat";
+    endPrimary = finals ? "blimp" : "city";
+    el.endTitle.textContent = you ? (championStory ? "Champion!" : "Victory!") : "Defeat";
     el.endMsg.textContent = reason + (quote ? " " + quote : "");
     el.endChips.hidden = !chipLine;
     el.endChips.textContent = chipLine;
@@ -3790,10 +3963,141 @@
     el.endAnte.hidden = !anteLine;
     el.endAnte.textContent = anteLine || "";
     el.btnAgain.hidden = false;
-    el.btnAgain.textContent = "Back to Domino";
+    el.btnAgain.textContent = finals ? "Back to the Blimp" : "Back to Domino";
     el.btnEndMenu.hidden = false;
     el.btnEndMenu.textContent = "Main Menu";
-    showScreen("end");
+    const done = () => showScreen("end");
+    if (championStory) playStory("blimp-champion", done);
+    else done();
+  }
+
+  function openBlimp() {
+    if (!finalsRevealed()) {
+      toast("The blimp stays dark until you hold " + LOCATOR_GOAL + " locator cards.");
+      return;
+    }
+    if (!citySave) citySave = defaultCity();
+    if (!citySave.blimpSeen) {
+      citySave.blimpSeen = true;
+      saveCity();
+      playStory("blimp-intro", () => showBlimp());
+      return;
+    }
+    showBlimp();
+  }
+
+  function showBlimp() {
+    if (!finalsRevealed()) {
+      openBlimp();
+      return;
+    }
+    renderBlimp();
+    showScreen("blimp");
+  }
+
+  function renderBlimp() {
+    const list = $("blimpList");
+    if (!list) return;
+    const deck = cityPlayerDeck();
+    const beaten = finalsBeaten();
+    const champ = isCityChampion();
+    const deckLine = $("blimpDeck");
+    if (deckLine) deckLine.textContent = deck ? deck.name : "Pick a deck";
+    const progress = $("blimpProgress");
+    if (progress) progress.textContent = champ ? "Champion" : (beaten.length + " / " + FINALS.length);
+    const note = $("blimpNote");
+    if (note) {
+      if (champ) note.textContent = "The bracket is yours. Rematch any finalist, including Marik. God cards you earned stay in your collection.";
+      else if (!deck) note.textContent = "Pick a deck, then take the bracket in order. No ante on the blimp. Ishizu is watching. Odion duels for her.";
+      else note.textContent = "Win in order. A loss retries that duel. Odion, Kaiba, and Marik award the Egyptian Gods. Ishizu is watching.";
+    }
+    list.innerHTML = "";
+    FINALS.forEach((row) => {
+      const src = CITY_ROSTER[row.id];
+      const access = finalsAccess(row.id);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "blimp-row " + (access === "next" ? "next" : access === "done" || access === "rematch" ? "done" : "locked");
+      btn.disabled = access === "locked" || access === "done";
+      btn.setAttribute("role", "listitem");
+      btn.dataset.id = row.id;
+      const img = document.createElement("img");
+      img.alt = "";
+      const art = src && cardDB[src.ace];
+      if (art) img.src = art.image;
+      const copy = document.createElement("span");
+      copy.className = "copy";
+      const nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = src ? src.name : row.id;
+      const sub = document.createElement("span");
+      sub.className = "sub";
+      const prize = row.god ? (" · " + (REWARD_SHORT[row.god] || row.god)) : "";
+      if (access === "rematch") sub.textContent = "Rematch" + prize;
+      else if (access === "done") sub.textContent = "Beaten" + prize;
+      else if (access === "next") sub.textContent = (row.god ? "Win · " + row.god : "Tap to duel") ;
+      else sub.textContent = "Locked" + prize;
+      const round = document.createElement("span");
+      round.className = "round";
+      round.textContent = row.round;
+      copy.appendChild(nm);
+      copy.appendChild(sub);
+      btn.appendChild(img);
+      btn.appendChild(copy);
+      btn.appendChild(round);
+      btn.addEventListener("click", () => startFinalsDuel(row.id));
+      list.appendChild(btn);
+    });
+  }
+
+  function startFinalsDuel(id) {
+    const access = finalsAccess(id);
+    if (access === "locked") {
+      toast("Win the duel before this one.");
+      return;
+    }
+    if (access === "done") {
+      toast("Rematches open after you win the bracket.");
+      return;
+    }
+    const src = CITY_ROSTER[id];
+    if (!src) return;
+    const deck = cityPlayerDeck();
+    if (!deck) {
+      toast("Pick a deck first.");
+      cityDeckReturn = "blimp";
+      openCityDecks();
+      return;
+    }
+    const custom = String(deck.id || "").indexOf("custom:") === 0 || savedDecks.some((d) => d.id === deck.id);
+    if (custom) {
+      const issues = issuesFor(deck.main, deck.extra);
+      if (issues.length) { toast(issues[0]); cityDeckReturn = "blimp"; openCityDecks(); return; }
+    }
+    const go = () => {
+      beginMatch(deck, id, {
+        rules: "city",
+        mode: "city",
+        field: null,
+        tourneyKey: id,
+        taunt: src.intro || "",
+        cityId: citySave && citySave.place || "",
+        arena: src.arena || "",
+        cityFeatured: false,
+        cityDuelist: id,
+        cityFinals: true,
+        rematch: access === "rematch",
+        outroWin: src.outroWin || "",
+        outroLoss: src.outroLoss || "",
+      });
+    };
+    if (id === "blimp-marik" && access === "next" && citySave && !citySave.marikSeen) {
+      citySave.marikSeen = true;
+      saveCity();
+      playStory("marik-pre", go);
+      return;
+    }
+    go();
   }
 
   function ownedCopies() {
@@ -4280,6 +4584,90 @@
     },
   };
 
+  function copyCityDeck(id) {
+    const src = CITY_ROSTER[id];
+    return src ? src.main.slice() : [];
+  }
+
+  (function addBlimpRoster() {
+    const mai = CITY_ROSTER["city-mai"];
+    const joey = CITY_ROSTER["city-joey"];
+    const kaibaMain = copyCityDeck("city-kaiba");
+    const drop = kaibaMain.indexOf("Lesser Dragon");
+    if (drop >= 0) kaibaMain[drop] = "Obelisk the Tormentor";
+    CITY_ROSTER["blimp-mai"] = {
+      id: "blimp-mai", name: "Mai", ace: mai.ace, arena: "mai",
+      home: "", featured: false, diff: 5, wager: mai.wager,
+      intro: "The blimp is my stage. The Harpies do not miss twice.",
+      outroWin: "Mai: \"Take the win. Marik is still above both of us.\"",
+      outroLoss: "Mai: \"Pretty cards. The bracket stays with me.\"",
+      main: mai.main.slice(), extra: (mai.extra || []).slice(),
+    };
+    CITY_ROSTER["blimp-joey"] = {
+      id: "blimp-joey", name: "Joey", ace: joey.ace, arena: "joey",
+      home: "", featured: false, diff: 5, wager: joey.wager,
+      intro: "No street, no ante. Just Red-Eyes and the bracket, pal.",
+      outroWin: "Joey: \"You got me. Kaiba is gonna hate this.\"",
+      outroLoss: "Joey: \"Time Wizard called it. Try the bracket again.\"",
+      main: joey.main.slice(), extra: (joey.extra || []).slice(),
+    };
+    CITY_ROSTER["blimp-odion"] = {
+      id: "blimp-odion", name: "Odion", ace: "Castle of Dark Illusions", arena: "odion",
+      home: "", featured: false, diff: 7, wager: "Castle of Dark Illusions",
+      intro: "Ishizu is watching. The tomb does not open because you asked.",
+      outroWin: "Odion: \"Slifer leaves with you. My sister will hear of this.\"",
+      outroLoss: "Odion: \"The traps hold. Ishizu expected this.\"",
+      main: cityPile([
+        ["Mystical Elf", 3], ["Giant Soldier of Stone", 3], ["Gemini Elf", 2],
+        ["La Jinn the Mystical Genie of the Lamp", 2], ["Sangan", 1], ["Man-Eater Bug", 2],
+        ["Magician of Faith", 2], ["Castle of Dark Illusions", 1], ["Summoned Skull", 1],
+        ["The Fiend Megacyber", 1],
+        ["Pot of Greed", 1], ["Monster Reborn", 1], ["Dark Hole", 1], ["Fissure", 1],
+        ["Raigeki", 1], ["Swords of Revealing Light", 1], ["Yami", 1], ["Malevolent Nuzzler", 1],
+        ["Mirror Force", 1], ["Trap Hole", 3], ["Call of the Haunted", 2], ["Magic Cylinder", 2],
+        ["Spellbinding Circle", 2], ["Gravity Bind", 2], ["Ceasefire", 1], ["Jar of Greed", 1],
+      ]),
+      extra: [],
+    };
+    CITY_ROSTER["blimp-kaiba"] = {
+      id: "blimp-kaiba", name: "Kaiba", ace: "Obelisk the Tormentor", arena: "kaiba",
+      home: "", featured: false, diff: 8, wager: "Obelisk the Tormentor",
+      intro: "This is my blimp. Obelisk ends anyone who reaches me.",
+      outroWin: "Kaiba: \"Take Obelisk. Marik is the only duel left that matters.\"",
+      outroLoss: "Kaiba: \"Obelisk stays. The final is not for you.\"",
+      main: kaibaMain,
+      extra: (CITY_ROSTER["city-kaiba"].extra || []).slice(),
+    };
+    CITY_ROSTER["blimp-marik"] = {
+      id: "blimp-marik", name: "Marik", ace: "The Winged Dragon of Ra", arena: "marik",
+      home: "", featured: false, diff: 9, wager: "The Winged Dragon of Ra",
+      intro: "I am Marik. The Winged Dragon of Ra answers this duel.",
+      outroWin: "Marik: \"Ra is yours. Do not pretend the card is tame.\"",
+      outroLoss: "Marik: \"The pharaoh's heir falls. Ra remains with me.\"",
+      main: cityPile([
+        ["The Winged Dragon of Ra", 1], ["Summoned Skull", 1],
+        ["La Jinn the Mystical Genie of the Lamp", 3], ["Gemini Elf", 2],
+        ["Dark Titan of Terror", 2], ["The Fiend Megacyber", 2], ["Cannon Soldier", 2],
+        ["Sangan", 1], ["Witch of the Black Forest", 1], ["Man-Eater Bug", 2],
+        ["Magician of Faith", 1], ["Cyber Jar", 1], ["Skull Servant", 2], ["The 13th Grave", 1],
+        ["Pot of Greed", 1], ["Monster Reborn", 1], ["Dark Hole", 1], ["Raigeki", 1],
+        ["Fissure", 1], ["Change of Heart", 1], ["Upstart Goblin", 2], ["Yami", 1],
+        ["Malevolent Nuzzler", 1],
+        ["Mirror Force", 1], ["Magic Cylinder", 1], ["Call of the Haunted", 1],
+        ["Trap Hole", 2], ["Ceasefire", 1], ["Spellbinding Circle", 1], ["Jar of Greed", 1],
+      ]),
+      extra: [],
+    };
+  })();
+
+  const FINALS = [
+    { id: "blimp-mai", round: "Quarterfinal", god: "" },
+    { id: "blimp-joey", round: "Quarterfinal", god: "" },
+    { id: "blimp-odion", round: "Semifinal", god: "Slifer the Sky Dragon" },
+    { id: "blimp-kaiba", round: "Semifinal", god: "Obelisk the Tormentor" },
+    { id: "blimp-marik", round: "Final", god: "The Winged Dragon of Ra" },
+  ];
+
   const RAW = {"Dark Magician":{"id":46986414,"type":"Normal Monster","race":"Spellcaster","attribute":"DARK","level":7,"atk":2500,"def":2100,"desc":"''The ultimate wizard in terms of attack and defense.''"},"Celtic Guardian":{"id":91152256,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":4,"atk":1400,"def":1200,"desc":"An elf who learned to wield a sword, he baffles enemies with lightning-swift attacks."},"Curse of Dragon":{"id":28279543,"type":"Normal Monster","race":"Dragon","attribute":"DARK","level":5,"atk":2000,"def":1500,"desc":"A wicked dragon that taps into dark forces to execute a powerful attack."},"Gaia The Fierce Knight":{"id":6368038,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":7,"atk":2300,"def":2100,"desc":"''A knight whose horse travels faster than the wind. His battle-charge is a force to be reckoned with.''"},"Beaver Warrior":{"id":32452818,"type":"Normal Monster","race":"Beast-Warrior","attribute":"EARTH","level":4,"atk":1200,"def":1500,"desc":"What this creature lacks in size it makes up for in defense when battling in the prairie."},"Silver Fang":{"id":90357090,"type":"Normal Monster","race":"Beast","attribute":"EARTH","level":3,"atk":1200,"def":800,"desc":"A snow wolf that's beautiful to the eye, but absolutely vicious in battle."},"Kuriboh":{"id":40640057,"type":"Effect Monster","race":"Fiend","attribute":"DARK","level":1,"atk":300,"def":200,"desc":"During damage calculation, if your opponent's monster attacks (Quick Effect): You can discard this card; you take no battle damage from that battle."},"Summoned Skull":{"id":70781052,"type":"Normal Monster","race":"Fiend","attribute":"DARK","level":6,"atk":2500,"def":1200,"desc":"A fiend with dark powers for confusing the enemy. Among the Fiend-Type monsters, this monster boasts considerable force.\n\n(This card is always treated as an \"Archfiend\" card.)"},"Feral Imp":{"id":41392891,"type":"Normal Monster","race":"Fiend","attribute":"DARK","level":4,"atk":1300,"def":1400,"desc":"A playful little fiend that lurks in the dark, waiting to attack an unwary enemy."},"Magical Hats":{"id":81210420,"type":"Trap Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"During your opponent's Battle Phase: Choose 2 Spell/Trap Cards from your Deck and 1 monster in your Main Monster Zone. Special Summon them as Normal Monsters (ATK 0/DEF 0) in face-down Defense Position, Set the chosen monster if it is face-up, and shuffle them on the field. The 2 cards chosen from your Deck are destroyed at the end of the Battle Phase, and cannot remain on the field except during this Battle Phase."},"Swords of Revealing Light":{"id":72302403,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"After this card's activation, it remains on the field, but you must destroy it during the End Phase of your opponent's 3rd turn. When this card is activated: If your opponent controls a face-down monster, flip all monsters they control face-up. While this card is face-up on the field, your opponent's monsters cannot declare an attack."},"Dark Hole":{"id":53129443,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Destroy all monsters on the field."},"Monster Reborn":{"id":83764719,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Target 1 monster in either GY; Special Summon it."},"Polymerization":{"id":24094653,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Fusion Summon 1 Fusion Monster from your Extra Deck, using monsters from your hand or field as Fusion Material."},"Gaia the Dragon Champion":{"id":66889139,"type":"Fusion Monster","race":"Dragon","attribute":"WIND","level":7,"atk":2600,"def":2100,"desc":"\"Gaia The Fierce Knight\" + \"Curse of Dragon\""},"Blue-Eyes White Dragon":{"id":89631139,"type":"Normal Monster","race":"Dragon","attribute":"LIGHT","level":8,"atk":3000,"def":2500,"desc":"This legendary dragon is a powerful engine of destruction. Virtually invincible, very few have faced this awesome creature and lived to tell the tale."},"Saggi the Dark Clown":{"id":66602787,"type":"Normal Monster","race":"Spellcaster","attribute":"DARK","level":3,"atk":600,"def":1500,"desc":"This clown appears from nowhere and executes very strange moves to avoid enemy attacks."},"Hitotsu-Me Giant":{"id":76184692,"type":"Normal Monster","race":"Beast-Warrior","attribute":"EARTH","level":4,"atk":1200,"def":1000,"desc":"A one-eyed behemoth with thick, powerful arms made for delivering punishing blows."},"Battle Ox":{"id":5053103,"type":"Normal Monster","race":"Beast-Warrior","attribute":"EARTH","level":4,"atk":1700,"def":1000,"desc":"A monster with tremendous power, it destroys enemies with a swing of its axe."},"La Jinn the Mystical Genie of the Lamp":{"id":97590747,"type":"Normal Monster","race":"Fiend","attribute":"DARK","level":4,"atk":1800,"def":1000,"desc":"A genie of the lamp that is at the beck and call of its master."},"Judge Man":{"id":30113682,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":6,"atk":2200,"def":1500,"desc":"This club-wielding warrior battles to the end and will never surrender."},"Rude Kaiser":{"id":26378150,"type":"Normal Monster","race":"Beast-Warrior","attribute":"EARTH","level":5,"atk":1800,"def":1600,"desc":"With an axe in each hand, this monster delivers heavy damage."},"Fissure":{"id":66788016,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Destroy the 1 face-up monster your opponent controls that has the lowest ATK (your choice, if tied)."},"Raigeki":{"id":12580477,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Destroy all monsters your opponent controls."},"Blue-Eyes Ultimate Dragon":{"id":23995346,"type":"Fusion Monster","race":"Dragon","attribute":"LIGHT","level":12,"atk":4500,"def":3800,"desc":"\"Blue-Eyes White Dragon\" + \"Blue-Eyes White Dragon\" + \"Blue-Eyes White Dragon\""},"Red-Eyes Black Dragon":{"id":74677422,"type":"Normal Monster","race":"Dragon","attribute":"DARK","level":7,"atk":2400,"def":2000,"desc":"''A ferocious dragon with a deadly attack.''"},"Baby Dragon":{"id":88819587,"type":"Normal Monster","race":"Dragon","attribute":"WIND","level":3,"atk":1200,"def":700,"desc":"Much more than just a child, this dragon is gifted with untapped power."},"Time Wizard":{"id":71625222,"type":"Effect Monster","race":"Spellcaster","attribute":"LIGHT","level":2,"atk":500,"def":400,"desc":"Once per turn: You can toss a coin and call it. If you call it right, destroy all monsters your opponent controls. If you call it wrong, destroy as many monsters you control as possible, and if you do, take damage equal to half the total ATK those destroyed monsters had while face-up on the field."},"Thousand Dragon":{"id":41462083,"type":"Fusion Monster","race":"Dragon","attribute":"WIND","level":7,"atk":2400,"def":2000,"desc":"\"Time Wizard\" + \"Baby Dragon\""},"Flame Swordsman":{"id":45231177,"type":"Fusion Monster","race":"Warrior","attribute":"FIRE","level":5,"atk":1800,"def":1600,"desc":"\"Flame Manipulator\" + \"Masaki the Legendary Swordsman\""},"Alligator's Sword":{"id":64428736,"type":"Normal Monster","race":"Beast","attribute":"EARTH","level":4,"atk":1500,"def":1200,"desc":"ey, dis mighty lissard man can swing his sword so fast, dat it's more dan da speed a sound!"},"Axe Raider":{"id":48305365,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":4,"atk":1700,"def":1150,"desc":"An axe-wielding monster of tremendous strength and agility."},"Swordsman of Landstar":{"id":3573512,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":3,"atk":500,"def":1200,"desc":"An amateur with a sword, this fairy warrior relies on its mysterious powers."},"Panther Warrior":{"id":42035044,"type":"Effect Monster","race":"Beast-Warrior","attribute":"EARTH","level":4,"atk":2000,"def":1600,"desc":"This card cannot declare an attack unless you Tribute 1 monster."},"Shield & Sword":{"id":52097679,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Switch the original ATK and DEF of all face-up monsters currently on the field, until the end of this turn."},"Flame Manipulator":{"id":34460851,"type":"Normal Monster","race":"Spellcaster","attribute":"FIRE","level":3,"atk":900,"def":1000,"desc":"This Spellcaster attacks enemies with fire-related spells such as \"Sea of Flames\" and \"Wall of Fire\"."},"Masaki the Legendary Swordsman":{"id":44287299,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":4,"atk":1100,"def":1100,"desc":"Legendary swordmaster Masaki is a veteran of over 100 battles."},"Legendary Sword":{"id":61854111,"type":"Spell Card","race":"Equip","attribute":"","level":0,"atk":null,"def":null,"desc":"Equip only to a Warrior monster. It gains 300 ATK/DEF."},"Black Pendant":{"id":65169794,"type":"Spell Card","race":"Equip","attribute":"","level":0,"atk":null,"def":null,"desc":"The equipped monster gains 500 ATK. When this card is sent from the field to the Graveyard: Inflict 500 damage to your opponent."},"Book of Secret Arts":{"id":91595718,"type":"Spell Card","race":"Equip","attribute":"","level":0,"atk":null,"def":null,"desc":"A Spellcaster-Type monster equipped with this card increases its ATK and DEF by 300 points."},"Dragon Treasure":{"id":1435851,"type":"Spell Card","race":"Equip","attribute":"","level":0,"atk":null,"def":null,"desc":"A Dragon-Type monster equipped with this card increases its ATK and DEF by 300 points."},"Horn of the Unicorn":{"id":64047146,"type":"Spell Card","race":"Equip","attribute":"","level":0,"atk":null,"def":null,"desc":"The equipped monster gains 700 ATK and DEF. When this card is sent from the field to the Graveyard: Return it to the top of the Deck."},"Mystical Elf":{"id":15025844,"type":"Normal Monster","race":"Spellcaster","attribute":"LIGHT","level":4,"atk":800,"def":2000,"desc":"A delicate elf that lacks offense, but has a terrific defense backed by mystical power."},"Giant Soldier of Stone":{"id":13039848,"type":"Normal Monster","race":"Rock","attribute":"EARTH","level":3,"atk":1300,"def":2000,"desc":"A giant warrior made of stone. A punch from this creature has earth-shaking results."},"Winged Dragon, Guardian of the Fortress #1":{"id":87796900,"type":"Normal Monster","race":"Dragon","attribute":"WIND","level":4,"atk":1400,"def":1200,"desc":"A dragon commonly found guarding mountain fortresses. Its signature attack is a sweeping dive from out of the blue."},"Mammoth Graveyard":{"id":40374923,"type":"Normal Monster","race":"Dinosaur","attribute":"EARTH","level":3,"atk":1200,"def":800,"desc":"A mammoth that protects the graves of its pack and is absolutely merciless when facing grave-robbers."},"Neo the Magic Swordsman":{"id":50930991,"type":"Normal Monster","race":"Spellcaster","attribute":"LIGHT","level":4,"atk":1700,"def":1000,"desc":"A dimensional drifter who not only practices sorcery, but is also a sword and martial arts master."},"Trap Hole":{"id":4206964,"type":"Trap Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"When your opponent Normal or Flip Summons 1 monster with 1000 or more ATK: Target that monster; destroy that target."},"Pot of Greed":{"id":55144522,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Draw 2 cards."},"Mirror Force":{"id":44095762,"type":"Trap Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"When an opponent's monster declares an attack: Destroy all your opponent's Attack Position monsters."},"Change of Heart":{"id":4031928,"type":"Spell Card","race":"Normal","attribute":"","level":0,"atk":null,"def":null,"desc":"Target 1 monster your opponent controls; take control of it until the End Phase."},"Swordstalker":{"id":50005633,"type":"Normal Monster","race":"Warrior","attribute":"DARK","level":6,"atk":2000,"def":1600,"desc":"A monster formed by the vengeful souls of those who passed away in battle."},"Lesser Dragon":{"id":55444629,"type":"Normal Monster","race":"Dragon","attribute":"WIND","level":4,"atk":1200,"def":1000,"desc":"A minor dragon incapable of breathing fire."},"Koumori Dragon":{"id":67724379,"type":"Normal Monster","race":"Dragon","attribute":"DARK","level":4,"atk":1500,"def":1200,"desc":"A vicious, fire-breathing dragon whose wicked flame corrupts the souls of its victims."},"Mystic Horseman":{"id":68516705,"type":"Normal Monster","race":"Beast","attribute":"EARTH","level":4,"atk":1300,"def":1550,"desc":"Half man and half horse, this monster is known for its extreme speed."},"Dark Titan of Terror":{"id":89494469,"type":"Normal Monster","race":"Fiend","attribute":"DARK","level":4,"atk":1300,"def":1100,"desc":"A fiend said to dwell in the world of dreams, it attacks enemies in their sleep."},"Uraby":{"id":1784619,"type":"Normal Monster","race":"Dinosaur","attribute":"EARTH","level":4,"atk":1500,"def":800,"desc":"Fast on its feet, this dinosaur rips enemies to shreds with its sharp claws."},"Rabid Horseman":{"id":94905343,"type":"Fusion Monster","race":"Beast-Warrior","attribute":"EARTH","level":6,"atk":2000,"def":1700,"desc":"\"Battle Ox\" + \"Mystic Horseman\""},"Armored Lizard":{"id":15480588,"type":"Normal Monster","race":"Reptile","attribute":"EARTH","level":4,"atk":1500,"def":1200,"desc":"A lizard with a very tough hide and a vicious bite."},"Kojikocy":{"id":1184620,"type":"Normal Monster","race":"Warrior","attribute":"EARTH","level":4,"atk":1500,"def":1200,"desc":"A man-hunter with powerful arms that can crush boulders."},"Rock Ogre Grotto #1":{"id":68846917,"type":"Normal Monster","race":"Rock","attribute":"EARTH","level":3,"atk":800,"def":1200,"desc":"Protected by a solid body of rock, this monster throws a bone-shattering punch."}};
 
   let rulesMode = "classic";
@@ -4489,7 +4877,7 @@
   }
 
   function showScreen(name) {
-    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "city", "cityrules", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile", "challenges", "trade"].forEach((id) => {
+    ["menu", "decks", "customs", "builder", "vs", "howto", "duel", "island", "city", "cityrules", "blimp", "end", "unlock", "pack", "settings", "story", "shop", "binder", "rematch", "puzzle", "profile", "challenges", "trade"].forEach((id) => {
       const node = $(id);
       const on = id === name;
       node.hidden = !on;
@@ -9061,7 +9449,7 @@
     onSummonWindow(p, res.slot, res.monster.faceup ? "normal" : "set");
     render();
     const live = state && state.player.monsters[res.slot];
-    if (live && live.name === "The Winged Dragon of Ra") beginRaPay(state.player, live);
+    if (live && live.faceup && live.name === "The Winged Dragon of Ra") beginRaPay(state.player, live);
   }
 
   async function beginRaPay(owner, monster) {
@@ -9812,6 +10200,9 @@
   }
 
   function projectedStats(card) {
+    const godName = (card && card.name) || "";
+    if (godName === "Obelisk the Tormentor" || godName === "Slifer the Sky Dragon") return { atk: 4000, def: 4000 };
+    if (godName === "The Winged Dragon of Ra") return { atk: 3900, def: 3900 };
     const ref = card.ref || card;
     let atk = ref.atk || 0;
     let def = ref.def || 0;
@@ -9978,6 +10369,7 @@
   }
 
   function planTribute(ai, card) {
+    if (card && card.name === "The Winged Dragon of Ra" && (openingTurn() || ai.lp < 2000)) return null;
     const need = tributesNeeded(card);
     const idxs = [];
     ai.monsters.forEach((m, i) => { if (m) idxs.push(i); });
@@ -10011,12 +10403,16 @@
     let score = pwr.atk + (prof.style === "wall" ? pwr.def * 0.45 : pwr.def * 0.05);
     if (raceMatchesField(card.ref.race)) score += 120 + prof.diff * 10;
     if (prof.bias.indexOf(card.ref.race) >= 0) score += 140;
-    if (prof.style === "aggro" || prof.style === "beatdown" || prof.style === "mind") score += pwr.atk * 0.04;
+    if (prof.style === "aggro" || prof.style === "beatdown" || prof.style === "mind" || prof.style === "god") score += pwr.atk * 0.04;
     tributes.forEach((i) => { score -= tributeValue(ai.monsters[i]) * 0.22; });
     if (card.name === "Thousand-Eyes Idol" &&
         ai.hand.some((c) => c.name === "Polymerization") &&
         ai.monsters.some((m) => m && m.name === "Relinquished") &&
         ai.extra.some((c) => c.name === "Thousand-Eyes Restrict")) score += 8000;
+    if (isGodName(card.name)) {
+      if (card.name === "The Winged Dragon of Ra" && (openingTurn() || ai.lp < 2000)) score -= 20000;
+      else score += 8000;
+    }
     if (card.name === "Man-Eater Bug") {
       const threat = knownThreat(state.player).atk;
       if (threat >= 1500) score += 1100 + threat * 0.1;
@@ -10029,6 +10425,7 @@
 
   function chooseStance(ai, card) {
     const prof = aiProfile();
+    if (isGodName(card.name)) return { pos: "atk", faceup: true };
     const pwr = projectedStats(card);
     const oppAtk = knownThreat(state.player).atk;
     if (isFlipCard(card) && !aiSloppy()) return { pos: "def", faceup: false };
@@ -10046,7 +10443,7 @@
       if (pegasusEye()) eyeLine("Trap Hole will not stop this summon.");
       return { pos: "def", faceup: prof.style === "wall" ? false : pwr.def >= pwr.atk };
     }
-    if ((prof.style === "aggro" || prof.style === "beatdown") && pwr.atk + 150 >= pwr.def && !loses) {
+    if ((prof.style === "aggro" || prof.style === "beatdown" || prof.style === "god") && pwr.atk + 150 >= pwr.def && !loses) {
       return { pos: "atk", faceup: true };
     }
     if (pwr.def >= pwr.atk + 250 && (loses || prof.style === "wall")) {
@@ -10257,8 +10654,30 @@
       : " Sets a monster."));
     if (stance.faceup && stance.pos === "atk") tryTrapHole(ai, res.slot);
     if (!state || state.winner) return;
+    const summoned = ai.monsters[res.slot];
+    if (summoned && summoned.faceup && summoned.name === "The Winged Dragon of Ra" && summoned.raPower == null) {
+      await beginRaPay(ai, summoned);
+    }
+    if (!state || state.winner) return;
     if (ai.monsters[res.slot]) await aiGlance("ai", "m", res.slot);
     else await aiGlance();
+  }
+
+  async function aiGodPower(ai) {
+    if (!state || state.winner) return;
+    const idx = ai.monsters.findIndex((m) => m && m.faceup && m.name === "Obelisk the Tormentor" && m.obeliskSpent !== state.turnCount);
+    if (idx < 0) return;
+    const others = [];
+    ai.monsters.forEach((m, i) => { if (m && i !== idx) others.push(i); });
+    if (others.length < 2) return;
+    const foes = state.player.monsters.filter((m) => m && !isGod(m));
+    if (!foes.length) return;
+    const threat = knownThreat(state.player).atk;
+    if (!(foes.length >= 2 || threat >= 2500)) return;
+    await aiGlance("ai", "m", idx);
+    if (!state || state.winner) return;
+    obeliskFist(ai, idx);
+    await leavesDone();
   }
 
   async function aiEgotist(ai) {
@@ -10735,6 +11154,8 @@
       if (!still()) return;
       await aiSetBackrow(ai);
       if (!still()) return;
+      await aiGodPower(ai);
+      if (!still()) return;
       state.phase = "battle";
       state.spot = null;
       log(state.aiName + " enters the Battle Phase.");
@@ -11160,6 +11581,7 @@
       cityFeatured: !!opts.cityFeatured,
       cityHunter: !!opts.cityHunter,
       cityDuelist: opts.cityDuelist || "",
+      cityFinals: !!opts.cityFinals,
       copyExodia: !!opts.copyExodia,
       outroWin: opts.outroWin || "",
       outroLoss: opts.outroLoss || "",
@@ -13604,7 +14026,7 @@
     const cards = [takeCommon(), takeCommon()];
     cards.push(hot && Math.random() < 0.72 ? takeRare() : takeCommon());
     cards.push(takeRare());
-    const rewards = allowRewards && collection.unlocked ? REWARD_NAMES.filter((n) => cardDB[n]) : [];
+    const rewards = allowRewards && collection.unlocked ? EXODIA_NAMES.filter((n) => cardDB[n]) : [];
     let holoName = null;
     let holoRarity = "Ultra Rare";
     if (rewards.length && Math.random() < (hot ? 0.36 : 0.18)) {
@@ -13688,9 +14110,13 @@
   }
 
   function showUnlock() {
-    el.unlockLead.textContent = "Exodia wins if all five pieces are in your hand. The Gods need 3 Tributes in Classic rules. Added to your collection.";
+    const names = prize && Array.isArray(prize.unlockNames) && prize.unlockNames.length ? prize.unlockNames : REWARD_NAMES;
+    const godsLater = names.every((n) => GOD_NAMES.indexOf(n) < 0);
+    el.unlockLead.textContent = godsLater
+      ? "Exodia wins if all five pieces are in your hand. The Egyptian Gods are won aboard the Battle City blimp."
+      : "Exodia wins if all five pieces are in your hand. The Gods need 3 Tributes in Classic and Battle City. Added to your collection.";
     el.unlockGrid.innerHTML = "";
-    REWARD_NAMES.forEach((name) => {
+    names.forEach((name) => {
       const c = cardDB[name];
       const fig = document.createElement("figure");
       const isNew = ownedCount(name) > 0 && !cardSeen(name);
@@ -13937,12 +14363,13 @@
     { id: "seasoned", name: "Seasoned Duelist", need: "Win 10 duels", test: () => profile && profile.wins >= 10 },
     { id: "binder", name: "Binder Collector", need: "Own 30 different cards", test: () => ownedKinds() >= 30 },
     { id: "set", name: "Set Completer", need: "Complete any booster set", test: () => collectionProgress().complete > 0 },
-    { id: "heir", name: "Millennium Heir", need: "Unlock Exodia and the Gods", test: () => !!(collection && collection.unlocked) },
+    { id: "heir", name: "Millennium Heir", need: "Unlock Exodia and own the three Gods", test: () => !!(collection && collection.unlocked) && GOD_NAMES.every((n) => ownedCount(n) > 0) },
     { id: "steady", name: "Steady Hand", need: "Win with half your Life or more", test: () => profile && profile.cleanWins > 0 },
     { id: "shadow", name: "Shadow Game Winner", need: "Win a Shadow Game", test: () => profile && profile.shadowWins > 0 },
     { id: "trader", name: "Trader", need: "Complete 3 trades", test: () => profile && profile.trades >= 3 },
     { id: "weekstreak", name: "Weekly Streak", need: "Finish every weekly challenge, two weeks in a row", test: () => (profile && profile.challengeStreak >= 2) || (challengeSave && challengeSave.bestStreak >= 2) },
     { id: "locator", name: "Battle City Finalist", need: "Collect 6 locator cards", test: () => locatorList().length >= 6 },
+    { id: "citychamp", name: "Battle City Champion", need: "Win the blimp finals", test: () => isCityChampion() },
   ];
 
   function saveProfile() {
@@ -14073,6 +14500,7 @@
       ["Trades", String(profile.trades || 0)],
       ["Challenge streak", String(challengeSave ? (challengeSave.streak || 0) : (profile.challengeStreak || 0))],
       ["Locator cards", locatorList().length + " / " + LOCATOR_GOAL],
+      ["Battle City", isCityChampion() ? "Champion" : (finalsBeaten().length ? (finalsBeaten().length + " / " + FINALS.length) : (finalsRevealed() ? "Finals open" : "—"))],
     ];
     if (el.profileStats) {
       el.profileStats.innerHTML = "";
@@ -14305,8 +14733,44 @@
         kicker: "Champion",
         lines: [
           say("Pegasus", pegCard, "Well! The Eye blinked, the toons took a bow, and you are still standing. I despise how charming that is."),
-          say("Pegasus", pegCard, "The sealed cards are yours. Exodia, and three terribly dramatic gods. Try not to spend them all in one duel."),
+          say("Pegasus", pegCard, "Exodia is yours. The Egyptian Gods are not in this castle. Win Battle City if you want them."),
           sayPlayer(playerVoice("ending")),
+        ],
+      };
+    }
+    if (id === "blimp-intro") {
+      const deck = cityPlayerDeck();
+      const ace = (deck && deck.ace) || "Dark Magician";
+      return {
+        kicker: "The Blimp",
+        lines: [
+          say("Kaiba", "Blue-Eyes White Dragon", "Six locator cards. The blimp is no longer a rumor. Get aboard."),
+          say("Ishizu", "Obelisk the Tormentor", "Four duelists stand in front of my brother. The Egyptian Gods leave with the champion."),
+          { name: profileName(), card: ace, text: "Then I'll take the bracket one duel at a time." },
+        ],
+      };
+    }
+    if (id === "marik-pre") {
+      const deck = cityPlayerDeck();
+      const ace = (deck && deck.ace) || "Dark Magician";
+      return {
+        kicker: "Final",
+        lines: [
+          say("Marik", "The Winged Dragon of Ra", "I am Marik. The Winged Dragon of Ra answers only this duel."),
+          say("Marik", "The Winged Dragon of Ra", "Your locator cards bought you a seat. They will not buy you a way down."),
+          { name: profileName(), card: ace, text: "Then we settle it here." },
+        ],
+      };
+    }
+    if (id === "blimp-champion") {
+      const deck = cityPlayerDeck();
+      const ace = (deck && deck.ace) || "The Winged Dragon of Ra";
+      return {
+        kicker: "Champion",
+        lines: [
+          say("Kaiba", "Obelisk the Tormentor", "The bracket is finished. Don't let it go to your head."),
+          say("Marik", "The Winged Dragon of Ra", "Ra is yours. Do not pretend the card is tame."),
+          { name: profileName(), card: ace, text: "Battle City is over. The gods are in my deck." },
         ],
       };
     }
@@ -15155,6 +15619,7 @@
     const main = deck.main.slice();
     const protect = {};
     if (deck.ace) protect[deck.ace] = true;
+    (deck.main || []).forEach((name) => { if (isGodName(name)) protect[name] = true; });
     packBonusFor(key || deck.id).forEach((name) => { protect[name] = true; });
     const tally = () => countNames(main);
     const monsters = () => main.map((name, i) => ({ name: name, i: i, card: cardDB[name] }))
@@ -15163,11 +15628,11 @@
     while (swaps < 4) {
       const mons = monsters();
       mons.sort((a, b) => (a.card.atk || 0) - (b.card.atk || 0) || a.i - b.i);
-      const weak = mons.find((row) => !protect[row.name] && (row.card.atk || 0) < 1700);
+      const weak = mons.find((row) => !protect[row.name] && !isGodName(row.name) && (row.card.atk || 0) < 1700);
       if (!weak) break;
       const have = tally();
       const strong = mons.slice().sort((a, b) => (b.card.atk || 0) - (a.card.atk || 0))
-        .find((row) => (row.card.atk || 0) >= 1800 && (have[row.name] || 0) < 3 && row.name !== weak.name);
+        .find((row) => !isGodName(row.name) && (row.card.atk || 0) >= 1800 && (have[row.name] || 0) < 3 && row.name !== weak.name);
       if (!strong) break;
       main[weak.i] = strong.name;
       swaps++;
@@ -15246,7 +15711,7 @@
       const firstUnlock = !collection.unlocked;
       if (firstUnlock) {
         collection.unlocked = true;
-        grantCards(REWARD_NAMES);
+        grantCards(EXODIA_NAMES);
       }
       markCleared("pegasus");
       const cards = pullPack(PACK_OF.pegasus, packBonusFor("pegasus"), !firstUnlock, false);
@@ -15254,6 +15719,7 @@
       prize = {
         cards: cards, index: 0, revealed: false, who: "Pegasus",
         setName: PACK_OF.pegasus, returnTo: "menu", firstUnlock: firstUnlock,
+        unlockNames: firstUnlock ? EXODIA_NAMES.slice() : null,
       };
       tourney = null;
       saveTourney();
@@ -16097,6 +16563,8 @@
   $("wagerNo").addEventListener("click", () => closeCityAnte());
   $("wagerWarn").addEventListener("click", (e) => { if (e.target === $("wagerWarn")) closeCityAnte(); });
   if ($("btnCitySide")) $("btnCitySide").addEventListener("click", () => startCityDuel("city-bonz"));
+  if ($("btnBlimpBack")) $("btnBlimpBack").addEventListener("click", () => showCityMap());
+  if ($("btnBlimpIntro")) $("btnBlimpIntro").addEventListener("click", () => playStory("blimp-intro", () => showBlimp()));
   $("shadowWarn").addEventListener("click", (e) => { if (e.target === $("shadowWarn")) closeShadowWarn(); });
   $("tradeSheetClose").addEventListener("click", () => closeTradeSheet());
   $("tradeOverlay").addEventListener("click", (e) => { if (e.target === $("tradeOverlay")) closeTradeSheet(); });
@@ -16351,6 +16819,7 @@
     if (endPrimary === "pack") { abandon(); openPrize(); return; }
     if (endPrimary === "map") { abandon(); showIsland(); return; }
     if (endPrimary === "city") { abandon(); showCityMap(); return; }
+    if (endPrimary === "blimp") { abandon(); showBlimp(); return; }
     if (endPrimary === "puzzle") {
       const puzzle = state && state.puzzle;
       abandon();
@@ -16473,6 +16942,20 @@
   }
   if (!CITY_ROSTER["city-ghoul"] || !CITY_ROSTER["city-ghoul"].hunter) console.error("Burn Rare Hunter is missing");
   if (!CITY_ROSTER["city-bonz"] || CITY_ROSTER["city-bonz"].featured) console.error("Bonz should not award a locator");
+  if (!FINALS || FINALS.length < 5) console.error("Battle City finals are incomplete");
+  const finalsSeen = {};
+  (FINALS || []).forEach((row, index) => {
+    if (!row || finalsSeen[row.id]) console.error("Duplicate finalist", row && row.id);
+    finalsSeen[row.id] = true;
+    const src = CITY_ROSTER[row.id];
+    if (!src || src.featured) console.error("Finalist missing", row && row.id);
+    if (row.god && GOD_NAMES.indexOf(row.god) < 0) console.error("Finalist god", row && row.id);
+    if (index === FINALS.length - 1 && (!src || src.main.indexOf("The Winged Dragon of Ra") < 0)) console.error("Marik has no Ra");
+  });
+  const kaibaBlimp = CITY_ROSTER["blimp-kaiba"];
+  if (!kaibaBlimp || kaibaBlimp.main.indexOf("Obelisk the Tormentor") < 0) console.error("Finals Kaiba has no Obelisk");
+  if (CITY_ROSTER["city-kaiba"].main.indexOf("Obelisk the Tormentor") >= 0) console.error("Street Kaiba should not play Obelisk");
+  if (!CITY_ROSTER["blimp-odion"] || CITY_ROSTER["blimp-odion"].main.indexOf("Slifer the Sky Dragon") >= 0) console.error("Odion should award Slifer, not play it");
   if (lifeStart("city") !== 4000 || lifeStart("classic") !== 8000 || lifeStart("dk") !== 2000) console.error("Life Point totals drifted");
   if (STARTER_NAMES.length !== 20 || STARTER_NAMES.some((n) => !cardDB[n])) console.error("Starter collection is incomplete");
   if (PUZZLES.length < 10) console.error("Puzzle pool is short", PUZZLES.length);
@@ -16587,6 +17070,9 @@
       revealed: finalsRevealed(),
       deck: cityPlayerDeck() ? cityPlayerDeck().name : "",
       quiet: citySave ? (citySave.quiet || 0) : 0,
+      champion: isCityChampion(),
+      finals: finalsBeaten(),
+      next: (nextFinalist() && nextFinalist().id) || "",
       districts: CITY_DISTRICTS.map((d) => ({ id: d.id, name: d.name, links: d.links.slice(), who: d.who })),
       duelists: Object.keys(CITY_ROSTER).map((id) => {
         const src = CITY_ROSTER[id];
@@ -16608,6 +17094,11 @@
     awardLocator: (id) => awardLocator(id),
     moveCity: (id) => moveCity(id),
     showCity: () => openBattleCity(),
+    finals: () => finalsSnapshot(),
+    finalsAccess: (id) => finalsAccess(id),
+    recordFinals: (id) => recordFinalsWin(id),
+    reloadCity: () => { loadCity(); return finalsSnapshot(); },
+    showBlimp: () => openBlimp(),
     dailyDeal: () => {
       const deal = dailyDeal();
       return deal ? { name: deal.name, price: deal.price, rarity: deal.rarity, foil: deal.foil || "", date: deal.date } : null;
