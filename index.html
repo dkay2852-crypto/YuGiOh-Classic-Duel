@@ -1088,10 +1088,28 @@
     .card {
       width: 100%; height: 100%; border-radius: 2px; object-fit: cover;
       border: 1px solid rgba(0,0,0,0.5); display: block;
+      background: #1a2744;
+    }
+    /* Phone browsers do not resolve height:100% on a flex item when the zone
+       centers its contents, so a face-down card (no intrinsic image size) shrank
+       to nothing. Pull the card out of that flex layout and size it from the zone. */
+    .zone > .card,
+    .zone > .foil-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
     }
     .card.facedown {
       background: repeating-linear-gradient(45deg, #1a2a4a 0 4px, #243860 4px 8px);
       border: 1px solid var(--gold-dim);
+    }
+    .card.named {
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 2px; overflow: hidden;
+      background: linear-gradient(180deg, #24365c, #121c30);
+      color: var(--cream); font-size: 0.42rem; line-height: 1.05; font-weight: 700;
     }
     .card.def { transform: rotate(90deg) scale(0.68); }
     .card.atk-glow { box-shadow: 0 0 0 2px #ff5252; }
@@ -5954,6 +5972,7 @@
   }
 
   function getStats(cardInst) {
+    if (!cardInst || !cardInst.ref) return { atk: 0, def: 0 };
     const absorbed = findAbsorb(cardInst);
     if (absorbed) return { atk: absorbed.absorbAtk || 0, def: absorbed.absorbDef || 0 };
     let atk = cardInst.ref.atk || 0;
@@ -6190,7 +6209,7 @@
   function anyFaceup(name) { return faceups(name).length > 0; }
 
   function effectiveRace(monster) {
-    if (!monster) return "";
+    if (!monster || !monster.ref) return "";
     const dna = faceups("DNA Surgery")[0];
     if (dna && dna.st.dna && monster.faceup && !isGod(monster)) return dna.st.dna;
     if (monster.faceup && !isGod(monster) && !monster.parasite && parasiteInsects(monster)) return "Insect";
@@ -7005,11 +7024,19 @@
       if (n < 0) return false;
       pick = pool[n];
     }
-    const gi = owner.gy.findIndex((c) => c.uid === pick.uid);
-    if (gi >= 0) owner.gy.splice(gi, 1);
-    const st = staySpell(owner, index);
     const slot = firstEmpty(owner.monsters);
-    const mon = monFrom(pick, { summonWay: "special", arrived: state.turnCount });
+    if (slot < 0) {
+      if (owner === state.player) toast("No monster zone.");
+      return false;
+    }
+    const gi = owner.gy.findIndex((c) => c.uid === pick.uid);
+    if (gi < 0) return false;
+    const st = staySpell(owner, index);
+    if (!st) return false;
+    owner.gy.splice(gi, 1);
+    const mon = monFrom(pick, {
+      summonWay: "special", arrived: state.turnCount, position: "atk", faceup: true,
+    });
     owner.monsters[slot] = mon;
     st.hauntUid = mon.uid;
     owner.summonedThisTurn.add(mon.uid);
@@ -8470,7 +8497,7 @@
       else if (st.name === "Spellbinding Circle") use = state.player.monsters.some((m) => m && m.faceup && !isGod(m));
       else if (st.name === "Dragon Capture Jar") use = state.player.monsters.some((m) => m && m.faceup && m.ref.race === "Dragon");
       else if (st.name === "Mirror Wall") use = state.player.monsters.some((m) => m && m.faceup && m.position === "atk") && ai.lp > 2500;
-      else if (st.name === "Call of the Haunted") use = ai.gy.some((c) => c.ref && c.ref.isMonster && (c.ref.atk || 0) >= (shadowMind() ? 1000 : 1400)) && firstEmpty(ai.monsters) >= 0;
+      else if (st.name === "Call of the Haunted") use = ai.gy.some((c) => c.ref && c.ref.isMonster && !isGodName(c.name) && (c.ref.atk || 0) >= (shadowMind() ? 1000 : 1400)) && firstEmpty(ai.monsters) >= 0;
       else if (st.name === "Royal Command") use = state.player.monsters.some((m) => m && !m.faceup);
       else if (st.name === "Light of Intervention") use = true;
       else if (st.name === "Messenger of Peace") use = false;
@@ -8814,7 +8841,7 @@
 
   function canEquip(name, monster) {
     const spec = EQUIP[name];
-    if (!spec || !monster || !monster.faceup || isGod(monster)) return false;
+    if (!spec || !monster || !monster.faceup || isGod(monster) || !monster.ref) return false;
     if (spec.race && monster.ref.race !== spec.race) return false;
     return true;
   }
@@ -9533,6 +9560,7 @@
 
   function openSheet(ctx) {
     const c = ctx.card;
+    if (c && !c.ref) c.ref = { name: c.name || "", desc: "", image: "", isMonster: false, isSpell: false, isTrap: false };
     const known = ctx.faceup;
     el.sheetName.textContent = known ? c.name : "Set Card";
     if (known && (c.ref.imageFull || c.ref.image)) {
@@ -9921,18 +9949,27 @@
       const card = zones[i];
       if (card) {
         z.dataset.name = card.name;
-        const face = card.faceup && (card.ref.image || card.token);
-        const node = document.createElement(face && card.ref.image ? "img" : "div");
-        const showFoil = !!(face && card.foil && FOIL_TIERS[card.foil]);
-        if (face && card.ref.image) {
-          node.className = "card" + (!showFoil && card.position === "def" ? " def" : "");
-          node.src = card.ref.image;
-          node.alt = card.name;
+        const ref = card.ref || null;
+        const faceup = !!card.faceup;
+        const def = card.position === "def";
+        const image = faceup && ref && ref.image ? ref.image : "";
+        const showFoil = !!(image && card.foil && FOIL_TIERS[card.foil]);
+        const node = document.createElement(image ? "img" : "div");
+        if (image) {
+          node.className = "card" + (!showFoil && def ? " def" : "");
+          node.src = image;
+          node.alt = card.name || "Monster";
           node.draggable = false;
-        } else if (face) {
-          node.className = "card";
-          node.textContent = card.token ? "Slime" : card.name;
-        } else node.className = "card facedown" + (card.position === "def" ? " def" : "");
+          node.addEventListener("error", () => {
+            const plate = document.createElement("div");
+            plate.className = "card named" + (!showFoil && def ? " def" : "");
+            plate.textContent = card.token ? "Slime" : (card.name || "Monster");
+            if (node.isConnected) node.replaceWith(plate);
+          });
+        } else if (faceup) {
+          node.className = "card named" + (def ? " def" : "");
+          node.textContent = card.token ? "Slime" : (card.name || "Monster");
+        } else node.className = "card facedown" + (def ? " def" : "");
         if (state.pending && state.pending.type === "attack" && owner === "player" && kind === "m" && card.uid === state.pending.uid) {
           node.classList.add("atk-glow");
         }
@@ -10079,7 +10116,7 @@
       d.className = "hc";
       d.dataset.name = c.name;
       d.dataset.index = String(i);
-      if (c.ref.image) {
+      if (c.ref && c.ref.image) {
         const img = document.createElement("img");
         img.src = c.ref.image;
         img.alt = c.name;
